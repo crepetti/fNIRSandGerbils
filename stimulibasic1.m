@@ -4,13 +4,6 @@
 %%TARGET WORDS)
 %%informational masking - unscrambled
 
-
-
-
-
-
-
-
 %%need to filter the energetic masking target words to not overlap in
 %%frequency band
 
