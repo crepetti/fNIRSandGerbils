@@ -3,7 +3,6 @@
 %%energetic masking control - scrambled (the MASKERS ARE SCRAMBLED NOT THE
 %%TARGET WORDS)
 %%informational masking - unscrambled
-
 %%need to filter the energetic masking target words to not overlap in
 %%frequency band
 
@@ -31,6 +30,7 @@ trial = 1;
 numtrials = 48;
 scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
 scramblingarray = randsample(scramblingarray, numtrials);
+all_word_order = [];
 
 % generate folder
 foldername = [subjectID,'_stimuli'];
@@ -64,7 +64,6 @@ while trial <= numtrials
         end
         duplicateindex = duplicateindex + 1;
     end
-
 
     % load the audio file and put into a larger array
     loadsoundindex = 1;
@@ -147,11 +146,12 @@ while trial <= numtrials
         audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
         disp(audiofilename)
     end
-
+all_word_order(trial,:) = final_word_order;
     trial = trial + 1;
 
 end
 
+save([foldername, '/', subjectID, '_alltrialwords.mat'], all_word_order');
 disp('All Done!')
 
 
@@ -177,7 +177,7 @@ disp('All Done!')
 
 
 
-plot(tVec, newMaskerSound);
+%plot(tVec, newMaskerSound);
 % save('Test Sound 11-15.mat','twoStreamsTest1','fs')
 
 
@@ -220,16 +220,6 @@ plot(tVec, newMaskerSound);
 %     soundWave(2, iStart:iEnd) = tempWord;
 % end
 
-
-
-%my stimuli?
-%so each word that we play occupies 16 frequenyc bands
-%each word is under 1-2 sec in length, but we'll need 20 sec total and 3-5
-%color words at least
-%the words will be in a consistent stream with overlap
-%the scrambled masker is the energetic, the unscrambled is the
-%informational
-%energetic =
 
 %[y, fs] = audioread('voc_demo_hipass.wav'); %this loads and reads the sound as a two-dimensional matrix
 %y being the data itself and fs being the given sampling rate
