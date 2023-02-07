@@ -13,6 +13,7 @@
 %%OK HERE'S ACTUAL CODE
 %%path
 addpath('C:\Users\benri\Nextcloud\Python\stim\bobmike\unprocessed\bob_all');
+addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\AuditoryToolbox');
 
 %%make a master stream/control stream and variables
 subjectID = input('Enter Subject ID Below: ', 's');
@@ -27,14 +28,17 @@ randcolor = randi([3 5],1,1);
 nummasker = numtotalwords - randcolor;
 overlap = 0.1;
 trial = 1;
-numtrials = 48;
+numtrials = 4;
 scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
 scramblingarray = randsample(scramblingarray, numtrials);
-all_word_order = [];
+all_word_order = strings(numtrials,numtotalwords);
 
 % generate folder
 foldername = [subjectID,'_stimuli'];
 if ~isfolder(foldername) % if this folder already exists, we will overwrite those stimuli
+    mkdir(foldername);
+elseif isfolder(foldername)
+    delete(foldername);
     mkdir(foldername);
 end
 
@@ -136,7 +140,7 @@ while trial <= numtrials
     % sound(newTargetFiltered, fs);
     % pause
     % sound(newMaskerFiltered,fs);
-    sound(newTargetFiltered + newMaskerFiltered, fs);
+    %sound(newTargetFiltered + newMaskerFiltered, fs);
     if scramblingindex == 0
         audiofilename = [foldername,'/',subjectID, '_unscrambled_trial_', num2str(trial), '.wav'];
         audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
@@ -146,12 +150,12 @@ while trial <= numtrials
         audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
         disp(audiofilename)
     end
-all_word_order(trial,:) = final_word_order;
+    all_word_order(trial,:) = final_word_order;
     trial = trial + 1;
 
 end
 
-save([foldername, '/', subjectID, '_alltrialwords.mat'], all_word_order');
+save([foldername, '/', subjectID, '_alltrialwords.mat'], 'all_word_order');
 disp('All Done!')
 
 
