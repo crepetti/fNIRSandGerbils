@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+
+# A datafile created by Gustav!
+# 
+# Experiment: fNIRSandGerbils
+# 
+# Vocoded speech in spatially-separated speech or noise maskers.
+# 
+# $comments
+# 
+
+S,Trial,Date,Block,Condition,masker,Soundfile,Ear,Times
+test2,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\unscrambled\10_unscrambled.wav,b,4.138,5.917,6.755
+test2,2,2023-03-01,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\scrambled\13_scrambled.wav,b,3.291,3.897,5.662,6.515

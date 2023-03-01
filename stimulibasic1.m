@@ -34,12 +34,17 @@ scramblingarray = randsample(scramblingarray, numtrials);
 all_word_order = strings(numtrials,numtotalwords);
 
 % generate folder
-foldername = [subjectID,'_stimuli'];
+foldername = ['stim/s_',subjectID];
 if ~isfolder(foldername) % if this folder already exists, we will overwrite those stimuli
     mkdir(foldername);
+    mkdir([foldername,'/scrambled']);
+    mkdir([foldername,'/unscrambled']);
+
 elseif isfolder(foldername)
     delete(foldername);
     mkdir(foldername);
+    mkdir([foldername,'/scrambled']);
+    mkdir([foldername,'/unscrambled']);
 end
 
 while trial <= numtrials
@@ -142,11 +147,13 @@ while trial <= numtrials
     % sound(newMaskerFiltered,fs);
     %sound(newTargetFiltered + newMaskerFiltered, fs);
     if scramblingindex == 0
-        audiofilename = [foldername,'/',subjectID, '_unscrambled_trial_', num2str(trial), '.wav'];
+        this_foldername = [foldername,'/unscrambled'];
+        audiofilename = [this_foldername,'/',num2str(trial),'_unscrambled', '.wav'];
         audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
         disp(audiofilename)
     elseif scramblingindex == 1
-        audiofilename = [foldername,'/',subjectID, '_scrambled_trial_', num2str(trial), '.wav'];
+        this_foldername = [foldername,'/scrambled'];
+        audiofilename = [this_foldername,'/',num2str(trial),'_scrambled', '.wav'];
         audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
         disp(audiofilename)
     end

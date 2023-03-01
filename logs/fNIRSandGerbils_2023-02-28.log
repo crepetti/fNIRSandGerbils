@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+
+# A log file for Gustav
+
+
+Experiment fNIRSandGerbils running subject test1 started at 16:16:50 on 2023-02-28
+
+  Block 1 of 12 started at 16:16:54; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test1 started at 16:27:27 on 2023-02-28
+
+  Block 1 of 12 started at 16:27:45; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 16:44:45 on 2023-02-28
+
+  Block 1 of 12 started at 16:44:59; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 16:53:39 on 2023-02-28
+
+  Block 1 of 12 started at 16:53:54; Condition: 2 ; masker = unscrambled

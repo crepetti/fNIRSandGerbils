@@ -1,0 +1,61 @@
+# -*- coding: utf-8 -*-
+
+# A log file for Gustav
+
+
+Experiment fNIRSandGerbils running subject test2 started at 08:47:13 on 2023-03-01
+
+  Block 1 of 12 started at 08:47:26; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 09:00:13 on 2023-03-01
+
+  Block 1 of 12 started at 09:00:29; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:25:46 on 2023-03-01
+
+  Block 1 of 12 started at 10:26:01; Condition: 2 ; masker = unscrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:44:49 on 2023-03-01
+
+  Block 1 of 12 started at 10:44:52; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:45:21 on 2023-03-01
+
+  Block 1 of 12 started at 10:45:24; Condition: 2 ; masker = unscrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:46:52 on 2023-03-01
+
+  Block 1 of 12 started at 10:46:56; Condition: 2 ; masker = unscrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:47:18 on 2023-03-01
+
+  Block 1 of 12 started at 10:47:24; Condition: 1 ; masker = scrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 12 ended at 10:48:05; Condition: 1 ; masker = scrambled
+
+  Block 2 of 12 started at 10:48:05; Condition: 2 ; masker = unscrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:52:53 on 2023-03-01
+
+  Block 1 of 12 started at 10:52:59; Condition: 2 ; masker = unscrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 12 ended at 10:53:13; Condition: 2 ; masker = unscrambled
+
+  Block 2 of 12 started at 10:53:13; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject test2 started at 10:55:49 on 2023-03-01
+
+  Block 1 of 12 started at 10:55:59; Condition: 2 ; masker = unscrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+
+Experiment fNIRSandGerbils running subject test2 started at 10:56:42 on 2023-03-01
+
+  Block 1 of 12 started at 10:56:47; Condition: 2 ; masker = unscrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 12 ended at 10:56:59; Condition: 2 ; masker = unscrambled
+
+  Block 2 of 12 started at 10:56:59; Condition: 1 ; masker = scrambled
+    Trial 2, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 2 of 12 ended at 10:57:14; Condition: 1 ; masker = scrambled
+
+  Block 3 of 12 started at 10:57:14; Condition: 2 ; masker = unscrambled
