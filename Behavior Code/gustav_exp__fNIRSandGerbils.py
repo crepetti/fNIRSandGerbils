@@ -469,7 +469,7 @@ def present_trial(exp):
                         responses.append(str(np.round(this_elapsed_ms/1000, 3)))
                         resp_percent.append(this_elapsed_ms / dur_ms * 100)
 
-                    progress = psylab.string.prog(this_elapsed_percent, width=30, char_done="=", spec_percent=resp_percent, spec_char="X")
+                    progress = psylab.string.prog(this_elapsed_percent, width=70, char_done="=", spec_percent=resp_percent, spec_char="X")
                     exp.interface.update_Prompt(progress, show=True, redraw=True)
                 exp.user.response = ",".join(responses)
 #                fid = open(exp.dataFile, 'a')

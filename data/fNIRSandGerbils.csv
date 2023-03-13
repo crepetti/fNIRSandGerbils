@@ -12,3 +12,15 @@
 S,Trial,Date,Block,Condition,masker,Soundfile,Ear,Times
 test2,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\unscrambled\10_unscrambled.wav,b,4.138,5.917,6.755
 test2,2,2023-03-01,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\scrambled\13_scrambled.wav,b,3.291,3.897,5.662,6.515
+test3,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,3.143,5.961
+test3,2,2023-03-01,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,2.07,5.17,6.21
+test3,3,2023-03-01,3,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\12_unscrambled.wav,b,3.491,6.007
+test3,1,2023-03-01,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,2.774,3.768,5.306
+test3,2,2023-03-01,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.914,5.929
+test3,3,2023-03-01,3,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\16_scrambled.wav,b,2.057,2.971,4.581,5.721
+test3,4,2023-03-01,4,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\12_unscrambled.wav,b,3.371,4.05,6.417
+test3,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.98,5.888
+test3,1,2023-03-03,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.984,5.904
+test3,2,2023-03-03,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,5.199,6.033
+test3,1,2023-03-03,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,1.833,5.276,6.047
+test3,2,2023-03-03,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,3.058,5.958

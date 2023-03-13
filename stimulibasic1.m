@@ -28,7 +28,9 @@ randcolor = randi([3 5],1,1);
 nummasker = numtotalwords - randcolor;
 overlap = 0.1;
 trial = 1;
+practicetrial = 1;
 numtrials = 48;
+numpracticetrials = 10;
 scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
 scramblingarray = randsample(scramblingarray, numtrials);
 all_word_order = strings(numtrials,numtotalwords);
@@ -39,14 +41,117 @@ if ~isfolder(foldername) % if this folder already exists, we will overwrite thos
     mkdir(foldername);
     mkdir([foldername,'/scrambled']);
     mkdir([foldername,'/unscrambled']);
-
+    mkdir([foldername,'/practice']);
 elseif isfolder(foldername)
     delete(foldername);
     mkdir(foldername);
     mkdir([foldername,'/scrambled']);
     mkdir([foldername,'/unscrambled']);
+    mkdir([foldername,'/practice']);
 end
 
+%% Generate Practice Trials
+while practicetrial <= numpracticetrials
+    masker_words_to_use = randsample(all_masker_words, nummasker, 'true'); %picking words from masker bucket and allowing multiple of the same word
+    color_words_to_use = randsample(all_color_words,randcolor,'true'); %same for color words
+
+    %mix them in a bucket and randomize them, sample without replacements showing up, but also randomizing so that color and masker words are mixed
+    num_words_total = length(masker_words_to_use) + length(color_words_to_use);
+    final_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
+
+    %check for two words in a row (if color, do color, if masker, do masker)
+    duplicateindex = 1;
+    duplicatecheck = strings(1,numtotalwords);
+    while duplicateindex <= numtotalwords - 1
+        duplicatecheck(duplicateindex) = final_word_order(duplicateindex);
+        if duplicatecheck(duplicateindex) == final_word_order(duplicateindex + 1)
+            if ismember(duplicatecheck(duplicateindex), all_color_words) == 1
+                final_word_order(duplicateindex) = randsample(all_color_words(all_color_words ~= duplicatecheck(duplicateindex)), 1, 'false');
+            elseif ismember(duplicatecheck(duplicateindex), all_masker_words) == 1
+                final_word_order(duplicateindex) = randsample(all_masker_words(all_masker_words ~= duplicatecheck(duplicateindex)), 1, 'false');
+            else
+                duplicateindex = duplicateindex + 0;
+            end
+        end
+        duplicateindex = duplicateindex + 1;
+    end
+
+    % load the audio file and put into a larger array
+    loadsoundindex = 1;
+    soundArray = strings(1, numtotalwords);
+    while loadsoundindex <= numtotalwords
+        word_filename = append(final_word_order(loadsoundindex), '_short.wav');
+        soundArray(loadsoundindex) = word_filename;
+        loadsoundindex = loadsoundindex + 1;
+    end
+
+    %overlap the sounds
+    tOnset = 0:wordlength-overlap:(wordlength-overlap)*numtotalwords;
+    tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
+    newtotalSound = zeros(length(tVec), 1);
+    newTargetSound = zeros(length(tVec), 1);
+    newMaskerSound = zeros(length(tVec), 1);
+    iOnset = 1;
+    while iOnset <= numtotalwords
+        [y,fs] = audioread(soundArray(iOnset));
+        curr_tOnset = tOnset(iOnset);
+        %adds to target sound array
+        if ismember(final_word_order(iOnset), all_color_words)
+            [~,start_index] = min(abs(tVec - curr_tOnset));
+            [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
+            newTargetSound(start_index:stop_index - 1) = newTargetSound(start_index:stop_index - 1) + y;
+            %adds to masker sound array
+        elseif ismember(final_word_order(iOnset), all_masker_words)
+            [~,start_index] = min(abs(tVec - curr_tOnset));
+            [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
+            newMaskerSound(start_index:stop_index - 1) = newMaskerSound(start_index:stop_index - 1) + y;
+        else
+            disp("uh oh!")
+        end
+        %find the closest values for onset time and onset time + 300 ms
+        %    [~,start_index] = min(abs(tVec - curr_tOnset));
+        %    [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
+        %    newtotalSound(start_index:stop_index - 1) = newtotalSound(start_index:stop_index - 1) + y;
+        iOnset = iOnset + 1;
+    end
+
+    newMaskerSound = newMaskerSound'; % transpose the array
+
+    %making the filter
+    numfilters = 16; %go between like 2 and 16
+    order = 9; %go between like 2 and 10
+    edges = logspace(log10(300), log10(10000), numfilters + 1);
+    newMaskerFiltered = zeros(1, length(tVec));
+    newTargetFiltered = zeros(1, length(tVec));
+
+    for iFilter = 1:numfilters
+        lowedge = edges(iFilter);
+        highedge = edges(iFilter + 1);
+        %n = order of filter (sharp/shallow)
+        %Wn = normalized frequency
+        [bLow, aLow] = butter(order, highedge/(fs/2), 'low');
+        [bHigh, aHigh] = butter(order, lowedge/(fs/2), 'high');
+        thisFilteredSound = zeros(1, length(tVec));
+        if mod(iFilter,2) == 1
+            thisFilteredSound = filter(bLow, aLow, newMaskerSound);
+            thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
+            newMaskerFiltered = newMaskerFiltered + thisFilteredSound;
+        elseif mod(iFilter,2) == 0
+            thisFilteredSound = filter(bLow, aLow, newTargetSound)';
+            thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
+            newTargetFiltered = newTargetFiltered + thisFilteredSound;
+        end
+    end
+
+    this_foldername = [foldername,'/practice'];
+    audiofilename = [this_foldername,'/',num2str(practicetrial),'_practice', '.wav'];
+    audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
+    disp(audiofilename)
+
+    practicetrial = practicetrial + 1;
+end
+
+%% Generate Experiment Trials
 while trial <= numtrials
     scramblingindex = scramblingarray(trial);
     %lets choose 15-17 masker words and 3-5 color words
@@ -85,7 +190,7 @@ while trial <= numtrials
 
     %overlap the sounds
     tOnset = 0:wordlength-overlap:(wordlength-overlap)*numtotalwords;
-    tVec = 0:1/fs:wordlength*numtotalwords; %1/fs = seconds per sample
+    tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
     newtotalSound = zeros(length(tVec), 1);
     newTargetSound = zeros(length(tVec), 1);
     newMaskerSound = zeros(length(tVec), 1);
@@ -103,6 +208,8 @@ while trial <= numtrials
             [~,start_index] = min(abs(tVec - curr_tOnset));
             [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
             newMaskerSound(start_index:stop_index - 1) = newMaskerSound(start_index:stop_index - 1) + y;
+        else
+            disp("uh oh!")
         end
         %find the closest values for onset time and onset time + 300 ms
         %    [~,start_index] = min(abs(tVec - curr_tOnset));
@@ -115,7 +222,7 @@ while trial <= numtrials
     if (scramblingindex == 1)
         newMaskerSound = scrambling(newMaskerSound, fs);
     end
-        newMaskerSound = newMaskerSound'; % transpose the array
+    newMaskerSound = newMaskerSound'; % transpose the array
 
     %making the filter
     numfilters = 16; %go between like 2 and 16
