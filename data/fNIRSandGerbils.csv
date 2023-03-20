@@ -1,26 +1,122 @@
-# -*- coding: utf-8 -*-
-
-# A datafile created by Gustav!
-# 
-# Experiment: fNIRSandGerbils
-# 
-# Vocoded speech in spatially-separated speech or noise maskers.
-# 
-# $comments
-# 
-
-S,Trial,Date,Block,Condition,masker,Soundfile,Ear,Times
-test2,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\unscrambled\10_unscrambled.wav,b,4.138,5.917,6.755
-test2,2,2023-03-01,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\scrambled\13_scrambled.wav,b,3.291,3.897,5.662,6.515
-test3,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,3.143,5.961
-test3,2,2023-03-01,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,2.07,5.17,6.21
-test3,3,2023-03-01,3,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\12_unscrambled.wav,b,3.491,6.007
-test3,1,2023-03-01,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,2.774,3.768,5.306
-test3,2,2023-03-01,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.914,5.929
-test3,3,2023-03-01,3,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\16_scrambled.wav,b,2.057,2.971,4.581,5.721
-test3,4,2023-03-01,4,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\12_unscrambled.wav,b,3.371,4.05,6.417
-test3,1,2023-03-01,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.98,5.888
-test3,1,2023-03-03,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.984,5.904
-test3,2,2023-03-03,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,5.199,6.033
-test3,1,2023-03-03,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,1.833,5.276,6.047
-test3,2,2023-03-03,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,3.058,5.958
+# -*- coding: utf-8 -*-,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+# A datafile created by Gustav!,,,,,,,,,,,,,
+# ,,,,,,,,,,,,,
+# Experiment: fNIRSandGerbils,,,,,,,,,,,,,
+# ,,,,,,,,,,,,,
+# Vocoded speech in spatially-separated speech or noise maskers.,,,,,,,,,,,,,
+# ,,,,,,,,,,,,,
+# $comments,,,,,,,,,,,,,
+# ,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+S,Trial,Date,Block,Condition,masker,Soundfile,Ear,Times,,,,,
+test2,1,3/1/2023,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\unscrambled\10_unscrambled.wav,b,4.138,5.917,6.755,,,
+test2,2,3/1/2023,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test2\scrambled\13_scrambled.wav,b,3.291,3.897,5.662,6.515,,
+test3,1,3/1/2023,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,3.143,5.961,,,,
+test3,2,3/1/2023,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,2.07,5.17,6.21,,,
+test3,3,3/1/2023,3,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\12_unscrambled.wav,b,3.491,6.007,,,,
+test3,1,3/1/2023,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,2.774,3.768,5.306,,,
+test3,2,3/1/2023,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.914,5.929,,,,
+test3,3,3/1/2023,3,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\16_scrambled.wav,b,2.057,2.971,4.581,5.721,,
+test3,4,3/1/2023,4,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\12_unscrambled.wav,b,3.371,4.05,6.417,,,
+test3,1,3/1/2023,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.98,5.888,,,,
+test3,1,3/3/2023,1,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,2.984,5.904,,,,
+test3,2,3/3/2023,2,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,5.199,6.033,,,,
+test3,1,3/3/2023,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\scrambled\10_scrambled.wav,b,1.833,5.276,6.047,,,
+test3,2,3/3/2023,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_test3\unscrambled\11_unscrambled.wav,b,3.058,5.958,,,,
+bentest,1,3/15/2023,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\13_scrambled.wav,b,2.83,3.151,4.551,,,
+bentest,2,3/15/2023,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\10_unscrambled.wav,b,2.801,4.371,5.091,,,
+bentest,3,3/15/2023,3,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\14_scrambled.wav,b,0.712,1.751,2.471,4.732,,
+bentest,4,3/15/2023,4,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\11_unscrambled.wav,b,2.7,4.98,5.36,6.27,,
+bentest,5,3/15/2023,5,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\15_scrambled.wav,b,1.091,2.751,5.876,,,
+bentest,6,3/15/2023,6,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\12_unscrambled.wav,b,1.362,2.381,3.381,5.301,,
+bentest,7,3/15/2023,7,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\20_scrambled.wav,b,0.692,1.162,1.952,2.971,5.361,
+bentest,8,3/15/2023,8,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\16_unscrambled.wav,b,1.652,2.272,3.072,4.162,5.972,
+bentest,9,3/15/2023,9,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\21_scrambled.wav,b,1.322,3.152,5.137,5.852,,
+bentest,10,3/15/2023,10,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\17_unscrambled.wav,b,1.621,2.341,3.781,5.191,,
+bentest,11,3/15/2023,11,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\22_scrambled.wav,b,2.45,3.551,4.571,6.131,,
+bentest,12,3/15/2023,12,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\18_unscrambled.wav,b,2.251,3.691,5.301,,,
+bentest,13,3/15/2023,13,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\23_scrambled.wav,b,1.161,2.831,5.991,,,
+bentest,14,3/15/2023,14,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\19_unscrambled.wav,b,1.742,4.372,,,,
+bentest,15,3/15/2023,15,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\26_scrambled.wav,b,1.071,1.541,2.571,3.831,,
+bentest,16,3/15/2023,16,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\1_unscrambled.wav,b,1.801,3.531,4.531,6.131,,
+bentest,17,3/15/2023,17,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\27_scrambled.wav,b,0.951,1.481,2.031,3.041,5.141,
+bentest,18,3/15/2023,18,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\24_unscrambled.wav,b,1.091,1.811,4.331,5.92,,
+bentest,19,3/15/2023,19,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\28_scrambled.wav,b,1.432,2.422,3.602,3.912,6.612,
+bentest,20,3/15/2023,20,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\25_unscrambled.wav,b,1.671,2.471,3.271,3.731,,
+bentest,21,3/15/2023,21,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\29_scrambled.wav,b,0.791,1.732,5.142,,,
+bentest,22,3/15/2023,22,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\2_unscrambled.wav,b,2.322,3.892,5.232,,,
+bentest,23,3/15/2023,23,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\33_scrambled.wav,b,1.33,2.751,3.831,5.771,,
+bentest,24,3/15/2023,24,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\30_unscrambled.wav,b,1.742,2.762,4.632,5.762,,
+bentest,25,3/15/2023,25,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\34_scrambled.wav,b,0.851,2.186,4.991,,,
+bentest,26,3/15/2023,26,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\31_unscrambled.wav,b,1.972,2.672,3.671,6.436,,
+bentest,27,3/15/2023,27,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\35_scrambled.wav,b,0.859,1.162,2.832,4.172,,
+bentest,28,3/15/2023,28,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\32_unscrambled.wav,b,2.41,3.03,5.98,,,
+bentest,29,3/15/2023,29,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\37_scrambled.wav,b,2.071,4.531,5.621,,,
+bentest,30,3/15/2023,30,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\36_unscrambled.wav,b,4.217,6.111,,,,
+bentest,31,3/15/2023,31,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\3_scrambled.wav,b,1.391,1.756,2.151,5.351,,
+bentest,32,3/15/2023,32,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\38_unscrambled.wav,b,3.26,4.28,4.916,,,
+bentest,33,3/15/2023,33,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\43_scrambled.wav,b,2.196,3.212,5.991,,,
+bentest,34,3/15/2023,34,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\39_unscrambled.wav,b,2.042,3.632,,,,
+bentest,35,3/15/2023,35,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\44_scrambled.wav,b,2.407,3.911,5.172,6.192,,
+bentest,36,3/15/2023,36,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\40_unscrambled.wav,b,2.376,3.231,4.8,,,
+bentest,37,3/15/2023,37,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\45_scrambled.wav,b,0.871,1.801,4.832,5.371,,
+bentest,38,3/15/2023,38,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\41_unscrambled.wav,b,1.551,2.031,4.411,6.218,,
+bentest,39,3/15/2023,39,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\47_scrambled.wav,b,1.803,2.023,2.822,4.41,5.923,
+bentest,40,3/15/2023,40,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\42_unscrambled.wav,b,3.481,4.112,5.192,,,
+bentest,41,3/15/2023,41,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\48_scrambled.wav,b,1.561,3.172,3.881,,,
+bentest,42,3/15/2023,42,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\46_unscrambled.wav,b,2.631,3.416,,,,
+bentest,43,3/15/2023,43,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\5_scrambled.wav,b,1.021,5.381,5.971,,,
+bentest,44,3/15/2023,44,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\4_unscrambled.wav,b,5.701,,,,,
+bentest,45,3/15/2023,45,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\8_scrambled.wav,b,2.871,3.812,5.411,6.181,,
+bentest,46,3/15/2023,46,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\6_unscrambled.wav,b,2.191,3.141,4.218,4.811,5.511,6.141
+bentest,47,3/15/2023,47,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\scrambled\9_scrambled.wav,b,2.272,4.151,5.178,6.117,,
+bentest,48,3/15/2023,48,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_bentest\unscrambled\7_unscrambled.wav,b,2.581,3.531,4.536,5.171,6.132,
+victoriatest,1,3/15/2023,1,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\12_scrambled.wav,b,1.441,4.161,4.78,4.981,5.041,6.606
+victoriatest,2,3/15/2023,2,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\10_unscrambled.wav,b,1.571,2.442,3.401,4.491,5.671,
+victoriatest,3,3/15/2023,3,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\14_scrambled.wav,b,1.111,1.911,3.911,,,
+victoriatest,4,3/15/2023,4,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\11_unscrambled.wav,b,0.754,2.148,2.995,3.912,4.747,
+victoriatest,5,3/15/2023,5,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\15_scrambled.wav,b,0.754,1.824,3.364,4.355,,
+victoriatest,6,3/15/2023,6,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\13_unscrambled.wav,b,0.986,2.449,3.827,5.973,,
+victoriatest,7,3/15/2023,7,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\16_scrambled.wav,b,0.93,1.611,2.294,4.449,,
+victoriatest,8,3/15/2023,8,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\17_unscrambled.wav,b,2.778,5.557,,,,
+victoriatest,9,3/15/2023,9,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\21_scrambled.wav,b,2.303,,,,,
+victoriatest,10,3/15/2023,10,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\18_unscrambled.wav,b,0.682,1.286,1.888,3.952,,
+victoriatest,11,3/15/2023,11,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\22_scrambled.wav,b,1.142,1.823,2.893,4.133,4.972,
+victoriatest,12,3/15/2023,12,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\19_unscrambled.wav,b,0.681,2.366,5.527,,,
+victoriatest,13,3/15/2023,13,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\26_scrambled.wav,b,0.908,1.668,2.503,,,
+victoriatest,14,3/15/2023,14,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\1_unscrambled.wav,b,1.219,1.992,4.474,,,
+victoriatest,15,3/15/2023,15,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\2_scrambled.wav,b,0.839,1.984,,,,
+victoriatest,16,3/15/2023,16,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\20_unscrambled.wav,b,0.523,2.603,4.384,,,
+victoriatest,17,3/15/2023,17,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\30_scrambled.wav,b,0.61,1.217,2.596,4.287,,
+victoriatest,18,3/15/2023,18,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\23_unscrambled.wav,b,1.068,3.384,5.165,,,
+victoriatest,19,3/15/2023,19,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\33_scrambled.wav,b,1.533,3.918,4.602,5.456,,
+victoriatest,20,3/15/2023,20,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\24_unscrambled.wav,b,4.399,5.082,6.306,,,
+victoriatest,21,3/15/2023,21,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\35_scrambled.wav,b,1.697,3.019,5.399,,,
+victoriatest,22,3/15/2023,22,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\25_unscrambled.wav,b,2.767,3.368,3.818,5.11,,
+victoriatest,23,3/15/2023,23,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\36_scrambled.wav,b,1.927,3.391,3.761,4.92,,
+victoriatest,24,3/15/2023,24,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\27_unscrambled.wav,b,0.823,1.347,3.58,4.337,,
+victoriatest,25,3/15/2023,25,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\39_scrambled.wav,b,1.305,4.078,5.457,,,
+victoriatest,26,3/15/2023,26,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\28_unscrambled.wav,b,0.671,2.608,3.756,,,
+victoriatest,27,3/15/2023,27,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\3_scrambled.wav,b,0.832,1.826,,,,
+victoriatest,28,3/15/2023,28,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\29_unscrambled.wav,b,0.751,1.9,2.893,3.812,4.963,
+victoriatest,29,3/15/2023,29,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\40_scrambled.wav,b,2.554,4.01,5.62,,,
+victoriatest,30,3/15/2023,30,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\31_unscrambled.wav,b,2.298,3.061,3.666,5.209,6.045,
+victoriatest,31,3/15/2023,31,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\41_scrambled.wav,b,0.831,1.28,5.287,,,
+victoriatest,32,3/15/2023,32,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\32_unscrambled.wav,b,1.066,1.76,3.223,,,
+victoriatest,33,3/15/2023,33,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\42_scrambled.wav,b,0.9,3.595,,,,
+victoriatest,34,3/15/2023,34,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\34_unscrambled.wav,b,0.529,1.917,2.987,4.453,,
+victoriatest,35,3/15/2023,35,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\44_scrambled.wav,b,1.148,1.597,2.048,,,
+victoriatest,36,3/15/2023,36,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\37_unscrambled.wav,b,1.291,2.277,5.728,,,
+victoriatest,37,3/15/2023,37,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\46_scrambled.wav,b,0.903,1.976,2.583,,,
+victoriatest,38,3/15/2023,38,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\38_unscrambled.wav,b,1.911,3.232,4.691,,,
+victoriatest,39,3/15/2023,39,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\47_scrambled.wav,b,1.365,1.891,3.507,4.503,,
+victoriatest,40,3/15/2023,40,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\43_unscrambled.wav,b,1.678,3.151,4.922,5.682,,
+victoriatest,41,3/15/2023,41,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\48_scrambled.wav,b,1.53,2.293,3.756,5.306,,
+victoriatest,42,3/15/2023,42,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\45_unscrambled.wav,b,1.137,2.688,4.302,4.917,,
+victoriatest,43,3/15/2023,43,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\4_scrambled.wav,b,1.517,2.345,2.946,4.315,,
+victoriatest,44,3/15/2023,44,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\6_unscrambled.wav,b,1.983,3.136,4.35,6.168,,
+victoriatest,45,3/15/2023,45,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\5_scrambled.wav,b,0.754,2.747,3.513,4.508,,
+victoriatest,46,3/15/2023,46,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\7_unscrambled.wav,b,1.616,2.686,3.848,,,
+victoriatest,47,3/15/2023,47,1,scrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\scrambled\8_scrambled.wav,b,1.922,3.933,4.785,,,
+victoriatest,48,3/15/2023,48,2,unscrambled,C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_victoriatest\unscrambled\9_unscrambled.wav,b,0.52,3.681,5.598,,,

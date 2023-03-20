@@ -24,8 +24,6 @@ all_words = ["bag", "card", "chairs", "desks", "glove", "hat", "pen", "shoe", "s
 numtotalwords = 30;
 wordlength = 0.30; %length of sound file
 fs = 44100;
-randcolor = randi([3 5],1,1);
-nummasker = numtotalwords - randcolor;
 overlap = 0.1;
 trial = 1;
 practicetrial = 1;
@@ -52,6 +50,9 @@ end
 
 %% Generate Practice Trials
 while practicetrial <= numpracticetrials
+    randcolor = randi([3 5],1,1);
+    nummasker = numtotalwords - randcolor;
+
     masker_words_to_use = randsample(all_masker_words, nummasker, 'true'); %picking words from masker bucket and allowing multiple of the same word
     color_words_to_use = randsample(all_color_words,randcolor,'true'); %same for color words
 
@@ -153,6 +154,9 @@ end
 
 %% Generate Experiment Trials
 while trial <= numtrials
+    randcolor = randi([3 5],1,1);
+    nummasker = numtotalwords - randcolor;
+
     scramblingindex = scramblingarray(trial);
     %lets choose 15-17 masker words and 3-5 color words
     masker_words_to_use = randsample(all_masker_words, nummasker, 'true'); %picking words from masker bucket and allowing multiple of the same word
@@ -165,7 +169,7 @@ while trial <= numtrials
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
-    while duplicateindex <= numtotalwords - 1
+    while duplicateindex <= numtotalwords - 2
         duplicatecheck(duplicateindex) = final_word_order(duplicateindex);
         if duplicatecheck(duplicateindex) == final_word_order(duplicateindex + 1)
             if ismember(duplicatecheck(duplicateindex), all_color_words) == 1
@@ -176,8 +180,50 @@ while trial <= numtrials
                 duplicateindex = duplicateindex + 0;
             end
         end
+        % make sure no color words are next to each other (if within two,
+        % switch it with someone else
+        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
+            possible_new_indices = 1:num_words_total;
+            possible_new_indices(possible_new_indices == duplicateindex) = [];
+            possible_new_indices(possible_new_indices == duplicateindex + 1) = []; 
+            possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
+            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];            
+
+            new_index = randsample(possible_new_indices,1);
+            old_word = final_word_order(new_index);
+            while ismember(old_word,all_color_words)
+                new_index = randsample(possible_new_indices,1);
+                old_word = final_word_order(new_index);
+            end
+            final_word_order(new_index) = final_word_order(duplicateindex);
+            final_word_order(duplicateindex) = old_word;
+        end
+        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 2), all_color_words)
+            possible_new_indices = 1:num_words_total;
+            possible_new_indices(possible_new_indices == duplicateindex) = [];
+            possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
+            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];            
+
+            new_index = randsample(possible_new_indices,1);
+            old_word = final_word_order(new_index);
+            while ismember(old_word,all_color_words)
+                new_index = randsample(possible_new_indices,1);
+                old_word = final_word_order(new_index);
+            end
+            final_word_order(new_index) = final_word_order(duplicateindex);
+            final_word_order(duplicateindex) = old_word;
+        end
         duplicateindex = duplicateindex + 1;
     end
+    % no color words in the last three words
+
+    for ilastcheck = num_words_total-3:num_words_total
+        if ismember(final_word_order(ilastcheck),all_color_words)
+                final_word_order(ilastcheck) = randsample(all_masker_words(all_masker_words ~= final_word_order(ilastcheck)), 1, 'false');
+        end
+    end
+    % make sure no color words are next to each other
 
     % load the audio file and put into a larger array
     loadsoundindex = 1;
@@ -269,7 +315,7 @@ while trial <= numtrials
 
 end
 
-save([foldername, '/', subjectID, '_alltrialwords.mat'], 'all_word_order');
+save([foldername, '/', subjectID, '_alltrialwords.mat'], 'all_word_order','tOnset');
 disp('All Done!')
 
 

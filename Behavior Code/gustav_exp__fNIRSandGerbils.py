@@ -230,8 +230,9 @@ def setup(exp):
     #    exp.var.order = ",".join([str(i) for i in np.flipud(np.tile(np.arange(len(exp.var.factorial['masker']))+1, 6))])
 
     order = np.arange(len(exp.var.factorial['masker']))+1
-    np.random.shuffle(order)
-    for i in range(6-1):
+    num_trials = int(48)
+    #np.random.shuffle(order)
+    for i in range(24-1):
         this = np.arange(len(exp.var.factorial['masker']))+1
         looking = True
         while looking:
