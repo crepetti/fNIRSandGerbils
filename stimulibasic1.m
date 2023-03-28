@@ -169,7 +169,7 @@ while trial <= numtrials
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
-    while duplicateindex <= numtotalwords - 2
+    while duplicateindex <= numtotalwords - 3
         duplicatecheck(duplicateindex) = final_word_order(duplicateindex);
         if duplicatecheck(duplicateindex) == final_word_order(duplicateindex + 1)
             if ismember(duplicatecheck(duplicateindex), all_color_words) == 1
@@ -185,9 +185,11 @@ while trial <= numtrials
         if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
             possible_new_indices = 1:num_words_total;
             possible_new_indices(possible_new_indices == duplicateindex) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 1) = []; 
+            possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
             possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
-            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];            
+            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex - 3) = [];              
 
             new_index = randsample(possible_new_indices,1);
             old_word = final_word_order(new_index);
@@ -202,8 +204,28 @@ while trial <= numtrials
             possible_new_indices = 1:num_words_total;
             possible_new_indices(possible_new_indices == duplicateindex) = [];
             possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
             possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
-            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];            
+            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex - 3) = [];              
+
+            new_index = randsample(possible_new_indices,1);
+            old_word = final_word_order(new_index);
+            while ismember(old_word,all_color_words)
+                new_index = randsample(possible_new_indices,1);
+                old_word = final_word_order(new_index);
+            end
+            final_word_order(new_index) = final_word_order(duplicateindex);
+            final_word_order(duplicateindex) = old_word;
+        end
+        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 3), all_color_words)
+            possible_new_indices = 1:num_words_total;
+            possible_new_indices(possible_new_indices == duplicateindex) = [];
+            possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
+            possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
+            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
+            possible_new_indices(possible_new_indices == duplicateindex - 3) = [];   
 
             new_index = randsample(possible_new_indices,1);
             old_word = final_word_order(new_index);

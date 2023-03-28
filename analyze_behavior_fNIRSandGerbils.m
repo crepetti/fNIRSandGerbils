@@ -23,6 +23,11 @@ for isubject = 1:size(curr_subject_ID,1)
     num_color_words = 0;
     num_nontarget_words = 0;
     subject_ID = strtrim(string(curr_subject_ID(isubject,:)));
+    numtotalwords = 30;
+    wordlength = 0.30; %length of sound file
+    fs = 44100;
+    overlap = 0.1;
+    tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
 
     %% Behavior processing
 
@@ -45,7 +50,8 @@ for isubject = 1:size(curr_subject_ID,1)
     hits_and_FAs = struct();
     all_color_times = struct();
     threshold_window_start = 0.2; % seconds
-    threshold_window_end = 2; % seconds
+    threshold_window_end = 0.6; % seconds
+    double_click_threshold = 0.05;
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct();
     color_words = string({'red','green','blue','white'});
@@ -61,10 +67,35 @@ for isubject = 1:size(curr_subject_ID,1)
         %% find the appropriate color times for this trial (NOT IN ORDER)
         all_words_this_trial = all_word_order(itrial,:);
         color_indices_this_trial = find(ismember(all_words_this_trial,color_words) == 1);
+        masker_indices_this_trial = find(~ismember(all_words_this_trial,color_words) == 1);
 
         current_target_color_times = tOnset(color_indices_this_trial);
+        current_masker_times = tOnset(masker_indices_this_trial);
 
         current_target_color_words = all_words_this_trial(color_indices_this_trial);
+
+
+        hit_windows = zeros(1,length(tVec));
+        FA_windows = zeros(1,length(tVec));
+        
+        % specify hit windows
+        for i = 1:length(current_target_color_times)
+            [~,start_index_hit_window] = min(abs(tVec - (current_target_color_times(i)+threshold_window_start)));
+            [~,end_index_hit_window] = min(abs(tVec - (current_target_color_times(i)+threshold_window_end)));
+
+            hit_windows(start_index_hit_window:end_index_hit_window) = 1;
+        end
+
+        % specify false alarm windows
+        for i = 1:length(current_masker_times)
+            [~,start_index_FA_window] = min(abs(tVec - (current_masker_times(i)+threshold_window_start)));
+            [~,end_index_FA_window] = min(abs(tVec - (current_masker_times(i)+threshold_window_end)));
+
+            FA_windows(start_index_FA_window:end_index_FA_window) = 1;
+        end
+
+        FA_windows(hit_windows == 1) = 0; % any time there is a hit window, there should not be an FA window 
+
 
         %% Calculate difference between each click and each target color time
         all_target_click_distances= [];
@@ -91,35 +122,54 @@ for isubject = 1:size(curr_subject_ID,1)
 
         % find first non nan value in each row (color word) in
         % all_click_distances
-        if ~isempty(all_target_click_distances)
-            response_by_target_color_word = [];
-            for irow = 1:size(all_target_click_distances,1)
-                current_row = all_target_click_distances(irow,:);
-                values = current_row(~isnan(current_row));
-                if isempty(values)
-                    response_by_target_color_word = [response_by_target_color_word, 0];
-                else
-                    response_by_target_color_word = [response_by_target_color_word, values(1)];
-                end
+%         if ~isempty(all_target_click_distances)
+%             response_by_target_color_word = [];
+%             for irow = 1:size(all_target_click_distances,1)
+%                 current_row = all_target_click_distances(irow,:);
+%                 values = current_row(~isnan(current_row));
+%                 if isempty(values)
+%                     response_by_target_color_word = [response_by_target_color_word, 0];
+%                 else
+%                     response_by_target_color_word = [response_by_target_color_word, values(1)];
+%                 end
+%             end
+% 
+%             by_subject_behavior_info(isubject).num_hits(itrial).value = sum( (threshold_window_start < response_by_target_color_word).*(response_by_target_color_word < threshold_window_end));
+%             by_subject_behavior_info(isubject).num_FAs(itrial).value = length(current_click_times) - sum( (threshold_window_start < response_by_target_color_word).*(response_by_target_color_word < threshold_window_end));
+%             by_subject_behavior_info(isubject).difference_score(itrial).value = length(current_click_times) - length(current_target_color_times);
+%         else
+%             by_subject_behavior_info(isubject).num_hits(itrial).value = 0;
+%             by_subject_behavior_info(isubject).num_FAs(itrial).value = 0;
+%         end
+
+        by_subject_behavior_info(isubject).num_hits(itrial).value = 0;
+        by_subject_behavior_info(isubject).num_FAs(itrial).value = 0;
+        for iclick = 1:length(current_click_times)
+            [~,current_click_index] = min(abs(tVec - current_click_times(iclick)));
+
+            if hit_windows(current_click_index) == 1
+                by_subject_behavior_info(isubject).num_hits(itrial).value = by_subject_behavior_info(isubject).num_hits(itrial).value + 1;
+            elseif FA_windows(current_click_index) == 1
+                by_subject_behavior_info(isubject).num_FAs(itrial).value = by_subject_behavior_info(isubject).num_FAs(itrial).value + 1;
             end
 
-            by_subject_behavior_info(isubject).num_hits(itrial).value = sum( (threshold_window_start < response_by_target_color_word).*(response_by_target_color_word < threshold_window_end));
-            by_subject_behavior_info(isubject).num_FAs(itrial).value = length(current_click_times) - sum( (threshold_window_start < response_by_target_color_word).*(response_by_target_color_word < threshold_window_end));
-            by_subject_behavior_info(isubject).difference_score(itrial).value = length(current_click_times) - length(current_target_color_times);
-
-            if by_subject_behavior_info(isubject).num_FAs(itrial).value < 0
-                by_subject_behavior_info(isubject).num_FAs(itrial).value = 0;
-            end
-        else
-            by_subject_behavior_info(isubject).num_hits(itrial).value = 0;
-            by_subject_behavior_info(isubject).num_FAs(itrial).value = 0;
         end
+
+        if (by_subject_behavior_info(isubject).num_FAs(itrial).value + by_subject_behavior_info(isubject).num_hits(itrial).value) > length(current_click_times)
+            disp("Uh Oh! More than the number of clicks!")
+        end
+
+        by_subject_behavior_info(isubject).difference_score(itrial).value = length(current_click_times) - length(current_target_color_times);
 
         by_subject_behavior_info(isubject).num_target_color_words(itrial).value = length(current_target_color_times);
         if by_subject_behavior_info(isubject).num_hits(itrial).value > by_subject_behavior_info(isubject).num_target_color_words(itrial).value
-            disp('Uh Oh!')
-            disp(by_subject_behavior_info(isubject).num_hits(itrial).value)
-            disp(by_subject_behavior_info(isubject).num_color_words(itrial).value)
+            disp('Uh Oh! Number of hits is greater than number of target words')
+        end
+
+        by_subject_behavior_info(isubject).num_masker_words(itrial).value = length(current_masker_times);
+
+        if by_subject_behavior_info(isubject).num_FAs(itrial).value > by_subject_behavior_info(isubject).num_masker_words(itrial).value
+            disp('Uh Oh! Number of FAs is greater than number of masker words')
         end
 
     end
