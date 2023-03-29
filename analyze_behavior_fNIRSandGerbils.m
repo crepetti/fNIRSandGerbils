@@ -1,9 +1,9 @@
 %% analyze_behavior_fNIRSandGerbils
 %% Author: Benjamin Richardson
 
-subject_ID = char('bentest','victoriatest');
+subject_ID = char('bentest','emayatest','victoriatest');
 
-curr_subject_ID = char('bentest','victoriatest');
+curr_subject_ID = char('bentest','emayatest');
 %% Load in Relevant files
 
 all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','Format','auto');
