@@ -182,61 +182,75 @@ while trial <= numtrials
         end
         % make sure no color words are next to each other (if within two,
         % switch it with someone else
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
-            possible_new_indices = 1:num_words_total;
-            possible_new_indices(possible_new_indices == duplicateindex) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
-            possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
-            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
-            possible_new_indices(possible_new_indices == duplicateindex - 3) = [];              
-
-            new_index = randsample(possible_new_indices,1);
-            old_word = final_word_order(new_index);
-            while ismember(old_word,all_color_words)
-                new_index = randsample(possible_new_indices,1);
-                old_word = final_word_order(new_index);
-            end
-            final_word_order(new_index) = final_word_order(duplicateindex);
-            final_word_order(duplicateindex) = old_word;
+         if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
+%             possible_new_indices = 1:num_words_total;
+%             possible_new_indices(possible_new_indices == duplicateindex) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 1) = [];            
+%             possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
+%             possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex - 3) = [];              
+% 
+%             new_index = randsample(possible_new_indices,1);
+%             old_word = final_word_order(new_index);
+%             while ismember(old_word,all_color_words)
+%                 new_index = randsample(possible_new_indices,1);
+%                 old_word = final_word_order(new_index);
+%             end
+%             final_word_order(new_index) = final_word_order(duplicateindex);
+            final_word_order(duplicateindex + 1) = randsample(all_masker_words,1,1);
         end
         if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 2), all_color_words)
-            possible_new_indices = 1:num_words_total;
-            possible_new_indices(possible_new_indices == duplicateindex) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
-            possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
-            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
-            possible_new_indices(possible_new_indices == duplicateindex - 3) = [];              
+%             possible_new_indices = 1:num_words_total;
+%             possible_new_indices(possible_new_indices == duplicateindex) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 1) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
+%             possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex - 3) = [];              
+% 
+%             new_index = randsample(possible_new_indices,1);
+%             old_word = final_word_order(new_index);
+%             while ismember(old_word,all_color_words)
+%                 new_index = randsample(possible_new_indices,1);
+%                 old_word = final_word_order(new_index);
+%             end
+%             final_word_order(new_index) = final_word_order(duplicateindex);
+%             final_word_order(duplicateindex) = old_word;
+            final_word_order(duplicateindex + 2) = randsample(all_masker_words,1,1);
 
-            new_index = randsample(possible_new_indices,1);
-            old_word = final_word_order(new_index);
-            while ismember(old_word,all_color_words)
-                new_index = randsample(possible_new_indices,1);
-                old_word = final_word_order(new_index);
-            end
-            final_word_order(new_index) = final_word_order(duplicateindex);
-            final_word_order(duplicateindex) = old_word;
         end
         if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 3), all_color_words)
-            possible_new_indices = 1:num_words_total;
-            possible_new_indices(possible_new_indices == duplicateindex) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
-            possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
-            possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
-            possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
-            possible_new_indices(possible_new_indices == duplicateindex - 3) = [];   
+%             possible_new_indices = 1:num_words_total;
+%             possible_new_indices(possible_new_indices == duplicateindex) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 1) = [];            
+%             possible_new_indices(possible_new_indices == duplicateindex + 2) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex + 3) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex - 1) = [];            
+%             possible_new_indices(possible_new_indices == duplicateindex - 2) = [];
+%             possible_new_indices(possible_new_indices == duplicateindex - 3) = [];   
+% 
+%             new_index = randsample(possible_new_indices,1);
+%             old_word = final_word_order(new_index);
+%             while ismember(old_word,all_color_words)
+%                 new_index = randsample(possible_new_indices,1);
+%                 old_word = final_word_order(new_index);
+%             end
+%             final_word_order(new_index) = final_word_order(duplicateindex);
+%             final_word_order(duplicateindex) = old_word;
+            final_word_order(duplicateindex + 3) = randsample(all_masker_words,1,1);
 
-            new_index = randsample(possible_new_indices,1);
-            old_word = final_word_order(new_index);
-            while ismember(old_word,all_color_words)
-                new_index = randsample(possible_new_indices,1);
-                old_word = final_word_order(new_index);
-            end
-            final_word_order(new_index) = final_word_order(duplicateindex);
-            final_word_order(duplicateindex) = old_word;
         end
         duplicateindex = duplicateindex + 1;
+        
+    end
+    % no color words in the first three words
+    for ifirstcheck = 1:3
+        if ismember(final_word_order(ifirstcheck),all_color_words)
+                final_word_order(ifirstcheck) = randsample(all_masker_words(all_masker_words ~= final_word_order(ifirstcheck)), 1, 'false');
+        end
     end
     % no color words in the last three words
 
@@ -245,7 +259,6 @@ while trial <= numtrials
                 final_word_order(ilastcheck) = randsample(all_masker_words(all_masker_words ~= final_word_order(ilastcheck)), 1, 'false');
         end
     end
-    % make sure no color words are next to each other
 
     % load the audio file and put into a larger array
     loadsoundindex = 1;
@@ -332,8 +345,14 @@ while trial <= numtrials
         audiowrite(audiofilename, newTargetFiltered + newMaskerFiltered, fs);
         disp(audiofilename)
     end
-    all_word_order(trial,:) = final_word_order;
-    trial = trial + 1;
+
+    num_color_words_this_trial = sum(ismember(final_word_order,all_color_words));
+    if num_color_words_this_trial < 3
+        trial = trial;
+    else
+        all_word_order(trial,:) = final_word_order;
+        trial = trial + 1;
+    end
 
 end
 
