@@ -12,8 +12,8 @@
 
 %%OK HERE'S ACTUAL CODE
 %%path
-addpath('C:\Users\benri\Nextcloud\Python\stim\bobmike\unprocessed\bob_all');
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\AuditoryToolbox');
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all');
+addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox');
 
 %%make a master stream/control stream and variables
 subjectID = input('Enter Subject ID Below: ', 's');
