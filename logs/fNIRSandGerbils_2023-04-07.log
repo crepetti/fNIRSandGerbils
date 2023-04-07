@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+
+# A log file for Gustav
+
+
+Experiment fNIRSandGerbils running subject boothtest started at 13:27:11 on 2023-04-07
+
+  Block 1 of 48 started at 13:28:34; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject boothtest started at 13:42:46 on 2023-04-07
+
+  Block 1 of 48 started at 13:43:03; Condition: 1 ; masker = scrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 48 ended at 13:43:19; Condition: 1 ; masker = scrambled
+
+  Block 2 of 48 started at 13:43:19; Condition: 2 ; masker = unscrambled
+
+Experiment fNIRSandGerbils running subject boothtest started at 13:46:33 on 2023-04-07
+
+  Block 1 of 48 started at 13:48:42; Condition: 1 ; masker = scrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 48 ended at 13:48:58; Condition: 1 ; masker = scrambled
+
+  Block 2 of 48 started at 13:48:58; Condition: 2 ; masker = unscrambled
+    Trial 2, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 2 of 48 ended at 13:49:26; Condition: 2 ; masker = unscrambled
+
+  Block 3 of 48 started at 13:49:26; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject boothtest started at 13:50:57 on 2023-04-07
+
+  Block 1 of 48 started at 13:52:42; Condition: 1 ; masker = scrambled
+
+Experiment fNIRSandGerbils running subject boothtest started at 13:56:47 on 2023-04-07
+
+  Block 1 of 48 started at 13:57:20; Condition: 1 ; masker = scrambled
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 48 ended at 13:57:35; Condition: 1 ; masker = scrambled
+
+  Block 2 of 48 started at 13:57:35; Condition: 2 ; masker = unscrambled
