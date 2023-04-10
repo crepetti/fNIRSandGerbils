@@ -1,9 +1,9 @@
 %% analyze_behavior_fNIRSandGerbils
 %% Author: Benjamin Richardson
 
-subject_ID = char('bentest','emayatest','victoriatest');
+subject_ID = char('bentest','emayatest','victoriatest','stest');
 
-curr_subject_ID = char('bentest','emayatest');
+curr_subject_ID = char('bentest','emayatest','stest');
 %% Load in Relevant files
 
 all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','Format','auto');
@@ -50,7 +50,7 @@ for isubject = 1:size(curr_subject_ID,1)
     hits_and_FAs = struct();
     all_color_times = struct();
     threshold_window_start = 0.2; % seconds
-    threshold_window_end = 0.6; % seconds
+    threshold_window_end = 0.7; % seconds
     double_click_threshold = 0.05;
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct();
@@ -296,6 +296,7 @@ end
 figure;
 all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2);
 all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2);
+all_difference_scores = cat(3,difference_scores_condition1,difference_scores_condition2);
 chance_rate = (1/25)*ones(length(curr_subject_ID),6,7);
 %all_hitrates = all_hitrates + 0.001;
 d_primes = norminv(all_hitrates) - norminv(all_FArates);
@@ -328,10 +329,18 @@ ylim([0,1])
 xticks(1:2)
 xticklabels({'scrambled','unscrambled'})
 
-figure;boxplot(squeeze(nanmean(all_hitrates,2))')
-ylabel('hit rate')
+figure;boxplot(squeeze(nanmean(d_primes,2)))
+ylabel('d prime')
 xlabel('Condition')
 ylim([0 1])
+xticks(1:2)
+xticklabels({'scrambled','unscrambled'})
+
+figure;
+boxplot(squeeze(nanmean(all_difference_scores,2)))
+ylabel('difference score')
+xlabel('Condition')
+ylim([-2 2])
 xticks(1:2)
 xticklabels({'scrambled','unscrambled'})
 
