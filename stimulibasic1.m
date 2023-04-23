@@ -268,7 +268,7 @@ while trial <= numtrials
     loadsoundindex = 1;
     soundArray = strings(1, numtotalwords);
     while loadsoundindex <= numtotalwords
-        word_filename = append(final_word_order(loadsoundindex), '_short.wav');
+        word_filename = append(final_word_order(loadsoundindex), '_long.wav');
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
     end
