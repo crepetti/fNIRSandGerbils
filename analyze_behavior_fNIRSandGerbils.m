@@ -50,7 +50,7 @@ for isubject = 1:size(curr_subject_ID,1)
     hits_and_FAs = struct();
     all_color_times = struct();
     threshold_window_start = 0.2; % seconds
-    threshold_window_end = 0.7; % seconds
+    threshold_window_end = 0.8; % seconds
     double_click_threshold = 0.05;
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct();
