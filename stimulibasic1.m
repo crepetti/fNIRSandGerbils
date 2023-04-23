@@ -12,7 +12,7 @@
 
 %%OK HERE'S ACTUAL CODE
 %%path
-addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all');
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all_long');
 addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox');
 
 %%make a master stream/control stream and variables
@@ -22,9 +22,9 @@ all_masker_words = ["bag", "card", "chairs", "desks", "glove", "hat", "pen", "sh
 all_color_words = ["blue", "green", "red", "white"];
 all_words = ["bag", "card", "chairs", "desks", "glove", "hat", "pen", "shoe", "sock", "spoons", "tables", "toy", "blue", "green", "red", "white"];
 numtotalwords = 30;
-wordlength = 0.30; %length of sound file
+wordlength = 0.50; %length of sound file
 fs = 44100;
-overlap = 0.1;
+overlap = 0.5/3;
 trial = 1;
 practicetrial = 1;
 numtrials = 48;
@@ -83,7 +83,7 @@ while practicetrial <= numpracticetrials
     loadsoundindex = 1;
     soundArray = strings(1, numtotalwords);
     while loadsoundindex <= numtotalwords
-        word_filename = append(final_word_order(loadsoundindex), '_short.wav');
+        word_filename = append(final_word_order(loadsoundindex), '_long.wav');
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
     end
