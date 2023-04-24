@@ -3,7 +3,7 @@
 
 subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2');
 
-curr_subject_ID = char('longtest1','longtest2');
+curr_subject_ID = char('longtest1',');
 %% Load in Relevant files
 
 all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','Format','auto');
