@@ -6,7 +6,7 @@ subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','long
 curr_subject_ID = char('longtest1','longtest2');
 %% Load in Relevant files
 
-all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','Format','auto');
+all_click_info = readtable('D:\Experiments\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','FileType','spreadsheet');%,'Format','auto');
 
 by_subject_behavior_info = struct();
 all_subjects_click_times = [];
@@ -14,7 +14,7 @@ all_subjects_click_times = [];
 
 for isubject = 1:size(curr_subject_ID,1)
     % load words for this subject
-    stim_info_filename = ['C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
+    stim_info_filename = ['D:\Experiments\fNIRSandGerbils\stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
     load(stim_info_filename) % loads all_word_order and tOnset
     
     by_subject_behavior_info(isubject).subject_ID = strtrim(curr_subject_ID(isubject,:));
@@ -40,7 +40,7 @@ for isubject = 1:size(curr_subject_ID,1)
     conditions = all_click_info.Condition(which_rows_this_subject);
     click_times = all_click_info(which_rows_this_subject,9:end); % will include NaNs! accounted for later
     soundfiles_by_trial = all_click_info.Soundfile(which_rows_this_subject);
-
+    
     %% Calculate hits, FA
     % Loop through each trial, and calculate hits, false alarms, correct
     % rejections, and misses
@@ -49,15 +49,20 @@ for isubject = 1:size(curr_subject_ID,1)
 
     hits_and_FAs = struct();
     all_color_times = struct();
-    threshold_window_start = 0.2; % seconds
-    threshold_window_end = 0.8; % seconds
+    threshold_window_start = 0; % seconds
+    threshold_window_end = 1; % seconds
     double_click_threshold = 0.05;
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct();
     color_words = string({'red','green','blue','white'});
     for itrial = 1:n_trials
-
-        current_click_times = table2array(click_times(itrial,:));
+        variable = string(soundfiles_by_trial{itrial, 1});
+        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(curr_subject_ID) + '\scrambled\');
+        variable = erase(variable, '_scrambled.wav');
+        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(curr_subject_ID) + '\unscrambled\');
+        variable = erase(variable,  '_unscrambled.wav');
+        variable = str2num(variable);
+        current_click_times = table2array(click_times(variable,:));
         %% throw out click times past trial onset
         %current_click_times(current_click_times > 15) = nan;
         current_click_times = current_click_times(~isnan(current_click_times));
@@ -194,8 +199,11 @@ end
 figure;
 p1 = histogram(all_nearest_click_distances,'BinWidth',0.05);
 xticks(tOnset - 1);
-p2 = xline(tOnset - 1);
-p3 = xline([0.2,0.6],'r','LineWidth',3);
+for i = 1:length(tOnset)
+p2 = xline(tOnset(i) - 1);
+end
+p3 = xline(threshold_window_start,'r','LineWidth',3);
+p3 = xline(threshold_window_end,'r','LineWidth',3);
 ylabel('Number of Clicks Total','FontSize',18)
 xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
 title('Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
