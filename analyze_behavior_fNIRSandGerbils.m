@@ -6,7 +6,7 @@ subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','long
 curr_subject_ID = char('longtest1','longtest2');
 %% Load in Relevant files
 
-all_click_info = readtable('D:\Experiments\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','FileType','spreadsheet');%,'Format','auto');
+all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','FileType','spreadsheet','Format','auto');
 
 by_subject_behavior_info = struct();
 all_subjects_click_times = [];
@@ -14,7 +14,7 @@ all_subjects_click_times = [];
 
 for isubject = 1:size(curr_subject_ID,1)
     % load words for this subject
-    stim_info_filename = ['D:\Experiments\fNIRSandGerbils\stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
+    stim_info_filename = ['C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
     load(stim_info_filename) % loads all_word_order and tOnset
     
     by_subject_behavior_info(isubject).subject_ID = strtrim(curr_subject_ID(isubject,:));
@@ -49,8 +49,8 @@ for isubject = 1:size(curr_subject_ID,1)
 
     hits_and_FAs = struct();
     all_color_times = struct();
-    threshold_window_start = 0; % seconds
-    threshold_window_end = 1; % seconds
+    threshold_window_start = 0.2; % seconds
+    threshold_window_end = 0.6; % seconds
     double_click_threshold = 0.05;
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct();
@@ -124,28 +124,6 @@ for isubject = 1:size(curr_subject_ID,1)
         end
 
         by_subject_behavior_info(isubject).condition(itrial).value = conditions(itrial);
-
-        % find first non nan value in each row (color word) in
-        % all_click_distances
-%         if ~isempty(all_target_click_distances)
-%             response_by_target_color_word = [];
-%             for irow = 1:size(all_target_click_distances,1)
-%                 current_row = all_target_click_distances(irow,:);
-%                 values = current_row(~isnan(current_row));
-%                 if isempty(values)
-%                     response_by_target_color_word = [response_by_target_color_word, 0];
-%                 else
-%                     response_by_target_color_word = [response_by_target_color_word, values(1)];
-%                 end
-%             end
-% 
-%             by_subject_behavior_info(isubject).num_hits(itrial).value = sum( (threshold_window_start < response_by_target_color_word).*(response_by_target_color_word < threshold_window_end));
-%             by_subject_behavior_info(isubject).num_FAs(itrial).value = length(current_click_times) - sum( (threshold_window_start < response_by_target_color_word).*(response_by_target_color_word < threshold_window_end));
-%             by_subject_behavior_info(isubject).difference_score(itrial).value = length(current_click_times) - length(current_target_color_times);
-%         else
-%             by_subject_behavior_info(isubject).num_hits(itrial).value = 0;
-%             by_subject_behavior_info(isubject).num_FAs(itrial).value = 0;
-%         end
 
         by_subject_behavior_info(isubject).num_hits(itrial).value = 0;
         by_subject_behavior_info(isubject).num_FAs(itrial).value = 0;
