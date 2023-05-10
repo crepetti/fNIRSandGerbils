@@ -1,7 +1,7 @@
 %% analyze_behavior_fNIRSandGerbils
 %% Author: Benjamin Richardson
 
-subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2');
+subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata');
 
 curr_subject_ID = char('longtest1','longtest2');
 %% Load in Relevant files
@@ -18,13 +18,9 @@ for isubject = 1:size(curr_subject_ID,1)
     load(stim_info_filename) % loads all_word_order and tOnset
     
     by_subject_behavior_info(isubject).subject_ID = strtrim(curr_subject_ID(isubject,:));
-    num_hits = 0;
-    num_FAs = 0;
-    num_color_words = 0;
-    num_nontarget_words = 0;
     subject_ID = strtrim(string(curr_subject_ID(isubject,:)));
     numtotalwords = 30;
-    wordlength = 0.30; %length of sound file
+    wordlength = 0.50; %length of sound file
     fs = 44100;
     overlap = 0.1;
     tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
@@ -50,7 +46,7 @@ for isubject = 1:size(curr_subject_ID,1)
     hits_and_FAs = struct();
     all_color_times = struct();
     threshold_window_start = 0.2; % seconds
-    threshold_window_end = 0.6; % seconds
+    threshold_window_end = (4/3)*wordlength; % seconds
     double_click_threshold = 0.05;
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct();
@@ -265,14 +261,14 @@ for isubject = 1:size(curr_subject_ID,1)
         this_condition = by_subject_behavior_info(isubject).condition(itrial).value;
         if this_condition == 1
             ionset1 = ionset1 + 1;
-            hit_rates_condition1(isubject,ionset1) =   by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value;
-            FA_rates_condition1(isubject,ionset1) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value;
+            hit_rates_condition1(isubject,ionset1) =   by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
+            FA_rates_condition1(isubject,ionset1) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(length(tOnset) - by_subject_behavior_info(isubject).num_target_color_words(itrial).value); % num subjects x num presentations
             difference_scores_condition1(isubject,ionset1) = by_subject_behavior_info(isubject).difference_score(itrial).value;
         elseif this_condition == 2
             ionset2 = ionset2 + 1;
 
-            hit_rates_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value;
-            FA_rates_condition2(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value;
+            hit_rates_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
+            FA_rates_condition2(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(length(tOnset) - by_subject_behavior_info(isubject).num_target_color_words(itrial).value); % num subjects x num presentations
             difference_scores_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).difference_score(itrial).value;
 
         end
@@ -280,12 +276,12 @@ for isubject = 1:size(curr_subject_ID,1)
     end
 end
 figure;
-all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2);
-all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2);
+all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2); % num subjects x num presentations x num conditions
+all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2); % num subjects x num presentations x num conditions
 all_difference_scores = cat(3,difference_scores_condition1,difference_scores_condition2);
 chance_rate = (1/25)*ones(length(curr_subject_ID),6,7);
 %all_hitrates = all_hitrates + 0.001;
-d_primes = norminv(all_hitrates) - norminv(all_FArates);
+d_primes = norminv(all_hitrates) - norminv(all_FArates); % num subjects x num presentations x num conditions
 % find subjects with d_primes of Inf or -Inf (to exclude)
 
 d_primes(d_primes == Inf) = nan;
@@ -295,30 +291,30 @@ d_primes(d_primes < 0) = nan;
 
 all_hitrates(all_hitrates == 0) = nan;
 all_FArates(all_FArates == 0) = nan;
-plot(1:2,squeeze(nanmean(all_hitrates,2)),'-o');
+plot(1:2,squeeze(nanmean(all_hitrates,2))','-o');
 title('hit rates')
 ylim([0 1])
 xticks(1:2)
 xticklabels({'scrambled','unscrambled'})
 
 figure;
-plot(1:2,squeeze(nanmean(all_FArates,2)),'-o');
+plot(1:2,squeeze(nanmean(all_FArates,2))','-o');
 title('FA rates')
 ylim([0 1])
 xticks(1:2)
 xticklabels({'scrambled','unscrambled'})
 
 figure;
-plot(1:2,squeeze(nanmean(d_primes,2)),'-o');
+plot(1:2,squeeze(nanmean(d_primes,2))','-o');
 title('D prime')
-ylim([0,1])
+%ylim([0,1])
 xticks(1:2)
 xticklabels({'scrambled','unscrambled'})
 
 figure;boxplot(squeeze(nanmean(d_primes,2)))
 ylabel('d prime')
 xlabel('Condition')
-ylim([0 1])
+%ylim([0 1])
 xticks(1:2)
 xticklabels({'scrambled','unscrambled'})
 
