@@ -18,18 +18,18 @@
 # along with Psylab.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Bug reports, bug fixes, suggestions, enhancements, or other 
-# contributions are welcome. Go to http://code.google.com/p/psylab/ 
-# for more information and to contribute. Or send an e-mail to: 
+# contributions are welcome. Go to http://code.google.com/p/psylab/
+# for more information and to contribute. Or send an e-mail to:
 # cbrown1@pitt.edu.
-# 
-# Psylab is a collection of Python modules for handling various aspects 
-# of psychophysical experimentation. Python is a powerful programming  
-# language that is free, open-source, easy-to-learn, and cross-platform, 
-# thus making it extremely well-suited to scientific applications. 
-# There are countless modules written by other scientists that are  
-# freely available, making Python a good choice regardless of your  
+#
+# Psylab is a collection of Python modules for handling various aspects
+# of psychophysical experimentation. Python is a powerful programming
+# language that is free, open-source, easy-to-learn, and cross-platform,
+# thus making it extremely well-suited to scientific applications.
+# There are countless modules written by other scientists that are
+# freely available, making Python a good choice regardless of your
 # particular field. Consider using Python as your scientific platform.
-# 
+#
 
 # A Gustav experiment file!
 
@@ -39,21 +39,39 @@ import numpy as np
 import matplotlib.pyplot as plt
 import psylab
 import gustav
-#from gustav.forms.curs import rt as theForm
+# from gustav.forms.curs import rt as theForm
 from gustav.forms import rt as theForm
 import medussa as m
-#import spyral
+
+# import spyral
+
+
+import serial
+
+# TRIGGER STUFF
+
+
+import serial.tools.list_ports
+ports = serial.tools.list_ports.comports()
+
+for port, desc, hwid in sorted(ports):
+    print("{}:{}[{}]".format(port,desc,hwid))
+port = serial.Serial(port = 'COM4', baudrate = 9600)
+port.close()
+port.open()
+trigger_sent = False
+
 try:
     import triggers
 except Exception as e:
     ret = input("Triggers module or Cedrus cpod hardware not found. Continue? (y/N) ")
     if ret == 'y':
         triggers = None
-    else: 
+    else:
         raise e
 
-def setup(exp):
 
+def setup(exp):
     """
     # Machine-specific settings
     machine = psylab.config.local_settings(conf_file='config/psylab.conf')
@@ -77,18 +95,18 @@ def setup(exp):
 """
 
     exp.stim.audiodev = m.open_default_device()
-#    exp.user.pa_id = 2,2,4
+    #    exp.user.pa_id = 2,2,4
     workdir = 'C:\\Users\\benri\\Documents\\GitHub\\fNIRSandGerbils'
 
     # General Experimental Variables
     exp.name = 'fNIRSandGerbils'
-    exp.method = 'constant' # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
+    exp.method = 'constant'  # 'constant' for constant stimuli, or 'adaptive' for a staircase procedure (SRT, etc)
     # TODO: move logstring and datastring vars out of exp and into either method or experiment, so they can be properly enumerated at startup
 
-    exp.logFile = os.path.join(workdir,'logs','$name_$date.log') # Name and date vars only on logfile name
+    exp.logFile = os.path.join(workdir, 'logs', '$name_$date.log')  # Name and date vars only on logfile name
     exp.logConsoleDelay = True
-    exp.dataFile = os.path.join(workdir,'data','$name.csv')
-    exp.recordData = True # Data is saved manually in present_trial
+    exp.dataFile = os.path.join(workdir, 'data', '$name.csv')
+    exp.recordData = True  # Data is saved manually in present_trial
     exp.dataString_header = "# A datafile created by Gustav!\n# \n# Experiment: $name\n# \n# $note\n# \n# $comments\n# \n\nS,Trial,Date,Block,Condition,@currentvars[],Soundfile,Ear,Times\n"
     exp.dataString_post_trial = "$subj,$trial,$date,$block,$condition,$currentvars[],$stim[file],$user[side],$user[response]\n"
     exp.logString_pre_exp = "\nExperiment $name running subject $subj started at $time on $date\n"
@@ -98,7 +116,7 @@ def setup(exp):
     exp.logString_post_block = "  Block $block of $blocks ended at $time; Condition: $condition ; $currentvarsvals[' ; ']\n"
     exp.frontend = 'tk'
     exp.debug = False
-    # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have 
+    # CUSTOM: A comma-delimited list of valid single-char responses. This experiment is designed to have
     # the experimenter do the scoring, and enter the score on each trial.
     exp.validKeys = '0,1,2,3,4,5,6,7,8,9'.split(',')
     exp.quitKey = '/'
@@ -119,48 +137,46 @@ def setup(exp):
     exp.stim.atten = 10
 
     if not exp.subjID:
-        exp.subjID = exp.term.get_input(parent=None, title = "Gustav!", prompt = 'Enter a Subject ID:')
+        exp.subjID = exp.term.get_input(parent=None, title="Gustav!", prompt='Enter a Subject ID:')
 
     exp.stim.fs = 44100.
-    exp.stim.basedir = os.path.join(workdir,"stim",f"s_{exp.subjID}")
+    exp.stim.basedir = os.path.join(workdir, "stim", f"s_{exp.subjID}")
     exp.stim.stimfiles = {}
     exp.var.factorial['masker'] = []
     exp.stim.practfiles = psylab.folder.consecutive_files(
-                    path=os.path.join(exp.stim.basedir,"practice"),
-                    repeat=True,
-                    file_ext=".WAV;.wav",
-            )
-    
+        path=os.path.join(exp.stim.basedir, "practice"),
+        repeat=True,
+        file_ext=".WAV;.wav",
+    )
+
     # Commented out 2-28-2023 for behavioral pilot (don't need triggers)
-    
-    
-    if triggers:
-        print("Generating triggers:")
-        exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
-        ntriggers = 3
-        exp.stim.trigfile = os.path.join(workdir,'data',f"{exp.name}_triggers.csv")
-        if os.path.exists(exp.stim.trigfile):
-            tf = open(exp.stim.trigfile, 'a+')
-        else:
-            tf = open(exp.stim.trigfile, 'a+')
-            tf.write("S,Trig,Condition\n")
 
-        for f in os.scandir(exp.stim.basedir):
-            if f.is_dir() and f.name != "practice":
-                exp.stim.stimfiles[f.name] = psylab.folder.consecutive_files(
-                    path=f.path,
-                    file_ext=".WAV;.wav",
-                )
-                exp.var.factorial['masker'].append(f.name)
-                ntriggers += 1
-                exp.stim.trigger_dict[f.name] = ntriggers
-                tf.write(f"{exp.subjID},{exp.var.factorial['masker'].index(f.name) + 4},{f.name}\n")
+    # <>    if triggers:
+    # <>        print("Generating triggers:")
+    # <>        exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
+    # <>        ntriggers = 3
+    # <>        exp.stim.trigfile = os.path.join(workdir,'data',f"{exp.name}_triggers.csv")
+    # <>        if os.path.exists(exp.stim.trigfile):
+    # <>            tf = open(exp.stim.trigfile, 'a+')
+    # <>        else:
+    # <>            tf = open(exp.stim.trigfile, 'a+')
+    # <>            tf.write("S,Trig,Condition\n")
+    # <>
+    # <> De-dedent the following for loop block
+    for f in os.scandir(exp.stim.basedir):
+        if f.is_dir() and f.name != "practice":
+            exp.stim.stimfiles[f.name] = psylab.folder.consecutive_files(
+                path=f.path,
+                file_ext=".WAV;.wav",
+            )
+            exp.var.factorial['masker'].append(f.name)
+    # <>                ntriggers += 1
+    # <>                exp.stim.trigger_dict[f.name] = ntriggers
+    # <>                tf.write(f"{exp.subjID},{exp.var.factorial['masker'].index(f.name) + 4},{f.name}\n")
 
-        for cond,n in exp.stim.trigger_dict.items():
-            print(f"Trigger {n}: {cond}")
-            tf.write(f"{exp.subjID},{n},{cond}\n")
-    
-
+    # <>        for cond,n in exp.stim.trigger_dict.items():
+    # <>            print(f"Trigger {n}: {cond}")
+    # <>            tf.write(f"{exp.subjID},{n},{cond}\n")
 
     """EXPERIMENT VARIABLES
         There are 2 kinds of variables: factorial and covariable
@@ -186,9 +202,9 @@ def setup(exp):
         are variable names, and the values are lists of levels. During the 
         experiment, you have access to the current level of each variable. For 
         example, if you have the following variable:
-        
+
         exp.var.factorial['target'] = ['Male', 'Female']
-        
+
         Then, you can find out what the level is at any point in the experiment 
         with exp.var.current['target'], which would return either 'Male' or 
         'Female' depending on what the condition happened to be. This is 
@@ -201,8 +217,6 @@ def setup(exp):
     #                                   'unscrambled'
     #                                 ]
 
-
-
     """CONSTANT METHOD VARIABLES
         The method of constant limits requires three variables to be set.
             trialsperblock
@@ -210,11 +224,11 @@ def setup(exp):
             starttrial [crash recovery]
     """
     exp.var.constant = {
-        'trialsperblock' : 1,
-        'startblock' : 1,
-        'starttrial' : 1,
-        }
-    
+        'trialsperblock': 1,
+        'startblock': 1,
+        'starttrial': 1,
+    }
+
     """CONDITION PRESENTATION ORDER
         Use 'prompt' to prompt for condition on each block, 'random' to randomize
         condition order, 'menu' to be able to choose from a list of conditions at
@@ -223,16 +237,16 @@ def setup(exp):
         make the first item in the print range 'random' to randomize the specified
         range.
     """
-    #if np.random.randint(2) == 1:
+    # if np.random.randint(2) == 1:
     #    exp.var.order = ",".join([str(i) for i in np.tile(np.arange(len(exp.var.factorial['masker']))+1, 6)])
-    #else:
+    # else:
     #    exp.var.order = ",".join([str(i) for i in np.flipud(np.tile(np.arange(len(exp.var.factorial['masker']))+1, 6))])
 
-    order = np.arange(len(exp.var.factorial['masker']))+1
+    order = np.arange(len(exp.var.factorial['masker'])) + 1
     num_trials = int(48)
-    #np.random.shuffle(order)
-    for i in range(24-1):
-        this = np.arange(len(exp.var.factorial['masker']))+1
+    # np.random.shuffle(order)
+    for i in range(24 - 1):
+        this = np.arange(len(exp.var.factorial['masker'])) + 1
         looking = True
         while looking:
             np.random.shuffle(this)
@@ -240,7 +254,6 @@ def setup(exp):
                 order = np.append(order, this)
                 looking = False
     exp.var.order = ",".join(str(item) for item in list(order))
-
 
     """IGNORE CONDITIONS
         A list of condition numbers to ignore. These conditions will not be
@@ -259,10 +272,11 @@ def setup(exp):
     exp.user.block_kwc = 0.
     exp.user.block_pc = 0.
 
-    if triggers:
-        print(exp.stim.trigger_dict.items())
-        exp.user.triggers = triggers.xid()
-    
+
+# <>    if triggers:
+# <>        print(exp.stim.trigger_dict.items())
+# <>        exp.user.triggers = triggers.xid()
+
 
 def pre_exp(exp):
     try:
@@ -286,25 +300,32 @@ def pre_exp(exp):
                 dur_ms = len(exp.stim.out) / exp.stim.fs * 1000
                 resp_percent = []
                 if not exp.debug:
-                    s = exp.stim.audiodev.open_array(exp.stim.out,exp.stim.fs)
+                    s = exp.stim.audiodev.open_array(exp.stim.out, exp.stim.fs)
                     this_wait_ms = 500
                     this_elapsed_ms = 0
-                    s.play()
+
+                    if not trigger_sent:
+                        ConditionCode = 1
+                        port.write(str.encode(chr(ConditionCode)))
+                        # Play stimulus
+                        s.play()
+
                     start_ms = exp.interface.timestamp_ms()
                     while s.is_playing:
-                        ret = exp.interface.get_resp(timeout=this_wait_ms/1000)
+                        ret = exp.interface.get_resp(timeout=this_wait_ms / 1000)
                         this_current_ms = exp.interface.timestamp_ms()
                         this_elapsed_ms = this_current_ms - start_ms
                         this_elapsed_percent = this_elapsed_ms / dur_ms * 100
                         if ret:
                             resp_percent.append(this_elapsed_percent)
-                            #responses.append(str(this_elapsed_ms/1000))
+                            # responses.append(str(this_elapsed_ms/1000))
 
-                        progress = psylab.string.prog(this_elapsed_percent, width=50, char_done="=", spec_percent=resp_percent, spec_char="X")
+                        progress = psylab.string.prog(this_elapsed_percent, width=50, char_done="=",
+                                                      spec_percent=resp_percent, spec_char="X")
                         exp.interface.update_Prompt(progress, show=True, redraw=True)
-                    #exp.interface.show_Notify_Left(show=False, redraw=True)
+                    # exp.interface.show_Notify_Left(show=False, redraw=True)
             #    m.play_array(stim.out,exp.stim.fs) #,output_device_id=exp.user.audio_id)
-    #            exp.interface.showPlaying(False)
+        #            exp.interface.showPlaying(False)
 
         if not ret == exp.quitKey:
             exp.interface.update_Prompt("Breathing Exercise? (y/N)", show=True, redraw=True)
@@ -313,37 +334,44 @@ def pre_exp(exp):
                 exp.interface.update_Prompt("No Breathing Exercise", show=True, redraw=True)
             else:
                 for i in range(exp.stim.breath_blocks):
-                    exp.interface.update_Prompt(f"{exp.stim.hale_dur} sec inhale, {exp.stim.hale_dur} sec exhale ({exp.stim.breath_block_breaths} times), then {exp.stim.hold_dur} sec breath hold\n({i+1} of {exp.stim.breath_blocks}; hit a key to start)", show=True, redraw=True)
+                    exp.interface.update_Prompt(
+                        f"{exp.stim.hale_dur} sec inhale, {exp.stim.hale_dur} sec exhale ({exp.stim.breath_block_breaths} times), then {exp.stim.hold_dur} sec breath hold\n({i + 1} of {exp.stim.breath_blocks}; hit a key to start)",
+                        show=True, redraw=True)
                     ret = exp.interface.get_resp()
                     if ret == exp.quitKey:
                         exp.run.gustav_is_go = False
                     else:
                         for j in range(exp.stim.breath_block_breaths):
                             hale_cur = 0
-                            prompt = f"Inhale ({j+1}/{exp.stim.breath_block_breaths})..."
+                            prompt = f"Inhale ({j + 1}/{exp.stim.breath_block_breaths})..."
                             time_init = exp.interface.timestamp_ms()
                             if triggers:
                                 # exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
                                 exp.interface.update_Status_Right(f"trigger {exp.stim.trigger_dict['Inhale']}")
                                 exp.user.triggers.trigger(exp.stim.trigger_dict['Inhale'])
                             while hale_cur < exp.stim.hale_dur:
-                                hale_cur = np.minimum((exp.interface.timestamp_ms() - time_init) / 1000, exp.stim.hale_dur)
+                                hale_cur = np.minimum((exp.interface.timestamp_ms() - time_init) / 1000,
+                                                      exp.stim.hale_dur)
                                 hale_cur = np.maximum(hale_cur, 0)
-                                progress = psylab.string.prog(hale_cur, width=50, char_done="=", maximum=exp.stim.hale_dur)
+                                progress = psylab.string.prog(hale_cur, width=50, char_done="=",
+                                                              maximum=exp.stim.hale_dur)
                                 this_prompt = f"{prompt}\n{progress} {np.int(hale_cur)} / {exp.stim.hale_dur}"
                                 exp.interface.update_Prompt(this_prompt, show=True, redraw=True)
                                 time.sleep(.2)
                             hale_cur = exp.stim.hale_dur
-                            prompt = f"Exhale ({j+1}/{exp.stim.breath_block_breaths})..."
+                            prompt = f"Exhale ({j + 1}/{exp.stim.breath_block_breaths})..."
                             time_init = exp.interface.timestamp_ms()
                             if triggers:
                                 # exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
                                 exp.interface.update_Status_Right(f"trigger {exp.stim.trigger_dict['Exhale']}")
                                 exp.user.triggers.trigger(exp.stim.trigger_dict['Exhale'])
                             while hale_cur > 0:
-                                hale_cur = np.minimum(exp.stim.hale_dur - ((exp.interface.timestamp_ms() - time_init) / 1000), exp.stim.hale_dur)
+                                hale_cur = np.minimum(
+                                    exp.stim.hale_dur - ((exp.interface.timestamp_ms() - time_init) / 1000),
+                                    exp.stim.hale_dur)
                                 hale_cur = np.maximum(hale_cur, 0)
-                                progress = psylab.string.prog(hale_cur, width=50, char_done="=", maximum=exp.stim.hale_dur)
+                                progress = psylab.string.prog(hale_cur, width=50, char_done="=",
+                                                              maximum=exp.stim.hale_dur)
                                 this_prompt = f"{prompt}\n{progress} {exp.stim.hale_dur - np.int(hale_cur)} / {exp.stim.hale_dur}"
                                 exp.interface.update_Prompt(this_prompt, show=True, redraw=True)
                                 time.sleep(.2)
@@ -369,21 +397,25 @@ def pre_exp(exp):
                             exp.interface.update_Status_Right(f"trigger {exp.stim.trigger_dict['Hold_Breath']}")
                             exp.user.triggers.trigger(exp.stim.trigger_dict['Hold_Breath'])
                         while hold_cur > 0:
-                            hold_cur = np.minimum(exp.stim.hold_dur - ((exp.interface.timestamp_ms() - time_init) / 1000), exp.stim.hold_dur)
+                            hold_cur = np.minimum(
+                                exp.stim.hold_dur - ((exp.interface.timestamp_ms() - time_init) / 1000),
+                                exp.stim.hold_dur)
                             hold_cur = np.maximum(hold_cur, 0)
                             progress = psylab.string.prog(hold_cur, width=50, char_done="=", maximum=exp.stim.hold_dur)
                             this_prompt = f"{prompt}\n{progress} {exp.stim.hold_dur - np.int(hold_cur)} / {exp.stim.hold_dur}"
                             exp.interface.update_Prompt(this_prompt, show=True, redraw=True)
                             time.sleep(.2)
                         hale_cur = exp.stim.hale_dur
-                        prompt = f"Exhale ({j+1}/{exp.stim.breath_block_breaths})..."
+                        prompt = f"Exhale ({j + 1}/{exp.stim.breath_block_breaths})..."
                         time_init = exp.interface.timestamp_ms()
                         if triggers:
                             # exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
                             exp.interface.update_Status_Right(f"trigger {exp.stim.trigger_dict['Exhale']}")
                             exp.user.triggers.trigger(exp.stim.trigger_dict['Exhale'])
                         while hale_cur > 0:
-                            hale_cur = np.minimum(exp.stim.hale_dur - ((exp.interface.timestamp_ms() - time_init) / 1000), exp.stim.hale_dur)
+                            hale_cur = np.minimum(
+                                exp.stim.hale_dur - ((exp.interface.timestamp_ms() - time_init) / 1000),
+                                exp.stim.hale_dur)
                             hale_cur = np.maximum(hale_cur, 0)
                             progress = psylab.string.prog(hale_cur, width=50, char_done="=", maximum=exp.stim.hale_dur)
                             this_prompt = f"{prompt}\n{progress} {exp.stim.hale_dur - np.int(hale_cur)} / {exp.stim.hale_dur}"
@@ -391,7 +423,7 @@ def pre_exp(exp):
                             time.sleep(.2)
 
         if ret == exp.quitKey:
-            #exp.interface.update_Prompt("Hit a key when you hear [red, green, blue, white]", show=False, redraw=True)
+            # exp.interface.update_Prompt("Hit a key when you hear [red, green, blue, white]", show=False, redraw=True)
             exp.gustav_is_go = False
 
     except Exception as e:
@@ -405,21 +437,24 @@ def pre_block(exp):
         exp.user.block_kwc = 0
         exp.user.block_pc = 0.
         exp.user.pract = 1
-        exp.interface.update_Status_Left(f"Block {exp.run.block+1} of {exp.run.nblocks}")
+        exp.interface.update_Status_Left(f"Block {exp.run.block + 1} of {exp.run.nblocks}")
     except Exception as e:
         exp.interface.destroy()
         raise e
+
 
 """PRE_TRIAL
     This function gets called on every trial to generate the stimulus, and do
     any other processing you need. All settings and variables are available. 
     For the current level of a variable, use exp.var.current['varname'].
 """
+
+
 def pre_trial(exp):
     try:
         exp.stim.file = exp.stim.stimfiles[exp.var.current['masker']].get_filename(fmt='full')
-        exp.stim.trigger = exp.stim.trigger_dict[exp.var.current['masker']]
-        exp.interface.update_Status_Center(exp.var.current['masker'], redraw=True) # Use condition # (1,2) as trigger #
+        # <>exp.stim.trigger = exp.stim.trigger_dict[exp.var.current['masker']]
+        exp.interface.update_Status_Center(exp.var.current['masker'], redraw=True)  # Use condition # (1,2) as trigger #
 
         exp.stim.out, exp.stim.fs = m.read_file(exp.stim.file)
         exp.stim.out = psylab.signal.atten(exp.stim.out, exp.stim.atten)
@@ -431,7 +466,7 @@ def pre_trial(exp):
 def present_trial(exp):
     # This is a custom present_trial that records keypress times during playback
 
-    exp.interface.update_Status_Right(f"Trigger {exp.stim.trigger}", redraw=True) # Use condition # (1,2) as trigger #
+    # <> exp.interface.update_Status_Right(f"Trigger {exp.stim.trigger}", redraw=True) # Use condition # (1,2) as trigger #
     exp.interface.update_Prompt("Hit [L/R/B] to start", show=True, redraw=True)
     wait = True
     while wait:
@@ -445,37 +480,38 @@ def present_trial(exp):
         try:
             exp.user.side = ret
             exp.interface.update_Prompt("Hit a key when you hear [blue, red, green, white]", show=True, redraw=True)
-            #exp.interface.update_Notify_Left('Playing', show=False, redraw=True)
-            #exp.interface.update_Status_Right("", redraw=True)
+            # exp.interface.update_Notify_Left('Playing', show=False, redraw=True)
+            # exp.interface.update_Status_Right("", redraw=True)
             responses = []
-#            exp.interface.showPlaying(True)
+            #            exp.interface.showPlaying(True)
             if not exp.debug:
-                s = exp.stim.audiodev.open_array(exp.stim.out,exp.stim.fs)
-                #exp.interface.show_Notify_Left(show=True, redraw=True)
+                s = exp.stim.audiodev.open_array(exp.stim.out, exp.stim.fs)
+                # exp.interface.show_Notify_Left(show=True, redraw=True)
                 dur_ms = len(exp.stim.out) / exp.stim.fs * 1000
                 this_wait_ms = 500
                 this_elapsed_ms = 0
                 resp_percent = []
                 s.play()
-                if triggers:
-                    exp.user.triggers.trigger(exp.stim.trigger)
+                # <>if triggers:
+                # <>    exp.user.triggers.trigger(exp.stim.trigger)
                 start_ms = exp.interface.timestamp_ms()
                 while s.is_playing:
-                    ret = exp.interface.get_resp(timeout=this_wait_ms/1000)
+                    ret = exp.interface.get_resp(timeout=this_wait_ms / 1000)
                     this_current_ms = exp.interface.timestamp_ms()
                     this_elapsed_ms = this_current_ms - start_ms
                     this_elapsed_percent = this_elapsed_ms / dur_ms * 100
                     if ret:
-                        responses.append(str(np.round(this_elapsed_ms/1000, 3)))
+                        responses.append(str(np.round(this_elapsed_ms / 1000, 3)))
                         resp_percent.append(this_elapsed_ms / dur_ms * 100)
 
-                    progress = psylab.string.prog(this_elapsed_percent, width=70, char_done="=", spec_percent=resp_percent, spec_char="X")
+                    progress = psylab.string.prog(this_elapsed_percent, width=70, char_done="=",
+                                                  spec_percent=resp_percent, spec_char="X")
                     exp.interface.update_Prompt(progress, show=True, redraw=True)
                 exp.user.response = ",".join(responses)
-#                fid = open(exp.dataFile, 'a')
-#                word_line = f"{exp.stim.file},{','.join(responses)}"
-#                fid.write(word_line+"\n")
-#            exp.interface.showPlaying(False)
+        #                fid = open(exp.dataFile, 'a')
+        #                word_line = f"{exp.stim.file},{','.join(responses)}"
+        #                fid.write(word_line+"\n")
+        #            exp.interface.showPlaying(False)
         except Exception as e:
             exp.interface.destroy()
             raise e
@@ -491,6 +527,7 @@ def present_trial(exp):
     exp.run.pylab_is_go to False
 """
 
+
 def prompt_response(exp):
     pass
     # while True:
@@ -502,11 +539,14 @@ def prompt_response(exp):
     #         exp.run.gustav_is_go = False
     #         break
 
+
 def post_trial(exp):
-    #if not exp.gustav_is_go:
+    # if not exp.gustav_is_go:
     exp.interface.update_Prompt("Waiting 30 sec...", show=True, redraw=True)
-    time.sleep(2) # CHANGED FOR PILOTING - only 2 seconds
+    time.sleep(2)  # CHANGED FOR PILOTING - only 2 seconds
     exp.interface.update_Prompt("", show=True, redraw=True)
+
+
 #    try:
 #        if exp.run.gustav_is_go:
 #            exp.user.block_kwp += int(exp.user.trial_kwp)
@@ -527,13 +567,17 @@ def post_trial(exp):
 
 def post_block(exp):
     pass
+
+
 #    exp.interface.updateInfo_BlockScore(f"Prev Condition # {exp.run.condition+1}\nScore: {exp.user.block_kwc:.1f} / {exp.user.block_kwp:.1f} ({exp.user.block_pc} %%)")
 
 def post_exp(exp):
-#    pass
-#    exp.interface.dialog.isPlaying.setText("Finished")
-#    exp.interface.showPlaying(True)
+    #    pass
+    #    exp.interface.dialog.isPlaying.setText("Finished")
+    #    exp.interface.showPlaying(True)
     exp.interface.destroy()
+    port.close()
+
 
 if __name__ == '__main__':
     argv = sys.argv[1:]
