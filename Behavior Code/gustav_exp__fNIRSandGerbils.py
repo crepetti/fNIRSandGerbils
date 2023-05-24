@@ -134,32 +134,31 @@ def setup(exp):
     # Commented out 2-28-2023 for behavioral pilot (don't need triggers)
     
     
-#<>    if triggers:
-#<>        print("Generating triggers:")
-#<>        exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
-#<>        ntriggers = 3
-#<>        exp.stim.trigfile = os.path.join(workdir,'data',f"{exp.name}_triggers.csv")
-#<>        if os.path.exists(exp.stim.trigfile):
-#<>            tf = open(exp.stim.trigfile, 'a+')
-#<>        else:
-#<>            tf = open(exp.stim.trigfile, 'a+')
-#<>            tf.write("S,Trig,Condition\n")
-#<>
-#<> De-dedent the following for loop block
-    for f in os.scandir(exp.stim.basedir):
-        if f.is_dir() and f.name != "practice":
-            exp.stim.stimfiles[f.name] = psylab.folder.consecutive_files(
+    if triggers:
+        print("Generating triggers:")
+        exp.stim.trigger_dict = {'Inhale': 1, 'Exhale': 2, 'Hold_Breath': 3}
+        ntriggers = 3
+        exp.stim.trigfile = os.path.join(workdir,'data',f"{exp.name}_triggers.csv")
+        if os.path.exists(exp.stim.trigfile):
+            tf = open(exp.stim.trigfile, 'a+')
+        else:
+            tf = open(exp.stim.trigfile, 'a+')
+            tf.write("S,Trig,Condition\n")
+
+        for f in os.scandir(exp.stim.basedir):
+            if f.is_dir() and f.name != "practice":
+                exp.stim.stimfiles[f.name] = psylab.folder.consecutive_files(
                     path=f.path,
                     file_ext=".WAV;.wav",
-            )
-            exp.var.factorial['masker'].append(f.name)
-#<>                ntriggers += 1
-#<>                exp.stim.trigger_dict[f.name] = ntriggers
-#<>                tf.write(f"{exp.subjID},{exp.var.factorial['masker'].index(f.name) + 4},{f.name}\n")
+                )
+                exp.var.factorial['masker'].append(f.name)
+                ntriggers += 1
+                exp.stim.trigger_dict[f.name] = ntriggers
+                tf.write(f"{exp.subjID},{exp.var.factorial['masker'].index(f.name) + 4},{f.name}\n")
 
-#<>        for cond,n in exp.stim.trigger_dict.items():
-#<>            print(f"Trigger {n}: {cond}")
-#<>            tf.write(f"{exp.subjID},{n},{cond}\n")
+        for cond,n in exp.stim.trigger_dict.items():
+            print(f"Trigger {n}: {cond}")
+            tf.write(f"{exp.subjID},{n},{cond}\n")
     
 
 
@@ -260,9 +259,9 @@ def setup(exp):
     exp.user.block_kwc = 0.
     exp.user.block_pc = 0.
 
-#<>    if triggers:
-#<>        print(exp.stim.trigger_dict.items())
-#<>        exp.user.triggers = triggers.xid()
+    if triggers:
+        print(exp.stim.trigger_dict.items())
+        exp.user.triggers = triggers.xid()
     
 
 def pre_exp(exp):
@@ -419,7 +418,7 @@ def pre_block(exp):
 def pre_trial(exp):
     try:
         exp.stim.file = exp.stim.stimfiles[exp.var.current['masker']].get_filename(fmt='full')
-        #<>exp.stim.trigger = exp.stim.trigger_dict[exp.var.current['masker']]
+        exp.stim.trigger = exp.stim.trigger_dict[exp.var.current['masker']]
         exp.interface.update_Status_Center(exp.var.current['masker'], redraw=True) # Use condition # (1,2) as trigger #
 
         exp.stim.out, exp.stim.fs = m.read_file(exp.stim.file)
@@ -432,7 +431,7 @@ def pre_trial(exp):
 def present_trial(exp):
     # This is a custom present_trial that records keypress times during playback
 
-    #<> exp.interface.update_Status_Right(f"Trigger {exp.stim.trigger}", redraw=True) # Use condition # (1,2) as trigger #
+    exp.interface.update_Status_Right(f"Trigger {exp.stim.trigger}", redraw=True) # Use condition # (1,2) as trigger #
     exp.interface.update_Prompt("Hit [L/R/B] to start", show=True, redraw=True)
     wait = True
     while wait:
@@ -458,8 +457,8 @@ def present_trial(exp):
                 this_elapsed_ms = 0
                 resp_percent = []
                 s.play()
-                #<>if triggers:
-                #<>    exp.user.triggers.trigger(exp.stim.trigger)
+                if triggers:
+                    exp.user.triggers.trigger(exp.stim.trigger)
                 start_ms = exp.interface.timestamp_ms()
                 while s.is_playing:
                     ret = exp.interface.get_resp(timeout=this_wait_ms/1000)
