@@ -24,7 +24,7 @@ all_words = ["bag", "card", "chairs", "desks", "glove", "hat", "pen", "shoe", "s
 numtotalwords = 30;
 wordlength = 0.50; %length of sound file
 fs = 44100;
-overlap = 0.5/3;
+overlap = 0;
 trial = 1;
 practicetrial = 1;
 numtrials = 48;
@@ -54,14 +54,14 @@ end
 while practicetrial <= numpracticetrials
     randcolor = randi([3 5],1,1);
     nummasker = numtotalwords - randcolor;
-
+    
     masker_words_to_use = randsample(all_masker_words, nummasker, 'true'); %picking words from masker bucket and allowing multiple of the same word
     color_words_to_use = randsample(all_color_words,randcolor,'true'); %same for color words
-
+    
     %mix them in a bucket and randomize them, sample without replacements showing up, but also randomizing so that color and masker words are mixed
     num_words_total = length(masker_words_to_use) + length(color_words_to_use);
     final_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
-
+    
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
@@ -78,7 +78,7 @@ while practicetrial <= numpracticetrials
         end
         duplicateindex = duplicateindex + 1;
     end
-
+    
     % load the audio file and put into a larger array
     loadsoundindex = 1;
     soundArray = strings(1, numtotalwords);
@@ -87,7 +87,7 @@ while practicetrial <= numpracticetrials
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
     end
-
+    
     %overlap the sounds
     tOnset = 0:wordlength-overlap:(wordlength-overlap)*numtotalwords;
     tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
@@ -117,16 +117,16 @@ while practicetrial <= numpracticetrials
         %    newtotalSound(start_index:stop_index - 1) = newtotalSound(start_index:stop_index - 1) + y;
         iOnset = iOnset + 1;
     end
-
+    
     newMaskerSound = newMaskerSound'; % transpose the array
-
+    
     %making the filter
     numfilters = 16; %go between like 2 and 16
     order = 9; %go between like 2 and 10
     edges = logspace(log10(300), log10(10000), numfilters + 1);
     newMaskerFiltered = zeros(1, length(tVec));
     newTargetFiltered = zeros(1, length(tVec));
-
+    
     for iFilter = 1:numfilters
         lowedge = edges(iFilter);
         highedge = edges(iFilter + 1);
@@ -145,14 +145,20 @@ while practicetrial <= numpracticetrials
             newTargetFiltered = newTargetFiltered + thisFilteredSound;
         end
     end
-
+    
     this_foldername = [foldername,'/practice'];
     audiofilename = [this_foldername,'/',num2str(practicetrial),'_practice', '.wav'];
     output = newTargetFiltered + newMaskerFiltered;
     output = output * rmsset/rms(output);
-    audiowrite(audiofilename, repmat(output,2,1)', fs);
+    output = repmat(output,2,1)';
+    trigger_channel_3 = zeros(size(output(:,1)));
+    trigger_channel_3(1)= 1;
+    trigger_channel_4 = zeros(size(output(:,1)));
+    trigger_channel_4(end) = 1;
+    output = cat(2,output,trigger_channel_3,trigger_channel_4);
+    audiowrite(audiofilename, output, fs);
     disp(audiofilename)
-
+    
     practicetrial = practicetrial + 1;
 end
 
@@ -160,16 +166,16 @@ end
 while trial <= numtrials
     randcolor = randi([3 5],1,1);
     nummasker = numtotalwords - randcolor;
-
+    
     scramblingindex = scramblingarray(trial);
     %lets choose 15-17 masker words and 3-5 color words
     masker_words_to_use = randsample(all_masker_words, nummasker, 'true'); %picking words from masker bucket and allowing multiple of the same word
     color_words_to_use = randsample(all_color_words,randcolor,'true'); %same for color words
-
+    
     %mix them in a bucket and randomize them, sample without replacements showing up, but also randomizing so that color and masker words are mixed
     num_words_total = length(masker_words_to_use) + length(color_words_to_use);
     final_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
-
+    
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
@@ -224,7 +230,7 @@ while trial <= numtrials
             %             final_word_order(new_index) = final_word_order(duplicateindex);
             %             final_word_order(duplicateindex) = old_word;
             final_word_order(duplicateindex + 2) = randsample(all_masker_words,1,1);
-
+            
         end
         if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 3), all_color_words)
             %             possible_new_indices = 1:num_words_total;
@@ -245,10 +251,10 @@ while trial <= numtrials
             %             final_word_order(new_index) = final_word_order(duplicateindex);
             %             final_word_order(duplicateindex) = old_word;
             final_word_order(duplicateindex + 3) = randsample(all_masker_words,1,1);
-
+            
         end
         duplicateindex = duplicateindex + 1;
-
+        
     end
     % no color words in the first three words
     for ifirstcheck = 1:3
@@ -257,13 +263,13 @@ while trial <= numtrials
         end
     end
     % no color words in the last three words
-
+    
     for ilastcheck = num_words_total-3:num_words_total
         if ismember(final_word_order(ilastcheck),all_color_words)
             final_word_order(ilastcheck) = randsample(all_masker_words(all_masker_words ~= final_word_order(ilastcheck)), 1, 'false');
         end
     end
-
+    
     % load the audio file and put into a larger array
     loadsoundindex = 1;
     soundArray = strings(1, numtotalwords);
@@ -272,7 +278,7 @@ while trial <= numtrials
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
     end
-
+    
     %overlap the sounds
     tOnset = 0:wordlength-overlap:(wordlength-overlap)*numtotalwords;
     tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
@@ -302,20 +308,20 @@ while trial <= numtrials
         %    newtotalSound(start_index:stop_index - 1) = newtotalSound(start_index:stop_index - 1) + y;
         iOnset = iOnset + 1;
     end
-
+    
     %making scrambled masker array
     if (scramblingindex == 1)
         newMaskerSound = scrambling(newMaskerSound, fs);
     end
     newMaskerSound = newMaskerSound'; % transpose the array
-
+    
     %making the filter
     numfilters = 16; %go between like 2 and 16
     order = 9; %go between like 2 and 10
     edges = logspace(log10(300), log10(10000), numfilters + 1);
     newMaskerFiltered = zeros(1, length(tVec));
     newTargetFiltered = zeros(1, length(tVec));
-
+    
     for iFilter = 1:numfilters
         lowedge = edges(iFilter);
         highedge = edges(iFilter + 1);
@@ -343,17 +349,31 @@ while trial <= numtrials
         audiofilename = [this_foldername,'/',num2str(trial),'_unscrambled', '.wav'];
         output = newTargetFiltered + newMaskerFiltered;
         output = output * rmsset/rms(output);
-        audiowrite(audiofilename, repmat(output,2,1)', fs);
+        output = repmat(output,2,1)';
+        trigger_channel_3 = zeros(size(output(:,1)));
+        trigger_channel_3(1)= 1;
+        trigger_channel_4 = zeros(size(output(:,1)));
+        trigger_channel_4(end) = 1;
+        output = cat(2,output,trigger_channel_3,trigger_channel_4);
+        audiowrite(audiofilename, output, fs);
+        audiowrite(audiofilename, output, fs);
         disp(audiofilename)
     elseif scramblingindex == 1
         this_foldername = [foldername,'/scrambled'];
         audiofilename = [this_foldername,'/',num2str(trial),'_scrambled', '.wav'];
         output = newTargetFiltered + newMaskerFiltered;
         output = output * rmsset/rms(output);
-        audiowrite(audiofilename, repmat(output,2,1)', fs);
+        output = repmat(output,2,1)';
+        trigger_channel_3 = zeros(size(output(:,1)));
+        trigger_channel_3(1)= 1;
+        trigger_channel_4 = zeros(size(output(:,1)));
+        trigger_channel_4(end) = 1;
+        output = cat(2,output,trigger_channel_3,trigger_channel_4);
+        audiowrite(audiofilename, output, fs);
+        audiowrite(audiofilename, output, fs);
         disp(audiofilename)
     end
-
+    
     num_color_words_this_trial = sum(ismember(final_word_order,all_color_words));
     if num_color_words_this_trial < 3
         trial = trial;
@@ -361,7 +381,7 @@ while trial <= numtrials
         all_word_order(trial,:) = final_word_order;
         trial = trial + 1;
     end
-
+    
 end
 
 save([foldername, '/', subjectID, '_alltrialwords.mat'], 'all_word_order','tOnset');

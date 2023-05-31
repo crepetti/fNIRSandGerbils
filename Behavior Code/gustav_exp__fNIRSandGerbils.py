@@ -42,6 +42,8 @@ import gustav
 # from gustav.forms.curs import rt as theForm
 from gustav.forms import rt as theForm
 import medussa as m
+import sounddevice as sd
+import soundfile as sf
 
 # import spyral
 
@@ -52,14 +54,7 @@ import serial
 
 
 import serial.tools.list_ports
-ports = serial.tools.list_ports.comports()
 
-for port, desc, hwid in sorted(ports):
-    print("{}:{}[{}]".format(port,desc,hwid))
-port = serial.Serial(port = 'COM4', baudrate = 9600)
-port.close()
-port.open()
-trigger_sent = False
 
 try:
     import triggers
@@ -96,7 +91,7 @@ def setup(exp):
 
     exp.stim.audiodev = m.open_default_device()
     #    exp.user.pa_id = 2,2,4
-    workdir = 'C:\\Users\\benri\\Documents\\GitHub\\fNIRSandGerbils'
+    workdir = 'D:\\Experiments\\fNIRSandGerbils'
 
     # General Experimental Variables
     exp.name = 'fNIRSandGerbils'
@@ -301,17 +296,26 @@ def pre_exp(exp):
                 resp_percent = []
                 if not exp.debug:
                     s = exp.stim.audiodev.open_array(exp.stim.out, exp.stim.fs)
+                    sound_data = exp.stim.out
                     this_wait_ms = 500
                     this_elapsed_ms = 0
 
-                    if not trigger_sent:
-                        ConditionCode = 1
-                        port.write(str.encode(chr(ConditionCode)))
-                        # Play stimulus
-                        s.play()
+                    # Add onset and offset triggers
+                    # print(s)
+                    # print(np.shape(s))
+                    # trigger_channel_3 = np.zeros(np.shape(s))
+                    # trigger_channel_3[0] = 1
+                    # trigger_channel_4 = np.zeros(np.shape(s))
+                    # trigger_channel_4[len(trigger_channel_4) -1] = 1
+                    # s = np.transpose(np.stack(((s,s,trigger_channel_3, trigger_channel_4))))
+                    # Play stimulus
+                    sd.default.device = 'ASIO Fireface USB'
+                    sd.play(sound_data, exp.stim.fs, mapping = [1,2,3,4])
+                    #s.play()
 
                     start_ms = exp.interface.timestamp_ms()
-                    while s.is_playing:
+                    this_elapsed_percent = 0
+                    while this_elapsed_percent < 100:
                         ret = exp.interface.get_resp(timeout=this_wait_ms / 1000)
                         this_current_ms = exp.interface.timestamp_ms()
                         this_elapsed_ms = this_current_ms - start_ms
@@ -321,7 +325,7 @@ def pre_exp(exp):
                             # responses.append(str(this_elapsed_ms/1000))
 
                         progress = psylab.string.prog(this_elapsed_percent, width=50, char_done="=",
-                                                      spec_percent=resp_percent, spec_char="X")
+                                                      spec_locs=resp_percent, spec_char="X")
                         exp.interface.update_Prompt(progress, show=True, redraw=True)
                     # exp.interface.show_Notify_Left(show=False, redraw=True)
             #    m.play_array(stim.out,exp.stim.fs) #,output_device_id=exp.user.audio_id)
@@ -486,16 +490,30 @@ def present_trial(exp):
             #            exp.interface.showPlaying(True)
             if not exp.debug:
                 s = exp.stim.audiodev.open_array(exp.stim.out, exp.stim.fs)
+                sound_data = exp.stim.out
                 # exp.interface.show_Notify_Left(show=True, redraw=True)
                 dur_ms = len(exp.stim.out) / exp.stim.fs * 1000
                 this_wait_ms = 500
                 this_elapsed_ms = 0
                 resp_percent = []
-                s.play()
+
+                # Add onset and offset triggers
+                # print(s)
+                # print(np.shape(s))
+                # trigger_channel_3 = np.zeros(np.shape(s))
+                # trigger_channel_3[0] = 1
+                # trigger_channel_4 = np.zeros(np.shape(s))
+                # trigger_channel_4[len(trigger_channel_4) - 1] = 1
+                # s = np.transpose(np.stack(((s, s, trigger_channel_3, trigger_channel_4))))
+                sd.default.device = 'ASIO Fireface USB'
+                sd.play(sound_data, exp.stim.fs, mapping=[1, 2, 3, 4])
+                # s.play()
+
                 # <>if triggers:
                 # <>    exp.user.triggers.trigger(exp.stim.trigger)
                 start_ms = exp.interface.timestamp_ms()
-                while s.is_playing:
+                this_elapsed_percent = 0
+                while this_elapsed_percent < 100:
                     ret = exp.interface.get_resp(timeout=this_wait_ms / 1000)
                     this_current_ms = exp.interface.timestamp_ms()
                     this_elapsed_ms = this_current_ms - start_ms
@@ -505,7 +523,7 @@ def present_trial(exp):
                         resp_percent.append(this_elapsed_ms / dur_ms * 100)
 
                     progress = psylab.string.prog(this_elapsed_percent, width=70, char_done="=",
-                                                  spec_percent=resp_percent, spec_char="X")
+                                                  spec_locs=resp_percent, spec_char="X")
                     exp.interface.update_Prompt(progress, show=True, redraw=True)
                 exp.user.response = ",".join(responses)
         #                fid = open(exp.dataFile, 'a')
@@ -543,7 +561,7 @@ def prompt_response(exp):
 def post_trial(exp):
     # if not exp.gustav_is_go:
     exp.interface.update_Prompt("Waiting 30 sec...", show=True, redraw=True)
-    time.sleep(2)  # CHANGED FOR PILOTING - only 2 seconds
+    time.sleep(5)  # CHANGED FOR PILOTING - only 2 seconds
     exp.interface.update_Prompt("", show=True, redraw=True)
 
 
@@ -576,7 +594,7 @@ def post_exp(exp):
     #    exp.interface.dialog.isPlaying.setText("Finished")
     #    exp.interface.showPlaying(True)
     exp.interface.destroy()
-    port.close()
+    print('Experiment Complete! Wait for the experimenter to come get you.')
 
 
 if __name__ == '__main__':
