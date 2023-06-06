@@ -152,9 +152,9 @@ while practicetrial <= numpracticetrials
     output = output * rmsset/rms(output);
     output = repmat(output,2,1)';
     trigger_channel_3 = zeros(size(output(:,1)));
-    trigger_channel_3(1)= 1;
+    %trigger_channel_3(1)= 1;
     trigger_channel_4 = zeros(size(output(:,1)));
-    trigger_channel_4(end) = 1;
+    %trigger_channel_4(end) = 1;
     output = cat(2,output,trigger_channel_3,trigger_channel_4);
     audiowrite(audiofilename, output, fs);
     disp(audiofilename)
@@ -353,7 +353,7 @@ while trial <= numtrials
         trigger_channel_3 = zeros(size(output(:,1)));
         trigger_channel_3(1)= 1;
         trigger_channel_4 = zeros(size(output(:,1)));
-        trigger_channel_4(end) = 1;
+       % trigger_channel_4(end) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
@@ -365,9 +365,9 @@ while trial <= numtrials
         output = output * rmsset/rms(output);
         output = repmat(output,2,1)';
         trigger_channel_3 = zeros(size(output(:,1)));
-        trigger_channel_3(1)= 1;
+       % trigger_channel_3(1)= 1;
         trigger_channel_4 = zeros(size(output(:,1)));
-        trigger_channel_4(end) = 1;
+        trigger_channel_4(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
