@@ -1,4 +1,4 @@
-%% analyze_behavior_fNIRSandGerbils
+%% analyze_behavior_fNIRSandGerbils_TESTING
 %% Author: Benjamin Richardson
 
 % Create array of all subjects that have been run
@@ -14,6 +14,9 @@ all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data
 by_subject_behavior_info = struct(); % create empty structure for behavior info split up by subject
 all_subjects_click_times = []; % create empty array for all click times (used for histograms)
 
+possible_threshold_ends = [0];%[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9];
+for ithreshold = 1:length(possible_threshold_ends)
+click_condition = [];
 
 for isubject = 1:size(curr_subject_ID,1) % For each subject....
 
@@ -43,8 +46,8 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     %% Loop through each trial, and calculate hits and false alarms
 
     n_trials = length(trials); % find number of trials
-    threshold_window_start = 0.2; % time in seconds from onset of word for start of hit/FA windows
-    threshold_window_end = 1; % time in seconds from onset of word for end of hit/FA windows
+    threshold_window_start = 0.5; %possible_threshold_ends(ithreshold); % time in seconds from onset of word for start of hit/FA windows
+    threshold_window_end = 1.0; % time in seconds from onset of word for end of hit/FA windows
     double_click_threshold = 0.05; % distance between clicks at which it would be decided that it is a double click
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct(); % create structure for nearest click distances
@@ -162,6 +165,8 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
             else
                 by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value = [by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value, current_target_color_words(nearest_click(i))];
                 by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value = [by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value, all_target_click_distances(nearest_click(i),i)];
+                click_condition = [click_condition, by_subject_behavior_info(isubject).condition(itrial).value];
+
             end
 
         end
@@ -176,10 +181,10 @@ end
 %% Plotting time!
 
 % Histogram of all click times throughout the trial
-figure;histogram(all_subjects_click_times,'BinWidth',0.1)
-xlabel('Time Since Stimulus Onset (seconds)','FontSize',18)
-ylabel('Number of Clicks Total','FontSize',18)
-title('Click Counts vs. Time since Stimulus Onset','FontSize',18);
+% figure;histogram(all_subjects_click_times,'BinWidth',0.1)
+% xlabel('Time Since Stimulus Onset (seconds)','FontSize',18)
+% ylabel('Number of Clicks Total','FontSize',18)
+% title('Click Counts vs. Time since Stimulus Onset','FontSize',18);
 
 % Histogram of click distance from nearest target word
 all_nearest_click_distances = [];
@@ -189,7 +194,9 @@ for isubject = 1:size(curr_subject_ID,1)
     end
 end
 figure;
-p1 = histogram(all_nearest_click_distances,'BinWidth',0.05);
+p1 = histogram(all_nearest_click_distances(click_condition == 1),'BinWidth',0.2);
+hold on
+pa = histogram(all_nearest_click_distances(click_condition == 2),'BinWidth',0.2);
 xticks(tOnset - 1);
 for i = 1:length(tOnset)
 p2 = xline(tOnset(i) - 1);
@@ -199,7 +206,7 @@ p3 = xline(threshold_window_end,'r','LineWidth',3);
 ylabel('Number of Clicks Total','FontSize',18)
 xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
 title('Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
-legend({'Click Counts','Word Onset Times','Antje Hit Window'})
+legend([p1,pa,p2,p3],{'Scrambled','Unscrambled','Word Onset Times','Hit Window'})
 
 
 % Histogram of reaction times split up by trial type
@@ -217,15 +224,15 @@ for isubject = 1:size(curr_subject_ID,1)
 
     end
 end
-figure;
-x = [all_nearest_click_distances_condition1,all_nearest_click_distances_condition2];
-g = [zeros(length(all_nearest_click_distances_condition1), 1); ones(length(all_nearest_click_distances_condition2), 1)];
-violinplot(x,g);
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
-xlabel('Condition','FontSize',18)
-ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
-title('Click Times since Color Word Onset vs. Condition','FontSize',18);
+% figure;
+% x = [all_nearest_click_distances_condition1,all_nearest_click_distances_condition2];
+% g = [zeros(length(all_nearest_click_distances_condition1), 1); ones(length(all_nearest_click_distances_condition2), 1)];
+% violinplot(x,g);
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
+% xlabel('Condition','FontSize',18)
+% ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
+% title('Click Times since Color Word Onset vs. Condition','FontSize',18);
 
 
 % histogram of reaction times split up by color word
@@ -253,17 +260,17 @@ for isubject = 1:size(curr_subject_ID,1)
         end
     end
 end
-figure; hold on
-histogram(red_nearest_click_times,'FaceColor','r');
-histogram(green_nearest_click_times,'FaceColor','g');
-histogram(blue_nearest_click_times,'FaceColor','b');
-histogram(white_nearest_click_times,'FaceColor','k');
-
-legend({'Red','White','Green','Blue'})
-xlabel('Color','FontSize',18);
-ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
-title('Click Times since Color Word Onset vs. Color Word','FontSize',18);
-
+% figure; hold on
+% histogram(red_nearest_click_times,'FaceColor','r');
+% histogram(green_nearest_click_times,'FaceColor','g');
+% histogram(blue_nearest_click_times,'FaceColor','b');
+% histogram(white_nearest_click_times,'FaceColor','k');
+% 
+% legend({'Red','White','Green','Blue'})
+% xlabel('Color','FontSize',18);
+% ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
+% title('Click Times since Color Word Onset vs. Color Word','FontSize',18);
+% 
 
 %% Hit and False Alarm Rates
 hit_rates_condition1 = nan(size(curr_subject_ID,1),24); % scrambled
@@ -286,14 +293,12 @@ for isubject = 1:size(curr_subject_ID,1)
             hit_rates_condition1(isubject,ionset1) =   by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
             FA_rates_condition1(isubject,ionset1) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_masker_words(itrial).value); % num subjects x num presentations
             difference_scores_condition1(isubject,ionset1) = by_subject_behavior_info(isubject).difference_score(itrial).value;
-            chance_rate_condition1(isubject,ionset1) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
         elseif this_condition == 2 % unscrambled
             ionset2 = ionset2 + 1;
 
             hit_rates_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
             FA_rates_condition2(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_masker_words(itrial).value); % num subjects x num presentations
             difference_scores_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).difference_score(itrial).value;
-            chance_rate_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
 
         end
 
@@ -301,7 +306,6 @@ for isubject = 1:size(curr_subject_ID,1)
 end
 all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2); % num subjects x num presentations x num conditions
 all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2); % num subjects x num presentations x num conditions
-all_chance_rates = cat(3,chance_rate_condition1,chance_rate_condition2);
 
 all_hitrates(all_hitrates == 0) = nan;
 all_FArates(all_FArates == 0) = nan;
@@ -309,8 +313,7 @@ all_FArates(all_FArates == 0) = nan;
 all_difference_scores = cat(3,difference_scores_condition1,difference_scores_condition2);
 chance_rate = (1/25)*ones(length(curr_subject_ID),6,7);
 %all_hitrates = all_hitrates + 0.001;
-%d_primes = norminv(all_hitrates) - norminv(all_FArates); % num subjects x num presentations x num conditions
-d_primes = norminv(all_hitrates) - norminv(all_chance_rates);
+d_primes = norminv(all_hitrates) - norminv(all_FArates); % num subjects x num presentations x num conditions
 % find subjects with d_primes of Inf or -Inf (to exclude)
 
 d_primes(d_primes == Inf) = nan;
@@ -332,12 +335,12 @@ d_primes(d_primes < 0) = nan;
 % xticks(1:2)
 % xticklabels({'scrambled','unscrambled'})
 % 
-figure;
-plot(squeeze(nanmean(d_primes,2))','-o');
-title('D prime (chance rate version)')
-%ylim([0,1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+% figure;
+% plot(squeeze(nanmean(d_primes,2))','-o');
+% title('D prime')
+% %ylim([0,1])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
 % 
 % figure;boxplot(squeeze(nanmean(d_primes,2)))
 % ylabel('d prime')
@@ -345,22 +348,22 @@ xticklabels({'scrambled','unscrambled'})
 % %ylim([0 1])
 % xticks(1:2)
 % xticklabels({'scrambled','unscrambled'})
-
-figure;
-boxplot(squeeze(nanmean(all_difference_scores,2)))
-ylabel('difference score')
-xlabel('Condition')
-ylim([-2 2])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
-
-figure;
-histogram(difference_scores_condition1(:),'BinWidth',1)
-hold on
-histogram(difference_scores_condition2(:),'BinWidth',1)
-legend({'Scrambled','Unscrambled'})
-xlabel('Difference Score','FontSize',18)
-ylabel('Frequency of occurrence','FontSize',18)
+% 
+% figure;
+% boxplot(squeeze(nanmean(all_difference_scores,2)))
+% ylabel('difference score')
+% xlabel('Condition')
+% ylim([-2 2])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
+% 
+% figure;
+% histogram(difference_scores_condition1(:))
+% hold on
+% histogram(difference_scores_condition2(:))
+% legend({'Scrambled','Unscrambled'})
+% xlabel('Difference Score','FontSize',18)
+% ylabel('Frequency of occurrence','FontSize',18)
 
 %% Hit rate over entire experiment instead
 all_hitrates_new = [];
@@ -382,23 +385,49 @@ for isubject = 1:size(curr_subject_ID,1)
     
 end
 
-figure;
-plot(all_hitrates_new','-o');
-title('hit rates')
-ylim([0 1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+hitrates_to_compare(ithreshold,:) = mean(all_hitrates_new,1);
+FArates_to_compare(ithreshold,:) = mean(all_FArates_new,1);
+dprimes_to_compare(ithreshold,:) = mean(all_dprimes_new,1);
+end
 
-figure;
-plot(all_FArates_new','-o');
-title('FA rates')
-ylim([0 1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+% figure;
+% scatter(possible_threshold_ends,hitrates_to_compare,'filled');
+% ylabel('Mean Hit Rate Across Subjects','FontSize',18)
+% xlabel('Threshold Window Start Time (seconds)','FontSize',18)
+% title('Hit Rate across Threshold Start (end = 2.0 s)','FontSize',18)
+% legend({'scrambled','unscrambled'})
+% 
+% figure;
+% scatter(possible_threshold_ends,FArates_to_compare,'filled');
+% ylabel('Mean FA Rate Across Subjects','FontSize',18)
+% title('FA Rate across Threshold Start (end = 2.0 s)','FontSize',18)
+% xlabel('Threshold Window Start Time (seconds)','FontSize',18)
+% legend({'scrambled','unscrambled'})
+% 
+% figure;
+% scatter(possible_threshold_ends,dprimes_to_compare,'filled');
+% ylabel('Mean D Prime Across Subjects','FontSize',18)
+% title('D Prime across Threshold Start (end = 2.0 s)','FontSize',18)
+% xlabel('Threshold Window Start Time (seconds)','FontSize',18)
+% legend({'scrambled','unscrambled'})
 
-figure;
-plot(all_dprimes_new','-o');
-title('D prime')
-%ylim([0,1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+% figure;
+% plot(all_hitrates_new','-o');
+% title('hit rates')
+% ylim([0 1])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
+% 
+% figure;
+% plot(all_FArates_new','-o');
+% title('FA rates')
+% ylim([0 1])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
+% 
+% figure;
+% plot(all_dprimes_new','-o');
+% title('D prime')
+% %ylim([0,1])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})

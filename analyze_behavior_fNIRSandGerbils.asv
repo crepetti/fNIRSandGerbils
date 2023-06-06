@@ -293,7 +293,6 @@ for isubject = 1:size(curr_subject_ID,1)
             hit_rates_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
             FA_rates_condition2(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_masker_words(itrial).value); % num subjects x num presentations
             difference_scores_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).difference_score(itrial).value;
-            chance_rate_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
 
         end
 
@@ -301,7 +300,6 @@ for isubject = 1:size(curr_subject_ID,1)
 end
 all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2); % num subjects x num presentations x num conditions
 all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2); % num subjects x num presentations x num conditions
-all_chance_rates = cat(3,chance_rate_condition1,chance_rate_condition2);
 
 all_hitrates(all_hitrates == 0) = nan;
 all_FArates(all_FArates == 0) = nan;
@@ -309,8 +307,7 @@ all_FArates(all_FArates == 0) = nan;
 all_difference_scores = cat(3,difference_scores_condition1,difference_scores_condition2);
 chance_rate = (1/25)*ones(length(curr_subject_ID),6,7);
 %all_hitrates = all_hitrates + 0.001;
-%d_primes = norminv(all_hitrates) - norminv(all_FArates); % num subjects x num presentations x num conditions
-d_primes = norminv(all_hitrates) - norminv(all_chance_rates);
+d_primes = norminv(all_hitrates) - norminv(all_FArates); % num subjects x num presentations x num conditions
 % find subjects with d_primes of Inf or -Inf (to exclude)
 
 d_primes(d_primes == Inf) = nan;
@@ -332,12 +329,12 @@ d_primes(d_primes < 0) = nan;
 % xticks(1:2)
 % xticklabels({'scrambled','unscrambled'})
 % 
-figure;
-plot(squeeze(nanmean(d_primes,2))','-o');
-title('D prime (chance rate version)')
-%ylim([0,1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+% figure;
+% plot(squeeze(nanmean(d_primes,2))','-o');
+% title('D prime')
+% %ylim([0,1])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
 % 
 % figure;boxplot(squeeze(nanmean(d_primes,2)))
 % ylabel('d prime')
