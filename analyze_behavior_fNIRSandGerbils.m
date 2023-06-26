@@ -5,7 +5,7 @@
 all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2');
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('nooverlappilot1','nooverlappilot2');
+curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 % names, and click times by trial
@@ -44,7 +44,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
 
     n_trials = length(trials); % find number of trials
     threshold_window_start = 0.2; % time in seconds from onset of word for start of hit/FA windows
-    threshold_window_end = 0.7; % time in seconds from onset of word for end of hit/FA windows
+    threshold_window_end = 0.8; % time in seconds from onset of word for end of hit/FA windows
     double_click_threshold = 0.05; % distance between clicks at which it would be decided that it is a double click
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct(); % create structure for nearest click distances
@@ -199,7 +199,7 @@ p3 = xline(threshold_window_end,'r','LineWidth',3);
 ylabel('Number of Clicks Total','FontSize',18)
 xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
 title('Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
-legend({'Click Counts','Word Onset Times','Antje Hit Window'})
+legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
 
 
 % Histogram of reaction times split up by trial type
