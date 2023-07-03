@@ -22,7 +22,12 @@ for isubject = 1:nsubjects
     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'setname',subID,'gui','on');
     EEG = pop_resample( EEG, 256);
     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'setname',subID,'overwrite','on','gui','on');
-    EEG = pop_firws(EEG, 'fcutoff', [0.3 30], 'ftype', 'bandpass', 'wtype', 'kaiser', 'warg', 5.65326, 'forder', 4638, 'minphase', 0);
+    % EEG = pop_firws(EEG, 'fcutoff', [0.3 30], 'ftype', 'bandpass', 'wtype', 'kaiser', 'warg', 5.65326, 'forder', 50, 'minphase', 0,'plotfresp',true);
+    fs = EEG.srate;
+    [b, a] = butter(1, [0.3, 30] / (fs / 2));
+    EEG.data = filtfilt(b, a, double(EEG.data'));
+    EEG.data = EEG.data';
+    EEG = eeg_checkset( EEG );
     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'setname',[subID,'BPF'],'gui','on');
 
     % STOP TO CLEAN UP HERE
