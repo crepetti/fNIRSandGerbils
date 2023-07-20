@@ -3,9 +3,9 @@
 % fNIRS and Gerbils
 
 % curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
-dir = '/Users/victoriafigarola/Documents/1_CMU/Barb_Lab/Ben/';
-dir_fnirsandgerbils = '/Users/victoriafigarola/Documents/1_CMU/Barb_Lab/Ben/fNIRSandGerbils.xlsx';
-curr_subject_ID = char('nooverlappilot3');
+dir = '/Users/ema36/OneDrive/Documents/fNIRSandGerbils/';
+dir_fnirsandgerbils = '/Users/ema36/OneDrive/Documents/fNIRSandGerbils/fNIRSandGerbils.xlsx';
+curr_subject_ID = char('nooverlappilot2');
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
@@ -18,7 +18,7 @@ num_tot_trials = 48;
 eeglab;
 %Load in pre-processed datasets
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-EEG = pop_loadset('filename',[curr_subject_ID '_ICAdone.set'],'filepath',dir);
+EEG = pop_loadset('filename',['nooverlappilot_ICA2.set'],'filepath',dir);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off'); 
 EEG = eeg_checkset( EEG );
 
@@ -141,6 +141,7 @@ test_avg_unscram=mean(test_unscram,1);
 test_unscram_masker = squeeze(unscrambled_by_masker_onset(:,2,:));
 test_avg_unscram_masker=mean(test_unscram_masker,1);
 
+t_epoched = linspace(-100,500,length(test_avg_unscram));
 figure;
 plot(t_epoched,detrend(test_avg_unscram))
 hold on
@@ -192,7 +193,7 @@ title('ERPs all channels (average over 24 presentations)','FontSize',18)
 % C3 (ch8), CP1 (ch9), C4 (ch23), FC6 (ch25), FC2 (ch26), F4 (ch27), AF4 (ch29), Fz (ch31), and Cz (ch32)
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
 
-single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(scrambled_by_target_onset(:,:,frontocentral_channels,:),4));
+single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(scrambled_by_target_onset(:,:,frontocentral_channels,:),3));
 
 % find erp and baseline
 for isubject = 1:nsubjects
