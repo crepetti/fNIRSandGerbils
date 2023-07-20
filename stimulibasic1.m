@@ -14,6 +14,7 @@
 %%path
 addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all_long');
 addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox');
+%comment nonsense
 
 %%make a master stream/control stream and variables
 subjectID = input('Enter Subject ID Below: ', 's');
