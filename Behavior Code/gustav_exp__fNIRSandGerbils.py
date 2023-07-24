@@ -238,9 +238,9 @@ def setup(exp):
     #    exp.var.order = ",".join([str(i) for i in np.flipud(np.tile(np.arange(len(exp.var.factorial['masker']))+1, 6))])
 
     order = np.arange(len(exp.var.factorial['masker'])) + 1
-    num_trials = int(48)
+    num_trials = int(144)
     # np.random.shuffle(order)
-    for i in range(24 - 1):
+    for i in range(72 - 1):
         this = np.arange(len(exp.var.factorial['masker'])) + 1
         looking = True
         while looking:
@@ -482,6 +482,7 @@ def present_trial(exp):
         exp.run.gustav_is_go = False
     else:
         try:
+            time.sleep(0.5)
             exp.user.side = ret
             exp.interface.update_Prompt("Hit a key when you hear [blue, red, green, white]", show=True, redraw=True)
             # exp.interface.update_Notify_Left('Playing', show=False, redraw=True)
