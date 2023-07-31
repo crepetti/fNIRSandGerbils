@@ -1,0 +1,39 @@
+%Emaya Anand, 7/23/23
+%% Epoching
+
+subID = 'nooverlappilot2';
+addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
+eeglab
+
+[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
+EEG = pop_loadset('filename', subID + '.set', 'filepath', 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\');
+%change ^^ after channel load changes
+[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
+EEG = eeg_checkset( EEG );
+
+%scrambled condition
+EEG = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled epochs'], 'epochinfo', 'yes');
+EEG = eeg_checkset( EEG );
+EEG = pop_rmbase( EEG, [], []);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
+EEG = eeg_checkset( EEG );
+save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\' subID + 'scrambled_epoch.mat'], "EEG")
+
+%unscrambled condition
+EEG = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled epochs'], 'epochinfo', 'yes');
+EEG = eeg_checkset( EEG );
+EEG = pop_rmbase( EEG, [], []);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
+EEG = eeg_checkset( EEG );
+save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\' subID + 'unscrambled_epoch.mat'], "EEG")
+
+%all epochs
+EEG = pop_epoch( EEG, {'19711, 36351'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+EEG = eeg_checkset( EEG );
+EEG = pop_rmbase( EEG, [], []);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
+EEG = eeg_checkset( EEG );
+save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\' subID + 'all_epoch.mat'], "EEG")
+
+eeglab redraw;
+ 

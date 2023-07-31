@@ -1,39 +1,39 @@
-%Emaya Anand, 7/23/23
-%% Epoching
-
-subID = 'nooverlappilot2';
+%% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
+%% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
+%% EPOCHING
+subID = 'test724';
 addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
 eeglab
 
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-EEG = pop_loadset('filename', subID + '.set', 'filepath', 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\pre processed data\');
+EEG = pop_loadset('filename', [subID, '_ICAdone.set'], 'filepath', 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\');
 %change ^^ after channel load changes
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
 EEG = eeg_checkset( EEG );
 
 %scrambled condition
-EEG = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled epochs'], 'epochinfo', 'yes');
-EEG = eeg_checkset( EEG );
-EEG = pop_rmbase( EEG, [], []);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
-EEG = eeg_checkset( EEG );
-save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\PrePro Epoched Data\' subID + 'scrambled_epoch.mat'], "EEG")
+EEG_scrambled = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled epochs'], 'epochinfo', 'yes');
+EEG_scrambled = eeg_checkset( EEG_scrambled );
+EEG_scrambled = pop_rmbase( EEG_scrambled, [], []);
+[ALLEEG EEG_scrambled CURRENTSET] = pop_newset(ALLEEG, EEG_scrambled, 2, 'gui', 'off');
+EEG_scrambled = eeg_checkset( EEG_scrambled );
+save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\', subID, 'scrambled_epoch.mat'], "EEG_scrambled")
 
 %unscrambled condition
-EEG = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled epochs'], 'epochinfo', 'yes');
-EEG = eeg_checkset( EEG );
-EEG = pop_rmbase( EEG, [], []);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
-EEG = eeg_checkset( EEG );
-save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\PrePro Epoched Data\' subID + 'unscrambled_epoch.mat'], "EEG")
+EEG_unscrambled = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled epochs'], 'epochinfo', 'yes');
+EEG_unscrambled = eeg_checkset( EEG_unscrambled );
+EEG_unscrambled = pop_rmbase( EEG_unscrambled, [], []);
+[ALLEEG EEG_unscrambled CURRENTSET] = pop_newset(ALLEEG, EEG_unscrambled, 2, 'gui', 'off');
+EEG_unscrambled = eeg_checkset( EEG_unscrambled );
+save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\', subID , 'unscrambled_epoch.mat'], "EEG_unscrambled")
 
 %all epochs
-EEG = pop_epoch( EEG, {'19711, 36351'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+EEG = pop_epoch( EEG, {'19711' , '36351'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
 EEG = eeg_checkset( EEG );
 EEG = pop_rmbase( EEG, [], []);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
 EEG = eeg_checkset( EEG );
-save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\PrePro Epoched Data\' subID + 'all_epoch.mat'], "EEG")
+save(['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\' ,subID, 'all_epoch.mat'], "EEG")
 
 eeglab redraw;
  
