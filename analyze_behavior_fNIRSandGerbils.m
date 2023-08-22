@@ -2,7 +2,7 @@
 %% Author: Benjamin Richardson
 
 % Create array of all subjects that have been run
-all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2');
+all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2','1');
 
 % Create array of subject IDs that you would like to analyze now
 curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
@@ -13,6 +13,8 @@ all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data
 
 by_subject_behavior_info = struct(); % create empty structure for behavior info split up by subject
 all_subjects_click_times = []; % create empty array for all click times (used for histograms)
+all_subjects_click_times_scrambled = []; % create empty array for all click times (used for histograms)
+all_subjects_click_times_unscrambled = []; % create empty array for all click times (used for histograms)
 
 
 for isubject = 1:size(curr_subject_ID,1) % For each subject....
@@ -62,6 +64,13 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
         current_click_times = current_click_times(~isnan(current_click_times));
 
         all_subjects_click_times = [all_subjects_click_times,current_click_times];
+        if conditions(itrial) == 1 % scrambled
+                    all_subjects_click_times_scrambled = [all_subjects_click_times_scrambled,current_click_times];
+        elseif conditions(itrial) == 2
+                    all_subjects_click_times_unscrambled = [all_subjects_click_times_unscrambled,current_click_times];
+        end
+
+
 
         %% find the appropriate color times for this trial (NOT IN ORDER)
         all_words_this_trial = all_word_order(itrial,:); % find the words presented in this trial
@@ -183,9 +192,19 @@ title('Click Counts vs. Time since Stimulus Onset','FontSize',18);
 
 % Histogram of click distance from nearest target word
 all_nearest_click_distances = [];
+all_nearest_click_distances_scrambled = [];
+all_nearest_click_distances_unscrambled = [];
+
 for isubject = 1:size(curr_subject_ID,1)
     for itrial = 1:n_trials
         all_nearest_click_distances = [all_nearest_click_distances,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+        if conditions(itrial) == 1 % scrambled
+            all_nearest_click_distances_scrambled = [all_nearest_click_distances_scrambled,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+        elseif conditions(itrial) == 2
+             all_nearest_click_distances_unscrambled = [all_nearest_click_distances_unscrambled,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+        end
+
+
     end
 end
 figure;
@@ -199,6 +218,33 @@ p3 = xline(threshold_window_end,'r','LineWidth',3);
 ylabel('Number of Clicks Total','FontSize',18)
 xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
 title('Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
+legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
+
+figure;
+p1 = histogram(all_nearest_click_distances_scrambled,'BinWidth',0.05);
+xticks(tOnset - 1);
+for i = 1:length(tOnset)
+p2 = xline(tOnset(i) - 1);
+end
+p3 = xline(threshold_window_start,'r','LineWidth',3);
+p3 = xline(threshold_window_end,'r','LineWidth',3);
+ylabel('Number of Clicks Total','FontSize',18)
+xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
+title('SCRAMBLED Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
+legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
+
+
+figure;
+p1 = histogram(all_nearest_click_distances_unscrambled,'BinWidth',0.05);
+xticks(tOnset - 1);
+for i = 1:length(tOnset)
+p2 = xline(tOnset(i) - 1);
+end
+p3 = xline(threshold_window_start,'r','LineWidth',3);
+p3 = xline(threshold_window_end,'r','LineWidth',3);
+ylabel('Number of Clicks Total','FontSize',18)
+xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
+title('UNSCRAMBLED Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
 legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
 
 
