@@ -33,11 +33,11 @@
 
 %%OK HERE'S ACTUAL CODE
 %%path
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\unprocessed\bob_all')
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\unprocessed\bob_all_long')
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\unprocessed\mike_all')
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all')
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all_long')
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\mike_all')
 
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\AuditoryToolbox')
+addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox')
 
 addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox');
 %comment nonsense
@@ -54,7 +54,7 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 144;
+numtrials = 32;
 numpracticetrials = 0;
 % scrambled or unscrambled (0 = unscrambled, 1 = scrambled)
 scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];

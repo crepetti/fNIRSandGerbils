@@ -507,7 +507,7 @@ def present_trial(exp):
                 # trigger_channel_4[len(trigger_channel_4) - 1] = 1
                 # s = np.transpose(np.stack(((s, s, trigger_channel_3, trigger_channel_4))))
                 sd.default.device = 'ASIO Fireface USB'
-                sd.play(sound_data, exp.stim.fs, mapping=[1, 2, 3, 4])
+                sd.play(sound_data, exp.stim.fs, mapping=[1, 2, 3, 4, 5])
                 # s.play()
 
                 # <>if triggers:

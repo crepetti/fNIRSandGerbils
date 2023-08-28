@@ -1,0 +1,128 @@
+# -*- coding: utf-8 -*-
+
+# A log file for Gustav
+
+
+Experiment fNIRSandGerbils running subject triggertest828 started at 12:32:54 on 2023-08-28
+
+  Block 1 of 288 started at 12:33:01; Condition: 1 ; masker = scrambled_diff_talker
+
+Experiment fNIRSandGerbils running subject triggertest828 started at 12:36:41 on 2023-08-28
+
+  Block 1 of 288 started at 12:36:44; Condition: 1 ; masker = scrambled_diff_talker
+
+Experiment fNIRSandGerbils running subject triggertest828 started at 12:38:07 on 2023-08-28
+
+  Block 1 of 288 started at 12:38:19; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 288 ended at 12:38:42; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 2 of 288 started at 12:38:42; Condition: 2 ; masker = scrambled_same_talker
+    Trial 2, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 2 of 288 ended at 12:39:03; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 3 of 288 started at 12:39:03; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 3, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 3 of 288 ended at 12:39:25; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 4 of 288 started at 12:39:25; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 4, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 4 of 288 ended at 12:39:49; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 5 of 288 started at 12:39:49; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 5, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 5 of 288 ended at 12:40:10; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 6 of 288 started at 12:40:10; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 6, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 6 of 288 ended at 12:40:35; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 7 of 288 started at 12:40:35; Condition: 2 ; masker = scrambled_same_talker
+    Trial 7, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 7 of 288 ended at 12:40:56; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 8 of 288 started at 12:40:56; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 8, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 8 of 288 ended at 12:41:21; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 9 of 288 started at 12:41:21; Condition: 2 ; masker = scrambled_same_talker
+    Trial 9, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 9 of 288 ended at 12:41:43; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 10 of 288 started at 12:41:43; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 10, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 10 of 288 ended at 12:42:03; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 11 of 288 started at 12:42:03; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 11, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 11 of 288 ended at 12:42:23; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 12 of 288 started at 12:42:23; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 12, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 12 of 288 ended at 12:42:43; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 13 of 288 started at 12:42:43; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 13, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 13 of 288 ended at 12:43:05; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 14 of 288 started at 12:43:05; Condition: 2 ; masker = scrambled_same_talker
+    Trial 14, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 14 of 288 ended at 12:43:26; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 15 of 288 started at 12:43:26; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 15, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 15 of 288 ended at 12:43:46; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 16 of 288 started at 12:43:46; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 16, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 16 of 288 ended at 12:44:06; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 17 of 288 started at 12:44:06; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 17, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 17 of 288 ended at 12:44:32; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 18 of 288 started at 12:44:32; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 18, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 18 of 288 ended at 12:44:54; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 19 of 288 started at 12:44:54; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 19, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 19 of 288 ended at 12:45:15; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 20 of 288 started at 12:45:15; Condition: 2 ; masker = scrambled_same_talker
+    Trial 20, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 20 of 288 ended at 12:45:35; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 21 of 288 started at 12:45:35; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 21, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 21 of 288 ended at 12:45:55; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 22 of 288 started at 12:45:55; Condition: 2 ; masker = scrambled_same_talker
+    Trial 22, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 22 of 288 ended at 12:46:18; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 23 of 288 started at 12:46:18; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 23, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 23 of 288 ended at 12:46:40; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 24 of 288 started at 12:46:40; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 24, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 24 of 288 ended at 12:47:01; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 25 of 288 started at 12:47:01; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 25, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 25 of 288 ended at 12:47:32; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 26 of 288 started at 12:47:32; Condition: 4 ; masker = unscrambled_same_talker
+    Trial 26, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 26 of 288 ended at 12:47:58; Condition: 4 ; masker = unscrambled_same_talker
+
+  Block 27 of 288 started at 12:47:58; Condition: 2 ; masker = scrambled_same_talker
+    Trial 27, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 27 of 288 ended at 12:48:25; Condition: 2 ; masker = scrambled_same_talker
+
+  Block 28 of 288 started at 12:48:25; Condition: 3 ; masker = unscrambled_diff_talker
+    Trial 28, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 28 of 288 ended at 12:48:46; Condition: 3 ; masker = unscrambled_diff_talker
+
+  Block 29 of 288 started at 12:48:46; Condition: 4 ; masker = unscrambled_same_talker
