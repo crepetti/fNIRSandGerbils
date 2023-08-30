@@ -240,7 +240,7 @@ def setup(exp):
     order = np.arange(len(exp.var.factorial['masker'])) + 1
     num_trials = int(144)
     # np.random.shuffle(order)
-    for i in range(72 - 1):
+    for i in range(36 - 1):
         this = np.arange(len(exp.var.factorial['masker'])) + 1
         looking = True
         while looking:
