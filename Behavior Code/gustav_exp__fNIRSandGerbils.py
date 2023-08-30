@@ -238,7 +238,7 @@ def setup(exp):
     #    exp.var.order = ",".join([str(i) for i in np.flipud(np.tile(np.arange(len(exp.var.factorial['masker']))+1, 6))])
 
     order = np.arange(len(exp.var.factorial['masker'])) + 1
-    num_trials = int(144)
+    num_trials = int(36)
     # np.random.shuffle(order)
     for i in range(36 - 1):
         this = np.arange(len(exp.var.factorial['masker'])) + 1
@@ -249,6 +249,7 @@ def setup(exp):
                 order = np.append(order, this)
                 looking = False
     exp.var.order = ",".join(str(item) for item in list(order))
+
 
     """IGNORE CONDITIONS
         A list of condition numbers to ignore. These conditions will not be
@@ -310,7 +311,7 @@ def pre_exp(exp):
                     # s = np.transpose(np.stack(((s,s,trigger_channel_3, trigger_channel_4))))
                     # Play stimulus
                     sd.default.device = 'ASIO Fireface USB'
-                    sd.play(sound_data, exp.stim.fs, mapping = [1,2,3,4])
+                    sd.play(sound_data, exp.stim.fs, mapping = [1,2,3,4,5])
                     #s.play()
 
                     start_ms = exp.interface.timestamp_ms()

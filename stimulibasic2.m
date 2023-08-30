@@ -54,7 +54,7 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 32;
+numtrials = 144;
 numpracticetrials = 0;
 % scrambled or unscrambled (0 = unscrambled, 1 = scrambled)
 scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
