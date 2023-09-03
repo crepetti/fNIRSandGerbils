@@ -562,8 +562,8 @@ def prompt_response(exp):
 
 def post_trial(exp):
     # if not exp.gustav_is_go:
-    exp.interface.update_Prompt("Waiting 30 sec...", show=True, redraw=True)
-    time.sleep(5)  # CHANGED FOR PILOTING - only 2 seconds
+    exp.interface.update_Prompt("Waiting a moment...", show=True, redraw=True)
+    time.sleep(3)  # CHANGED FOR PILOTING - only 2 seconds
     exp.interface.update_Prompt("", show=True, redraw=True)
 
 
