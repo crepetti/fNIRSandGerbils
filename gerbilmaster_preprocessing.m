@@ -4,9 +4,9 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
-subID = 'test724';
-filename = ['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\', subID, '.bdf'];
+addpath('C:\Users\benri\Documents\eeglab2023.0');
+subID = 'newpilot93';
+filename = ['C:\Users\benri\Documents\GitHub\fNIRSandGerbils\', subID, '.bdf'];
 eeglab
 
 %loading in BDF files and re-referencing to externals (mastoids/earlobes)
@@ -22,7 +22,7 @@ EEG = eeg_checkset( EEG );
 
 %adding in channel locations - FOR NOW DOING LOAD, WILL EDIT LATER!
 % EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\richardson_32_chanlocs.locs' 'filetype' 'locs'});
-EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+EEG=pop_chanedit(EEG, 'load',{'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 
 
 % [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
@@ -47,7 +47,7 @@ EEG = eeg_checkset( EEG );
 EEG = pop_runica(EEG, 'extended',1);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2,'setname',[subID, 'ICA'],'gui','on');
 
-EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\');
+EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\');
 [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 pop_selectcomps(EEG,[1:32])
@@ -60,7 +60,7 @@ close
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 3,'setname',[subID, 'ICA Cleaned'],'gui','on');
 
 %Saving ICA
-EEG = pop_saveset( EEG, 'filename', [subID , '_ICAdone.set'], 'filepath', 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\');
+EEG = pop_saveset( EEG, 'filename', [subID , '_ICAdone.set'], 'filepath', 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\');
 [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 eeglab redraw;
