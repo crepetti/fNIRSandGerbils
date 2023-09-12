@@ -14,8 +14,8 @@
 %% Defining variables in beginning:
 %subID = char('nooverlappilot2','nooverlappilot3');
 subID = char('test724'); %current subject --> NOTE: KEEP SUBJECT ID, FOLDER NAMES && DATA THE SAME 
-dir = ['C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data/']; %where the EEG data is stored in mat file
-dir_fnirsandgerbils = 'C:/Users/ema36/OneDrive/Documents/fNIRSandGerbils/data/fNIRSandGerbilscopy.xlsx'; %response times
+dir = ['C:\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data/']; %where the EEG data is stored in mat file
+dir_fnirsandgerbils = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx'; %response times
 erp_window_start_time = -100; % 100 ms before onset of word
 erp_window_end_time = 500; % 500 ms after onset of word
 num_tot_trials = 24;
