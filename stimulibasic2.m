@@ -55,7 +55,7 @@ overlap = 0;
 trial = 1;
 practicetrial = 1;
 numtrials = 144;
-numpracticetrials = 0;
+numpracticetrials = 10;
 % scrambled or unscrambled (0 = unscrambled, 1 = scrambled)
 scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
 scramblingarray = randsample(scramblingarray, numtrials);
@@ -66,6 +66,14 @@ talkerarray = randsample(talkerarray,numtrials);
 % background, 1 = mike is background)
 bob_or_mike = [zeros(1, numtrials/2), ones(1, numtrials/2)];
 bob_or_mike = randsample(bob_or_mike,numtrials);
+
+% make arrays for practice 
+practice_scramblingarray = [zeros(1, numpracticetrials/2), ones(1, numpracticetrials/2)];
+practice_scramblingarray = randsample(practice_scramblingarray, numpracticetrials);
+practice_talkerarray = [zeros(1, numpracticetrials/2), ones(1, numpracticetrials/2)];
+practice_talkerarray = randsample(practice_talkerarray,numpracticetrials);
+practice_bob_or_mike = [zeros(1, numpracticetrials/2), ones(1, numpracticetrials/2)];
+practice_bob_or_mike = randsample(practice_bob_or_mike,numpracticetrials);
 
 all_masker_word_order = strings(numtrials,numtotalwords);
 
@@ -92,20 +100,29 @@ end
 
 %% Generate Practice Trials
 while practicetrial <= numpracticetrials
+    %% Create masker sound
+    % Steps: 1) Choose words, 2) Filter at the word level, 3) Concatenate,
+    % 4) Scramble if necessary
     randcolor = randi([3 5],1,1);
     nummasker = numtotalwords - randcolor;
     
+    scramblingindex = practice_scramblingarray(practicetrial);
+    talkerindex = practice_talkerarray(practicetrial);
+    bob_or_mike_index = practice_bob_or_mike(practicetrial);
+
+    %lets choose 15-17 masker words and 3-5 color words
     masker_words_to_use = randsample(all_object_words, nummasker, 'true'); %picking words from masker bucket and allowing multiple of the same word
     color_words_to_use = randsample(all_color_words,randcolor,'true'); %same for color words
     
     %mix them in a bucket and randomize them, sample without replacements showing up, but also randomizing so that color and masker words are mixed
-    num_words_total = length(masker_words_to_use);
-    final_word_order = randsample([all_object_words, all_color_words], num_words_total, false);
+    num_words_total = length(masker_words_to_use) + length(color_words_to_use);
+    final_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
     
+    %% Duplicate Check
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
-    while duplicateindex <= numtotalwords - 1
+    while duplicateindex <= numtotalwords - 3
         duplicatecheck(duplicateindex) = final_word_order(duplicateindex);
         if duplicatecheck(duplicateindex) == final_word_order(duplicateindex + 1)
             if ismember(duplicatecheck(duplicateindex), all_color_words) == 1
@@ -116,41 +133,93 @@ while practicetrial <= numpracticetrials
                 duplicateindex = duplicateindex + 0;
             end
         end
+        % make sure no color words are next to each other (if within two,
+        % switch it with someone else
+        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
+            final_word_order(duplicateindex + 1) = randsample(all_object_words,1,1);
+        end
+        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 2), all_color_words)
+            final_word_order(duplicateindex + 2) = randsample(all_object_words,1,1);            
+        end
+        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 3), all_color_words)
+            final_word_order(duplicateindex + 3) = randsample(all_object_words,1,1);          
+        end
         duplicateindex = duplicateindex + 1;
+        
+    end
+    % no color words in the first three words
+    for ifirstcheck = 1:3
+        if ismember(final_word_order(ifirstcheck),all_color_words)
+            final_word_order(ifirstcheck) = randsample(all_object_words(all_object_words ~= final_word_order(ifirstcheck)), 1, 'false');
+        end
+    end
+    % no color words in the last three words
+    
+    for ilastcheck = num_words_total-3:num_words_total
+        if ismember(final_word_order(ilastcheck),all_color_words)
+            final_word_order(ilastcheck) = randsample(all_object_words(all_object_words ~= final_word_order(ilastcheck)), 1, 'false');
+        end
     end
     
-    % load the audio file and put into a larger array
+    % load the small audio files, filter, level correct and then put into a larger array
     loadsoundindex = 1;
     soundArray = strings(1, numtotalwords);
     while loadsoundindex <= numtotalwords
-        word_filename = append('unprocessed\bob_all\',final_word_order(loadsoundindex), '_short.wav');
+        if bob_or_mike_index == 0
+            word_filename = append('unprocessed\bob_all\',final_word_order(loadsoundindex), '_short.wav');
+        elseif bob_or_mike_index == 1
+            word_filename = append('unprocessed\mike_all\',final_word_order(loadsoundindex), '_short.wav');
+        end
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
     end
     
     %overlap the sounds
-    tOnset = 0:wordlength-overlap:(wordlength-overlap)*(numtotalwords-1);
+    tOnset = 0:wordlength-overlap:(wordlength-overlap)*numtotalwords;
     tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); %1/fs = seconds per sample
     newtotalSound = zeros(length(tVec), 1);
     newTargetSound = zeros(length(tVec), 1);
     newMaskerSound = zeros(length(tVec), 1);
     iOnset = 1;
     while iOnset <= numtotalwords
-        [y,fs] = audioread(soundArray(iOnset));
-        curr_tOnset = tOnset(iOnset);
-        %adds to target sound array
-        if ismember(final_word_order(iOnset), all_color_words)
-            [~,start_index] = min(abs(tVec - curr_tOnset));
-            [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
-            newTargetSound(start_index:stop_index - 1) = newTargetSound(start_index:stop_index - 1) + y;
-            %adds to masker sound array
-        elseif ismember(final_word_order(iOnset), all_object_words)
-            [~,start_index] = min(abs(tVec - curr_tOnset));
-            [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
-            newMaskerSound(start_index:stop_index - 1) = newMaskerSound(start_index:stop_index - 1) + y;
-        else
-            disp("uh oh!")
+        [y,fs] = audioread(soundArray(iOnset)); % load this word
+        filtered_word = zeros(length(y),1);
+        % filter this word
+
+        %making the filter
+        numfilters = 16; %go between like 2 and 16
+        order = 9; %go between like 2 and 10
+        edges = logspace(log10(300), log10(10000), numfilters + 1);
+
+        for iFilter = 1:numfilters
+            lowedge = edges(iFilter);
+            highedge = edges(iFilter + 1);
+            %n = order of filter (sharp/shallow)
+            %Wn = normalized frequency
+            [bLow, aLow] = butter(order, highedge/(fs/2), 'low');
+            [bHigh, aHigh] = butter(order, lowedge/(fs/2), 'high');
+            thisFilteredSound = zeros(1, length(y));
+            if mod(iFilter,2) == 1
+                thisFilteredSound = filter(bLow, aLow, y);
+                thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
+                filtered_word = filtered_word + thisFilteredSound;
+            elseif mod(iFilter,2) == 0
+                thisFilteredSound = filter(bLow, aLow, y);
+                thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
+                filtered_word = filtered_word + thisFilteredSound;
+            end
         end
+
+        % level correct this word
+        filtered_word = filtered_word * rmsset/rms(filtered_word);
+
+
+        % add this word to the array newMaskerSound
+
+        curr_tOnset = tOnset(iOnset);
+        [~,start_index] = min(abs(tVec - curr_tOnset));
+        [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
+        newMaskerSound(start_index:stop_index - 1) = newMaskerSound(start_index:stop_index - 1) + filtered_word;
         %find the closest values for onset time and onset time + 300 ms
         %    [~,start_index] = min(abs(tVec - curr_tOnset));
         %    [~,stop_index] = min(abs(tVec - (wordlength + curr_tOnset)));
@@ -158,44 +227,114 @@ while practicetrial <= numpracticetrials
         iOnset = iOnset + 1;
     end
     
+    %% Scramble masker sound if necessary
+    if (scramblingindex == 1)
+        newMaskerSound = scrambling(newMaskerSound, fs);
+    end
     newMaskerSound = newMaskerSound'; % transpose the array
     
-    %making the filter
-    numfilters = 16; %go between like 2 and 16
-    order = 9; %go between like 2 and 10
-    edges = logspace(log10(300), log10(10000), numfilters + 1);
-    newMaskerFiltered = zeros(1, length(tVec));
-    newTargetFiltered = zeros(1, length(tVec));
-    
-    for iFilter = 1:numfilters
-        lowedge = edges(iFilter);
-        highedge = edges(iFilter + 1);
-        %n = order of filter (sharp/shallow)
-        %Wn = normalized frequency
-        [bLow, aLow] = butter(order, highedge/(fs/2), 'low');
-        [bHigh, aHigh] = butter(order, lowedge/(fs/2), 'high');
-        thisFilteredSound = zeros(1, length(tVec));
-        if mod(iFilter,2) == 1
-            thisFilteredSound = filter(bLow, aLow, newMaskerSound);
-            thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
-            newMaskerFiltered = newMaskerFiltered + thisFilteredSound;
-        elseif mod(iFilter,2) == 0
-            thisFilteredSound = filter(bLow, aLow, newTargetSound)';
-            thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
-            newTargetFiltered = newTargetFiltered + thisFilteredSound;
+
+    %% Create target sound
+    % STEPS: 1) Choose words, 2) Filter at the word level 3) Concatenate
+
+    % choose 6-7 words in the target sound. Between 3-5 of them will be
+    % color words
+    start_time = tOnset(1) + 1;
+    end_time = tOnset(end) - wordlength;
+    num_target_color_words = randsample([3,4,5],1);
+    num_target_object_words = num_target_color_words; % always half and half colors and objects
+    num_target_words = num_target_color_words + num_target_object_words;
+    target_onsets = (end_time-start_time).*rand(num_target_words,1) + start_time; % choose target word onset times, making sure they are at least 1 second apart and at least wordlength before the end of stimulus
+    target_onsets = sort(target_onsets);
+    % target words will be prohibited from being 50 ms on either side of a masker word onset
+    tOnset_low = tOnset - 0.08;
+    tOnset_high = tOnset + 0.08;
+    onset_flag = 0;
+    for itarget = 1:length(target_onsets)
+        if any(logical((tOnset_low <= target_onsets(itarget)).*(target_onsets(itarget) <= tOnset_high)))
+            onset_flag = 1;
         end
     end
+    while any(abs(diff(target_onsets)) < 0.8) 
+        target_onsets = (end_time-start_time).*rand(num_target_words,1) + start_time;     % make sure target onset times are at least 1 second apart
+        target_onsets = sort(target_onsets);
+
+        onset_flag = 0;
+        for itarget = 1:length(target_onsets)
+            if any(logical((tOnset_low <= target_onsets(itarget)).*(target_onsets(itarget) <= tOnset_high)))
+                onset_flag = 1;
+            end
+        end
+    end
+
+    target_color_word_order = randsample(all_color_words,num_target_color_words,'true'); % choose target words
+    target_object_word_order = randsample(all_object_words,num_target_object_words,'true');
+    target_word_order = [target_color_word_order,target_object_word_order];
+    target_word_order = target_word_order(randperm(length(target_word_order)));
+
+    % ensure target word is never near the same word in the masker sound
+    for i = 1:length(target_word_order)
+        % find the closest word in final word order
+        [~,masker_word_index] = min(abs(tOnset - target_onsets(i)));
+        if target_word_order(i) == final_word_order(masker_word_index) && ismember(target_word_order(i),all_color_words)
+            target_word_order(i) = randsample(all_color_words(all_color_words ~= target_word_order(i)),1);
+        elseif target_word_order(i) == final_word_order(masker_word_index) && ismember(target_word_order(i),all_object_words)
+            target_word_order(i) = randsample(all_object_words(all_object_words ~= target_word_order(i)),1);
+        end
+    end
+
+
+    for i = 1:length(target_onsets)
+        if bob_or_mike_index == 0 && talkerindex == 0 % bob background, same talker
+            word_filename = append('unprocessed\bob_all\',target_word_order(i), '_short.wav');
+        elseif bob_or_mike_index == 0 && talkerindex == 1 % bob background, diff talker
+            word_filename = append('unprocessed\mike_all\',target_word_order(i), '_short.wav');
+        elseif bob_or_mike_index == 1 && talkerindex == 0 % mike background, same talker
+            word_filename = append('unprocessed\mike_all\',target_word_order(i), '_short.wav');
+        elseif bob_or_mike_index == 1 && talkerindex == 1 % mike background, diff talker            
+            word_filename = append('unprocessed\bob_all\',target_word_order(i), '_short.wav');
+        end
+        [y,fs] = audioread(word_filename);
+        filtered_word = zeros(length(y),1);
+        %making the filter
+        numfilters = 16; %go between like 2 and 16
+        order = 9; %go between like 2 and 10
+        edges = logspace(log10(300), log10(10000), numfilters + 1);
+
+        % Filter this word (opposite filters from masker)
+
+        for iFilter = 1:numfilters
+            lowedge = edges(iFilter);
+            highedge = edges(iFilter + 1);
+            %n = order of filter (sharp/shallow)
+            %Wn = normalized frequency
+            [bLow, aLow] = butter(order, highedge/(fs/2), 'low');
+            [bHigh, aHigh] = butter(order, lowedge/(fs/2), 'high');
+            thisFilteredSound = zeros(1, length(y));
+            if mod(iFilter,2) == 0
+                thisFilteredSound = filter(bLow, aLow, y);
+                thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
+                filtered_word = filtered_word + thisFilteredSound;
+            elseif mod(iFilter,2) == 1
+                thisFilteredSound = filter(bLow, aLow, y);
+                thisFilteredSound = filter(bHigh, aHigh, thisFilteredSound);
+                filtered_word = filtered_word + thisFilteredSound;
+            end
+        end
+
+        % Level set this word
+        filtered_word = filtered_word * rmsset/rms(filtered_word);
+
+        % Add to larger array
+        [~,ionset] = min(abs(tVec - target_onsets(i)));
+        newTargetSound(ionset:ionset + length(filtered_word) -1) = filtered_word;
+    end
+    
     
     this_foldername = [foldername,'/practice'];
     audiofilename = [this_foldername,'/',num2str(practicetrial),'_practice', '.wav'];
-    output = newTargetFiltered + newMaskerFiltered;
+    output = newTargetSound' + newMaskerSound;
     output = output * rmsset/rms(output);
-    output = repmat(output,2,1)';
-    trigger_channel_3 = zeros(size(output(:,1)));
-    %trigger_channel_3(1)= 1;
-    trigger_channel_4 = zeros(size(output(:,1)));
-    %trigger_channel_4(end) = 1;
-    output = cat(2,output,trigger_channel_3,trigger_channel_4);
     audiowrite(audiofilename, output, fs);
     disp(audiofilename)
     

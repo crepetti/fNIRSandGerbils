@@ -33,11 +33,11 @@
 
 %%OK HERE'S ACTUAL CODE
 %%path
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\unprocessed\bob_all')
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\unprocessed\bob_all_long')
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\unprocessed\mike_all')
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all')
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all_long')
+addpath('D:\Experiments\fNIRSandGerbils\unprocessed\mike_all')
 
-addpath('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\AuditoryToolbox')
+addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox')
 
 addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox');
 %comment nonsense
@@ -66,6 +66,8 @@ talkerarray = randsample(talkerarray,numtrials);
 % background, 1 = mike is background)
 bob_or_mike = [zeros(1, numtrials/2), ones(1, numtrials/2)];
 bob_or_mike = randsample(bob_or_mike,numtrials);
+
+% make ar
 
 all_masker_word_order = strings(numtrials,numtotalwords);
 
@@ -446,7 +448,6 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_3(1)= 1;
-
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
@@ -461,7 +462,7 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_4(1) = 1;
-        output = cat(2,output,trigger_channel_3,trigger_channel_4);
+        output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
@@ -475,7 +476,7 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_5(1) = 1;
-        output = cat(2,output,trigger_channel_3,trigger_channel_4);
+        output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
@@ -486,10 +487,11 @@ while trial <= numtrials
         output = repmat(output,2,1)';
         % Trigger = 1 0 1
         trigger_channel_3 = zeros(size(output(:,1)));
-       % trigger_channel_3(1)= 1;
         trigger_channel_4 = zeros(size(output(:,1)));
-        trigger_channel_4(1) = 1;
-        output = cat(2,output,trigger_channel_3,trigger_channel_4);
+        trigger_channel_5 = zeros(size(output(:,1)));
+        trigger_channel_3(1) = 1;
+        trigger_channel_5(1) = 1;
+        output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
