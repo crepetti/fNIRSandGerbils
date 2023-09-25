@@ -1,5 +1,7 @@
 %% PREPROCESSING
-
+%% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
+%% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
+%% NEED BDF FILES
 dir = '/Users/ema36/OneDrive/Documents/fNIRSandGerbils\';
 addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0')
 addpath(dir)
@@ -10,7 +12,7 @@ addpath(dir)
 eeglab;
 % Define subject information (which BDFs to load)
 % curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
-curr_subject_ID = char('nooverlappilot2');
+curr_subject_ID = char('newpilot917'); %% change per subject
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
@@ -20,10 +22,10 @@ nsubjects = size(curr_subject_ID,1);
 
 for isubject = 1:nsubjects
     subID = curr_subject_ID(isubject,:);
-    bdf_filename = [dir,subID,'_EEG.bdf'];
+    bdf_filename = [dir,subID,'.bdf'];
     ALLEEG = [];
     EEG = [];
-    %^^reset everything piece of mind
+    %^^reset everything peace of mind
     EEG = pop_biosig(bdf_filename,'ref',[1:32],'refoptions',{'keepref' 'on'}); %commonavg reference
     %EEG = pop_biosig(bdf_filename,'ref',[33 34],'refoptions',{'keepref' 'off'}); %mastoid reference
     EEG = pop_select( EEG,'nochannel',{'EXG1','EXG2','EXG3','EXG4','EXG5','EXG6','EXG7','EXG8','GSR1','GSR2','Erg1','Erg2','Resp','Plet','Temp'}); %take out EXG1/2 for mastoid ref
@@ -95,7 +97,7 @@ for isubject = 1:nsubjects
     close;
     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'setname', [subID, 'ICA Cleaned'], 'gui', 'on');
 
-  EEG = pop_saveset( EEG, 'filename','nooverlappilot_ICA2.set','filepath',dir);
+  EEG = pop_saveset( EEG, 'filename','newpilot917_ICA2.set','filepath',dir); %% change per subject
   [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
   eeglab redraw;

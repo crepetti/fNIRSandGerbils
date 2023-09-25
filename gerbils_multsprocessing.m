@@ -1,113 +1,108 @@
-%% POSTPROCESSING INDIVIDUAL ERPs and WORD ONSETS
+%% TAKING MULTIPLE SUBJECT EPOCH DATA AND AVERAGING IT THEN PLOTTING IT
 %% Primary Author: Benjamin Richardson
 %% Secondary Author: Emaya Anand
 %% NEED ICA_DONE FILES
-% script to calculate ERPs for scrambled and unscrambled word onsets in
+% script to average subject ERPs and plot them
 % fNIRS and Gerbils
-
+addpath 'C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0'
 dir = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\';
 dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\fNIRSandGerbils.xlsx';
-curr_subject_ID = char('newpilot93');
+
+subIDarray = ["newpilot93", "newpilot93"];
+
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
+
 erp_window_start_time = -100; % 100 ms before onset of word
 erp_window_end_time = 500; % 500 ms after onset of word
-nsubjects = size(curr_subject_ID,1);
+nsubjects = 2;
 num_tot_trials = 140; % look into this
-
+num_condition_trials = 35;
 
 eeglab;
-%Load in pre-processed datasets
-[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-EEG = pop_loadset('filename',['newpilot93_ICAdone.set'],'filepath',[dir,'\prepro_epoched_data']);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off'); 
-EEG = eeg_checkset( EEG );
-fs = EEG.srate;
-tube_delay = fs/44100;
-shifting_latencies = mat2cell( cell2mat({EEG.event.latency}') + (tube_delay * fs) , length(EEG.event),1);
-shifting_latencies = shifting_latencies{:};
-for i = 1:numel(shifting_latencies)
-    EEG.event(i).latency = shifting_latencies(i);
-end
-EEG = eeg_checkset( EEG );
 
-% Define subject information (which BDFs to load)
+%% Load in pre-processed datasets - wasn't sure if this is necessary?
+% isubbylist = [1:nsubjects];
+% n = 1;
+% for isubby = isubbylist(n)
+%     subID = char(subIDarray(:,n));
+%     [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
+%     EEG = pop_loadset('filename',[subID, '_ICAdone.set'],'filepath',[dir,'\prepro_epoched_data']);
+%     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off'); 
+%     EEG = eeg_checkset( EEG );
+%     fs = EEG.srate;
+%     tube_delay = fs/44100;
+%     shifting_latencies = mat2cell( cell2mat({EEG.event.latency}') + (tube_delay * fs) , length(EEG.event),1);
+%     shifting_latencies = shifting_latencies{:};
+%     for i = 1:numel(shifting_latencies)
+%         EEG.event(i).latency = shifting_latencies(i);
+%     end
+% EEG = eeg_checkset( EEG );
+% EEG = pop_saveset(EEG, [subID]);
+% n = n + 1;
+% end 
 
-% for isubject = 1:nsubjects
-    % subID = curr_subject_ID(isubject,:);
-    isubject = 1;
-    subID = curr_subject_ID(1,:);
+%Go through epoch data and separate by color/target/scram vs unscram
+isubby = [1:nsubjects];
+x = 1;
+%% bruh i got confused here - how do i isolate the erps per subject but then average them without writing over the data?
+for isub = isubby(x)
+    subID = char(subIDarray(:,x));
 
-    %% Epoching
-    EEG_scrambled_st = pop_epoch( EEG, {'45055'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
-    EEG_unscrambled_st = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
-    EEG_scrambled_dt = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
-    EEG_unscrambled_dt = pop_epoch( EEG, {'11007'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
-    EEG_all = pop_epoch( EEG, {'19711' , '36351', '45055', '11007'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
-
-
-    % Find tOnset to isolate ERPs: loading in all_word_order & tOnset -->
-    % THIS IS BELOW ALREADY
-    % words_filename = [dir, subID, '_alltrialwords.mat'];
-    % load(words_filename);
-
-    % isolate ERPs
-    all_epochs = EEG_all.data; % num channels x num time points x num trials
-    scrambled_st_epochs(isubject,:,:,:) = EEG_scrambled_st.data; % subject x num channels x num time points x num trials
-    unscrambled_st_epochs(isubject,:,:,:) = EEG_unscrambled_st.data; % subject x num channels x num time points x num trials
-    scrambled_dt_epochs(isubject,:,:,:) = EEG_scrambled_dt.data; % subject x num channels x num time points x num trials
-    unscrambled_dt_epochs(isubject,:,:,:) = EEG_unscrambled_dt.data; % subject x num channels x num time points x num trials
-    scrambled_time = EEG_scrambled_st.times; % in milliseconds
-    unscrambled_time = EEG_unscrambled_st.times; % in milliseconds
-
-
-    % Load click info to find condition
-    
-
-    % Find target word onset times
-    stim_info_filename = [dir,'stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
-    load(stim_info_filename); % loads all_word_order (array of all words) and tOnset (the onset times within each trial)
-    tOnset(end) = [];
-    %target_word_indices = all_word_order == 'red' | all_word_order == 'white' | all_word_order == 'blue' | all_word_order == 'green';
-
-    %% Isolate target word onset ERPs for both conditions
-    all_click_info = readtable(dir_fnirsandgerbils,'FileType','spreadsheet','Format','auto');
-    which_rows_this_subject = find(all_click_info.S == string(curr_subject_ID(isubject,:))); % find the rows in the spreadsheet which belong to this subject
-    conditions = all_click_info.Condition(which_rows_this_subject); % conditions by trial for this subject
+    load([subID] + 'scrambled_dt_epoch');
+    load([subID] + 'unscrambled_dt_epoch');
+    load ([subID] + 'unscrambled_st_epoch');
+    load ([subID] + 'scrambled_st_epoch');
+    load ([subID] + 'all_epoch');
 
     scrambled_st_by_target_red_onset = [];
     scrambled_st_by_target_green_onset = [];
     scrambled_st_by_target_blue_onset = [];
     scrambled_st_by_target_white_onset = [];
     scrambled_st_by_target_object_onset = [];
-
+    
     unscrambled_st_by_target_red_onset = [];
     unscrambled_st_by_target_green_onset = [];
     unscrambled_st_by_target_blue_onset = [];
     unscrambled_st_by_target_white_onset = [];
     unscrambled_st_by_target_object_onset = [];
-
+    
     scrambled_dt_by_target_red_onset = [];
     scrambled_dt_by_target_green_onset = [];
     scrambled_dt_by_target_blue_onset = [];
     scrambled_dt_by_target_white_onset = [];
     scrambled_dt_by_target_object_onset = [];
-
+    
     unscrambled_dt_by_target_red_onset = [];
     unscrambled_dt_by_target_green_onset = [];
     unscrambled_dt_by_target_blue_onset = [];
     unscrambled_dt_by_target_white_onset = [];
     unscrambled_dt_by_target_object_onset = [];
-
+    
     scrambled_dt_by_masker_onset = [];
     scrambled_st_by_masker_onset = [];
     unscrambled_st_by_masker_onset = [];
     unscrambled_dt_by_masker_onset = [];
+    %load click times
+    stim_info_filename = [dir,'stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
+    load(stim_info_filename); % loads all_word_order (array of all words) and tOnset (the onset times within each trial)
+    tOnset(end) = [];
+    %target_word_indices = all_word_order == 'red' | all_word_order == 'white' | all_word_order == 'blue' | all_word_order == 'green';
 
-    icount_scrambled = 1;
-    icount_unscrambled = 1;
-
+    %Separate by color Target
+    if all_target_words(itrial).words(ionset) == 'red'
+                    scrambled_dt_by_target_red_onset = cat(4, scrambled_dt_by_target_red_onset,all_epochs(:,start_time:end_time,itrial));
+                elseif all_target_words(itrial).words(ionset) == 'green'
+                    scrambled_dt_by_target_green_onset = cat(4, scrambled_dt_by_target_green_onset,all_epochs(:,start_time:end_time,itrial));
+                elseif all_target_words(itrial).words(ionset) == 'white'
+                    scrambled_dt_by_target_white_onset = cat(4, scrambled_dt_by_target_white_onset,all_epochs(:,start_time:end_time,itrial));
+                elseif all_target_words(itrial).words(ionset) == 'blue'
+                    scrambled_dt_by_target_blue_onset = cat(4, scrambled_dt_by_target_blue_onset,all_epochs(:,start_time:end_time,itrial));
+                else
+                    scrambled_dt_by_target_object_onset = cat(4, scrambled_dt_by_target_object_onset,all_epochs(:,start_time:end_time,itrial));
+    end
+   %% below is directly from post-processing
     for itrial = 1:num_tot_trials % for each trial...
         % find the condition
         curr_condition = conditions(itrial);
@@ -209,7 +204,10 @@ EEG = eeg_checkset( EEG );
         end
     end
 
-    %% Plotting
+end
+
+    
+%% Plotting - was hoping this would be the same as post processing but all the arrays would already be calculated as means of all subjects
     addpath C:\Users\ema36\OneDrive\Documents\errorbar_files\errorbar_files
     %% Same Talker Plot
     figure;
@@ -295,7 +293,7 @@ EEG = eeg_checkset( EEG );
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unccrambled white
+    %% White ST
     subplot(2,3,4)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -335,7 +333,7 @@ EEG = eeg_checkset( EEG );
         legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-    % scrambled vs unscrambled blue
+    %% Blue ST
     subplot(2,3,5)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -375,7 +373,7 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % All Color vs Object
+    %% All Color vs All Object
     subplot(2,3,3)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -416,7 +414,7 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % Maskers
+    %% All Maskers
      subplot(2,3,6)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -466,7 +464,7 @@ ylim([-3 4])
     scrambled_frontocentral_erp_baselined = [];
     unscrambled_frontocentral_erp_baselined = [];
     
-    % scrambled vs unscrambled red
+    %% Red DT
     subplot(2,3,1)
     frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
     single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(scrambled_dt_by_target_red_onset,2));
@@ -501,7 +499,7 @@ ylim([-3 4])
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unscrambled green
+    %% Green DT
     subplot(2,3,2)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -541,7 +539,7 @@ ylim([-3 4])
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unccrambled white
+    %% White DT
     subplot(2,3,4)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -581,7 +579,7 @@ ylim([-3 4])
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unscrambled blue
+    %% Blue DT
     subplot(2,3,5)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -621,7 +619,7 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % All Color vs Object
+    %% All DT Color vs Object
     subplot(2,3,3)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -662,7 +660,7 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % Maskers
+    %% All DT Maskers
      subplot(2,3,6)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
