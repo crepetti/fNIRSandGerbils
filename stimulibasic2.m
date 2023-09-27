@@ -54,18 +54,30 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 144;
+numtrials = 36;
 numpracticetrials = 10;
-% scrambled or unscrambled (0 = unscrambled, 1 = scrambled)
-scramblingarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
-scramblingarray = randsample(scramblingarray, numtrials);
-% same talker or diff talker (0 = same talker, 1 = diff talker)
-talkerarray = [zeros(1, numtrials/2), ones(1, numtrials/2)];
-talkerarray = randsample(talkerarray,numtrials);
-% choose whether bob or mike is the background talker (0 = bob is
-% background, 1 = mike is background)
-bob_or_mike = [zeros(1, numtrials/2), ones(1, numtrials/2)];
-bob_or_mike = randsample(bob_or_mike,numtrials);
+
+conditionarray = [ones(1, numtrials/4), 2*ones(1, numtrials/4), 3*ones(1, numtrials/4), 4*ones(1, numtrials/4)];
+conditionarray = randsample(conditionarray,numtrials);
+for i = 1:length(conditionarray)
+    if conditionarray(i) == 1 % scrambled diff talker
+        scramblingarray(i) = 1;
+        talkerarray(i) = 1;
+        bob_or_mike(i) =  randi([0,1]);
+    elseif conditionarray(i) == 2 % scrambled same talker
+        scramblingarray(i) = 1;
+        talkerarray(i) = 0;
+        bob_or_mike(i) =  randi([0,1]);
+    elseif conditionarray(i) == 3 % unscrambled diff talker
+        scramblingarray(i) = 1;
+        talkerarray(i) = 1;
+        bob_or_mike(i) =  randi([0,1]);
+    elseif conditionarray(i) == 4 % unscrambled same talker
+        scramblingarray(i) = 1;
+        talkerarray(i) = 0;
+        bob_or_mike(i) =  randi([0,1]);
+    end
+end
 
 % make arrays for practice 
 practice_scramblingarray = [zeros(1, numpracticetrials/2), ones(1, numpracticetrials/2)];

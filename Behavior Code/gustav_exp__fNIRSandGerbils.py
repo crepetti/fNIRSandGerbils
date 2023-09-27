@@ -238,7 +238,7 @@ def setup(exp):
     #    exp.var.order = ",".join([str(i) for i in np.flipud(np.tile(np.arange(len(exp.var.factorial['masker']))+1, 6))])
 
     order = np.arange(len(exp.var.factorial['masker'])) + 1
-    num_trials = int(36)
+    num_trials = int(144)
     # np.random.shuffle(order)
     for i in range(36 - 1):
         this = np.arange(len(exp.var.factorial['masker'])) + 1
@@ -459,7 +459,7 @@ def pre_trial(exp):
     try:
         exp.stim.file = exp.stim.stimfiles[exp.var.current['masker']].get_filename(fmt='full')
         # <>exp.stim.trigger = exp.stim.trigger_dict[exp.var.current['masker']]
-        exp.interface.update_Status_Center(exp.var.current['masker'], redraw=True)  # Use condition # (1,2) as trigger #
+        #exp.interface.update_Status_Center(exp.var.current['masker'], redraw=True)  # Use condition # (1,2) as trigger #
 
         exp.stim.out, exp.stim.fs = m.read_file(exp.stim.file)
         exp.stim.out = psylab.signal.atten(exp.stim.out, exp.stim.atten)
@@ -562,8 +562,8 @@ def prompt_response(exp):
 
 def post_trial(exp):
     # if not exp.gustav_is_go:
-    exp.interface.update_Prompt("Waiting a moment...", show=True, redraw=True)
-    time.sleep(3)  # CHANGED FOR PILOTING - only 2 seconds
+    exp.interface.update_Prompt("Waiting 5 sec...", show=True, redraw=True)
+    time.sleep(5)  # CHANGED FOR PILOTING - only 2 seconds
     exp.interface.update_Prompt("", show=True, redraw=True)
 
 
