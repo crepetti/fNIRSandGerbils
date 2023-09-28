@@ -54,7 +54,7 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 36;
+numtrials = 144;
 numpracticetrials = 10;
 
 conditionarray = [ones(1, numtrials/4), 2*ones(1, numtrials/4), 3*ones(1, numtrials/4), 4*ones(1, numtrials/4)];
@@ -69,11 +69,11 @@ for i = 1:length(conditionarray)
         talkerarray(i) = 0;
         bob_or_mike(i) =  randi([0,1]);
     elseif conditionarray(i) == 3 % unscrambled diff talker
-        scramblingarray(i) = 1;
+        scramblingarray(i) = 0;
         talkerarray(i) = 1;
         bob_or_mike(i) =  randi([0,1]);
     elseif conditionarray(i) == 4 % unscrambled same talker
-        scramblingarray(i) = 1;
+        scramblingarray(i) = 0;
         talkerarray(i) = 0;
         bob_or_mike(i) =  randi([0,1]);
     end
