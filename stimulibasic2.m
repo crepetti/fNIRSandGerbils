@@ -31,7 +31,7 @@
 % 15 seconds (closest you can get)
 %Sunday = cap design and make the behavioral side of things
 
-%%OK HERE'S ACTUAL CODE
+%%OK HERE'S ACTUAL CODEyyllllllll
 %%path
 addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all')
 addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all_long')
