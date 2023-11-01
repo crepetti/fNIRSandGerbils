@@ -5,7 +5,7 @@
 all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2','1');
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
+curr_subject_ID = char('newpilot93','newpilot912','newpilot917');
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 % names, and click times by trial
@@ -26,11 +26,10 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     this_subject_ID = strtrim(string(curr_subject_ID(isubject,:))); % define this subject ID
     by_subject_behavior_info(isubject).subject_ID = strtrim(curr_subject_ID(isubject,:)); % save subject ID in behavior struct
     
-    numtotalwords = 30; % number of words in the trial
-    wordlength = 0.50; %length of sound file (seconds)
+    numtotalwords = 40;
+    wordlength = 0.3; % length of an individual word
     fs = 44100; % sample rate of the audio (Hz)
-    overlap = 0.5/3; % overlap of each word
-    tVec = 0:1/fs:(wordlength*numtotalwords) - (overlap*(numtotalwords-1)); % define time vector 
+    tVec = 0:1/fs:(wordlength*numtotalwords); % define time vector 
 
     %% Behavior processing
     which_rows_this_subject = find(all_click_info.S == string(this_subject_ID)); % find the rows in the spreadsheet which belong to this subject
@@ -52,34 +51,33 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     by_subject_behavior_info(isubject).nearest_click_distances = struct(); % create structure for nearest click distances
 
     color_words = string({'red','green','blue','white'}); % define which words are color words
+    clicks_not_counted = 0;
     for itrial = 1:n_trials % for each trial...
         % ....find the subjects click times for this trial....
         variable = string(soundfiles_by_trial{itrial, 1});
-        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled\');
-        variable = erase(variable, '_scrambled.wav');
-        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled\');
-        variable = erase(variable,  '_unscrambled.wav');
+        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled_diff_talker\');
+        variable = erase(variable, '_scrambled_dt.wav');
+        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled_same_talker\');
+        variable = erase(variable, '_scrambled_st.wav');
+        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled_diff_talker\');
+        variable = erase(variable,  '_unscrambled_dt.wav');
+        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled_same_talker\');
+        variable = erase(variable,  '_unscrambled_st.wav');
         variable = str2num(variable);
-        current_click_times = table2array(click_times(variable,:));
+        current_click_times = table2array(click_times(itrial,:));
         current_click_times = current_click_times(~isnan(current_click_times));
 
         all_subjects_click_times = [all_subjects_click_times,current_click_times];
-        if conditions(itrial) == 1 % scrambled
-                    all_subjects_click_times_scrambled = [all_subjects_click_times_scrambled,current_click_times];
-        elseif conditions(itrial) == 2
-                    all_subjects_click_times_unscrambled = [all_subjects_click_times_unscrambled,current_click_times];
-        end
-
 
 
         %% find the appropriate color times for this trial (NOT IN ORDER)
-        all_words_this_trial = all_word_order(itrial,:); % find the words presented in this trial
-        color_indices_this_trial = find(ismember(all_words_this_trial,color_words) == 1); % find the indices of color words
-        masker_indices_this_trial = find(~ismember(all_words_this_trial,color_words) == 1); % find the indices of masker words
+        all_target_words_this_trial = all_target_words(variable).words; % find the words presented in this trial
+        target_color_indices_this_trial = find(ismember(all_target_words_this_trial,color_words) == 1); % find the indices of color words
+        target_object_indices_this_trial = find(~ismember(all_target_words_this_trial,color_words) == 1); % find the indices of masker words
 
-        current_target_color_times = tOnset(color_indices_this_trial); % onset times of color words this trial
-        current_masker_times = tOnset(masker_indices_this_trial); % onset times of masker words this trial
-        current_target_color_words = all_words_this_trial(color_indices_this_trial); % color word names for this trial
+        current_target_color_times = all_target_onsets(variable).onsets(target_color_indices_this_trial); % onset times of color words this trial
+        current_target_object_times = all_target_onsets(variable).onsets(target_object_indices_this_trial); % onset times of masker words this trial
+        current_target_color_words = all_target_words_this_trial(target_color_indices_this_trial); % color word names for this trial
 
 
         %% Hit and False Alarm Windows
@@ -96,9 +94,9 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
         end
 
         % specify false alarm windows
-        for i = 1:length(current_masker_times) % for each of the current masker times...
-            [~,start_index_FA_window] = min(abs(tVec - (current_masker_times(i)+threshold_window_start))); % ...the false alarm window will start threshold_window_start seconds after the word onset
-            [~,end_index_FA_window] = min(abs(tVec - (current_masker_times(i)+threshold_window_end))); % ...the false alarm window will end threshold_window_end seconds after the word onset
+        for i = 1:length(current_target_object_times) % for each of the current masker times...
+            [~,start_index_FA_window] = min(abs(tVec - (current_target_object_times(i)+threshold_window_start))); % ...the false alarm window will start threshold_window_start seconds after the word onset
+            [~,end_index_FA_window] = min(abs(tVec - (current_target_object_times(i)+threshold_window_end))); % ...the false alarm window will end threshold_window_end seconds after the word onset
 
             FA_windows(start_index_FA_window:end_index_FA_window) = 1;
         end
@@ -111,7 +109,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
         by_subject_behavior_info(isubject).num_hits(itrial).value = 0; % set starting number of hits to zero
         by_subject_behavior_info(isubject).num_FAs(itrial).value = 0; % set starting number of false alarms to zero
 
-        by_subject_behavior_info(isubject).num_masker_words(itrial).value = length(current_masker_times);
+        by_subject_behavior_info(isubject).num_target_object_words(itrial).value = length(current_target_object_times);
         by_subject_behavior_info(isubject).num_target_color_words(itrial).value = length(current_target_color_times);
 
         for iclick = 1:length(current_click_times) % for each click in this trial...
@@ -122,7 +120,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
             elseif FA_windows(current_click_index) == 1 %...otherwise if that click falls within a false alarm window...
                 by_subject_behavior_info(isubject).num_FAs(itrial).value = by_subject_behavior_info(isubject).num_FAs(itrial).value + 1; % ...add 1 to the number of false alarms
             else % ...if the click is not counted as either
-                disp('Click Not Counted as Hit or FA') % let me know!
+                clicks_not_counted = clicks_not_counted + 1;
             end
 
         end
@@ -149,7 +147,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
 
         % if number of false alarms is greater than the number of masker
         % words
-        if by_subject_behavior_info(isubject).num_FAs(itrial).value > by_subject_behavior_info(isubject).num_masker_words(itrial).value
+        if by_subject_behavior_info(isubject).num_FAs(itrial).value > by_subject_behavior_info(isubject).num_target_object_words(itrial).value
             disp('Uh Oh! Number of FAs is greater than number of masker words')
         end
 
@@ -185,178 +183,211 @@ end
 %% Plotting time!
 
 % Histogram of all click times throughout the trial
-figure;histogram(all_subjects_click_times,'BinWidth',0.1)
-xlabel('Time Since Stimulus Onset (seconds)','FontSize',18)
-ylabel('Number of Clicks Total','FontSize',18)
-title('Click Counts vs. Time since Stimulus Onset','FontSize',18);
+% figure;histogram(all_subjects_click_times,'BinWidth',0.1)
+% xlabel('Time Since Stimulus Onset (seconds)','FontSize',18)
+% ylabel('Number of Clicks Total','FontSize',18)
+% title('Click Counts vs. Time since Stimulus Onset','FontSize',18);
+% 
+% % Histogram of click distance from nearest target word
+% all_nearest_click_distances = [];
+% all_nearest_click_distances_scrambled = [];
+% all_nearest_click_distances_unscrambled = [];
+% 
+% for isubject = 1:size(curr_subject_ID,1)
+%     for itrial = 1:n_trials
+%         all_nearest_click_distances = [all_nearest_click_distances,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+%         if conditions(itrial) == 1 % scrambled
+%             all_nearest_click_distances_scrambled = [all_nearest_click_distances_scrambled,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+%         elseif conditions(itrial) == 2
+%              all_nearest_click_distances_unscrambled = [all_nearest_click_distances_unscrambled,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+%         end
+% 
+% 
+%     end
+% end
+% figure;
+% p1 = histogram(all_nearest_click_distances,'BinWidth',0.05);
+% xticks(tOnset - 1);
+% for i = 1:length(tOnset)
+% p2 = xline(tOnset(i) - 1);
+% end
+% p3 = xline(threshold_window_start,'r','LineWidth',3);
+% p3 = xline(threshold_window_end,'r','LineWidth',3);
+% ylabel('Number of Clicks Total','FontSize',18)
+% xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
+% title('Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
+% legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
+% 
+% figure;
+% p1 = histogram(all_nearest_click_distances_scrambled,'BinWidth',0.05);
+% xticks(tOnset - 1);
+% for i = 1:length(tOnset)
+% p2 = xline(tOnset(i) - 1);
+% end
+% p3 = xline(threshold_window_start,'r','LineWidth',3);
+% p3 = xline(threshold_window_end,'r','LineWidth',3);
+% ylabel('Number of Clicks Total','FontSize',18)
+% xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
+% title('SCRAMBLED Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
+% legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
+% 
+% 
+% figure;
+% p1 = histogram(all_nearest_click_distances_unscrambled,'BinWidth',0.05);
+% xticks(tOnset - 1);
+% for i = 1:length(tOnset)
+% p2 = xline(tOnset(i) - 1);
+% end
+% p3 = xline(threshold_window_start,'r','LineWidth',3);
+% p3 = xline(threshold_window_end,'r','LineWidth',3);
+% ylabel('Number of Clicks Total','FontSize',18)
+% xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
+% title('UNSCRAMBLED Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
+% legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
+% 
+% 
+% % Histogram of reaction times split up by trial type
+% 
+% all_nearest_click_distances_condition1 = [];
+% all_nearest_click_distances_condition2 = [];
+% for isubject = 1:size(curr_subject_ID,1)
+%     for itrial = 1:n_trials
+%         this_condition = by_subject_behavior_info(isubject).condition(itrial).value; % 1 is scrambled, 2 is unscrambled
+%         if this_condition == 1
+%             all_nearest_click_distances_condition1 =  [all_nearest_click_distances_condition1, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+%         elseif this_condition == 2
+%             all_nearest_click_distances_condition2 =  [all_nearest_click_distances_condition2, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
+%         end
+% 
+%     end
+% end
+% figure;
+% x = [all_nearest_click_distances_condition1,all_nearest_click_distances_condition2];
+% g = [zeros(length(all_nearest_click_distances_condition1), 1); ones(length(all_nearest_click_distances_condition2), 1)];
+% violinplot(x,g);
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
+% xlabel('Condition','FontSize',18)
+% ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
+% title('Click Times since Color Word Onset vs. Condition','FontSize',18);
 
-% Histogram of click distance from nearest target word
-all_nearest_click_distances = [];
-all_nearest_click_distances_scrambled = [];
-all_nearest_click_distances_unscrambled = [];
 
-for isubject = 1:size(curr_subject_ID,1)
-    for itrial = 1:n_trials
-        all_nearest_click_distances = [all_nearest_click_distances,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
-        if conditions(itrial) == 1 % scrambled
-            all_nearest_click_distances_scrambled = [all_nearest_click_distances_scrambled,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
-        elseif conditions(itrial) == 2
-             all_nearest_click_distances_unscrambled = [all_nearest_click_distances_unscrambled,by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
-        end
-
-
-    end
-end
-figure;
-p1 = histogram(all_nearest_click_distances,'BinWidth',0.05);
-xticks(tOnset - 1);
-for i = 1:length(tOnset)
-p2 = xline(tOnset(i) - 1);
-end
-p3 = xline(threshold_window_start,'r','LineWidth',3);
-p3 = xline(threshold_window_end,'r','LineWidth',3);
-ylabel('Number of Clicks Total','FontSize',18)
-xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
-title('Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
-legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
-
-figure;
-p1 = histogram(all_nearest_click_distances_scrambled,'BinWidth',0.05);
-xticks(tOnset - 1);
-for i = 1:length(tOnset)
-p2 = xline(tOnset(i) - 1);
-end
-p3 = xline(threshold_window_start,'r','LineWidth',3);
-p3 = xline(threshold_window_end,'r','LineWidth',3);
-ylabel('Number of Clicks Total','FontSize',18)
-xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
-title('SCRAMBLED Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
-legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
-
-
-figure;
-p1 = histogram(all_nearest_click_distances_unscrambled,'BinWidth',0.05);
-xticks(tOnset - 1);
-for i = 1:length(tOnset)
-p2 = xline(tOnset(i) - 1);
-end
-p3 = xline(threshold_window_start,'r','LineWidth',3);
-p3 = xline(threshold_window_end,'r','LineWidth',3);
-ylabel('Number of Clicks Total','FontSize',18)
-xlabel('Time Since Nearest Target Word Onset (seconds)','FontSize',18)
-title('UNSCRAMBLED Clicks w.r.t. Target Word Onset all subjects all trials','FontSize',18)
-legend([p1(1),p2(1),p3(1)],{'Click Counts','Word Onset Times','Hit/FA Window'})
-
-
-% Histogram of reaction times split up by trial type
-
-all_nearest_click_distances_condition1 = [];
-all_nearest_click_distances_condition2 = [];
-for isubject = 1:size(curr_subject_ID,1)
-    for itrial = 1:n_trials
-        this_condition = by_subject_behavior_info(isubject).condition(itrial).value; % 1 is scrambled, 2 is unscrambled
-        if this_condition == 1
-            all_nearest_click_distances_condition1 =  [all_nearest_click_distances_condition1, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
-        elseif this_condition == 2
-            all_nearest_click_distances_condition2 =  [all_nearest_click_distances_condition2, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value];
-        end
-
-    end
-end
-figure;
-x = [all_nearest_click_distances_condition1,all_nearest_click_distances_condition2];
-g = [zeros(length(all_nearest_click_distances_condition1), 1); ones(length(all_nearest_click_distances_condition2), 1)];
-violinplot(x,g);
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
-xlabel('Condition','FontSize',18)
-ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
-title('Click Times since Color Word Onset vs. Condition','FontSize',18);
-
-
-% histogram of reaction times split up by color word
-red_nearest_click_times = [];
-white_nearest_click_times = [];
-green_nearest_click_times = [];
-blue_nearest_click_times = [];
-
-for isubject = 1:size(curr_subject_ID,1)
-    for itrial = 1:n_trials
-        for i = 1:length(by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value)
-            if by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'red'
-                red_nearest_click_times = [red_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
-            elseif by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'white'
-                white_nearest_click_times = [white_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
-
-            elseif by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'green'
-                green_nearest_click_times = [green_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
-
-            elseif by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'blue'
-                blue_nearest_click_times = [blue_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
-
-            end
-
-        end
-    end
-end
-figure; hold on
-histogram(red_nearest_click_times,'FaceColor','r');
-histogram(green_nearest_click_times,'FaceColor','g');
-histogram(blue_nearest_click_times,'FaceColor','b');
-histogram(white_nearest_click_times,'FaceColor','k');
-
-legend({'Red','White','Green','Blue'})
-xlabel('Color','FontSize',18);
-ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
-title('Click Times since Color Word Onset vs. Color Word','FontSize',18);
+% % histogram of reaction times split up by color word
+% red_nearest_click_times = [];
+% white_nearest_click_times = [];
+% green_nearest_click_times = [];
+% blue_nearest_click_times = [];
+% 
+% for isubject = 1:size(curr_subject_ID,1)
+%     for itrial = 1:n_trials
+%         for i = 1:length(by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value)
+%             if by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'red'
+%                 red_nearest_click_times = [red_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
+%             elseif by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'white'
+%                 white_nearest_click_times = [white_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
+% 
+%             elseif by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'green'
+%                 green_nearest_click_times = [green_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
+% 
+%             elseif by_subject_behavior_info(isubject).nearest_target_color_word(itrial).value(i) == 'blue'
+%                 blue_nearest_click_times = [blue_nearest_click_times, by_subject_behavior_info(isubject).nearest_target_click_distances(itrial).value(i)];
+% 
+%             end
+% 
+%         end
+%     end
+% end
+% figure; hold on
+% histogram(red_nearest_click_times,'FaceColor','r');
+% histogram(green_nearest_click_times,'FaceColor','g');
+% histogram(blue_nearest_click_times,'FaceColor','b');
+% histogram(white_nearest_click_times,'FaceColor','k');
+% 
+% legend({'Red','White','Green','Blue'})
+% xlabel('Color','FontSize',18);
+% ylabel('Click Time w.r.t. \newline Color Word Onset (seconds)','FontSize',18)
+% title('Click Times since Color Word Onset vs. Color Word','FontSize',18);
 
 
 %% Hit and False Alarm Rates
-hit_rates_condition1 = nan(size(curr_subject_ID,1),24); % scrambled
-hit_rates_condition2 = nan(size(curr_subject_ID,1),24); % unscrambled
+hit_rates_condition1 = nan(size(curr_subject_ID,1),24); % scrambled diff talker
+hit_rates_condition2 = nan(size(curr_subject_ID,1),24); % scrambled same talker
+hit_rates_condition3 = nan(size(curr_subject_ID,1),24); % unscrambled diff talker
+hit_rates_condition4 = nan(size(curr_subject_ID,1),24); % unscrambled same talker
 
-FA_rates_condition1 = nan(size(curr_subject_ID,1),24); % scrambled
-FA_rates_condition2 = nan(size(curr_subject_ID,1),24); % unscrambled
+
+FA_rates_condition1 = nan(size(curr_subject_ID,1),24); % scrambled diff talker
+FA_rates_condition2 = nan(size(curr_subject_ID,1),24); % scrambled same talker
+FA_rates_condition3 = nan(size(curr_subject_ID,1),24); % unscrambled diff talker
+FA_rates_condition4 = nan(size(curr_subject_ID,1),24); % unscrambled same talker
+
+
 
 difference_scores_condition1 = nan(size(curr_subject_ID,1),24);
 difference_scores_condition2 = nan(size(curr_subject_ID,1),24);
+difference_scores_condition3 = nan(size(curr_subject_ID,1),24);
+difference_scores_condition4 = nan(size(curr_subject_ID,1),24);
+
+%1	scrambled_diff_talker
+%2	scrambled_same_talker
+%3	unscrambled_diff_talker
+%4	unscrambled_same_talker
 
 
 for isubject = 1:size(curr_subject_ID,1)
     ionset1 = 0;
     ionset2 = 0;
+    ionset3 = 0;
+    ionset4 = 0;
+
+    n_trials = length(by_subject_behavior_info(isubject).condition);
+
     for itrial = 1:n_trials
         this_condition = by_subject_behavior_info(isubject).condition(itrial).value;
-        if this_condition == 1 % scrambled
+        if this_condition == 1 % scrambled diff talker
             ionset1 = ionset1 + 1;
             hit_rates_condition1(isubject,ionset1) =   by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
-            FA_rates_condition1(isubject,ionset1) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_masker_words(itrial).value); % num subjects x num presentations
+            FA_rates_condition1(isubject,ionset1) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_target_object_words(itrial).value); % num subjects x num presentations
             difference_scores_condition1(isubject,ionset1) = by_subject_behavior_info(isubject).difference_score(itrial).value;
-            chance_rate_condition1(isubject,ionset1) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
-        elseif this_condition == 2 % unscrambled
+%            chance_rate_condition1(isubject,ionset1) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
+        elseif this_condition == 2 % scrambled same talker
             ionset2 = ionset2 + 1;
 
             hit_rates_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
-            FA_rates_condition2(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_masker_words(itrial).value); % num subjects x num presentations
+            FA_rates_condition2(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_target_object_words(itrial).value); % num subjects x num presentations
             difference_scores_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).difference_score(itrial).value;
-            chance_rate_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
+   %         chance_rate_condition2(isubject,ionset2) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
+        elseif this_condition == 3 % unscrambled diff talker
+            ionset3 = ionset3 + 1;
+
+            hit_rates_condition3(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
+            FA_rates_condition3(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_target_object_words(itrial).value); % num subjects x num presentations
+            difference_scores_condition3(isubject,ionset2) = by_subject_behavior_info(isubject).difference_score(itrial).value;
+     %       chance_rate_condition3(isubject,ionset2) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
+        elseif this_condition == 4 % unscrambled same talker
+            ionset4 = ionset4 + 1;
+
+            hit_rates_condition4(isubject,ionset2) = by_subject_behavior_info(isubject).num_hits(itrial).value/by_subject_behavior_info(isubject).num_target_color_words(itrial).value; % num subjects x num presentations
+            FA_rates_condition4(isubject,ionset2) =  by_subject_behavior_info(isubject).num_FAs(itrial).value/(by_subject_behavior_info(isubject).num_target_object_words(itrial).value); % num subjects x num presentations
+            difference_scores_condition4(isubject,ionset2) = by_subject_behavior_info(isubject).difference_score(itrial).value;
+     %       chance_rate_condition4(isubject,ionset2) = by_subject_behavior_info(isubject).num_target_color_words(itrial).value/(by_subject_behavior_info(isubject).num_target_color_words(itrial).value + by_subject_behavior_info(isubject).num_masker_words(itrial).value);
 
         end
 
     end
 end
-all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2); % num subjects x num presentations x num conditions
-all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2); % num subjects x num presentations x num conditions
-all_chance_rates = cat(3,chance_rate_condition1,chance_rate_condition2);
+all_hitrates = cat(3,hit_rates_condition1,hit_rates_condition2,hit_rates_condition3,hit_rates_condition4); % num subjects x num presentations x num conditions
+all_FArates = cat(3,FA_rates_condition1,FA_rates_condition2,hit_rates_condition3,hit_rates_condition4); % num subjects x num presentations x num conditions
+%all_chance_rates = cat(3,chance_rate_condition1,chance_rate_condition2);
 
 all_hitrates(all_hitrates == 0) = nan;
 all_FArates(all_FArates == 0) = nan;
 
 all_difference_scores = cat(3,difference_scores_condition1,difference_scores_condition2);
-chance_rate = (1/25)*ones(length(curr_subject_ID),6,7);
+%chance_rate = (1/25)*ones(length(curr_subject_ID),6,7);
 %all_hitrates = all_hitrates + 0.001;
 %d_primes = norminv(all_hitrates) - norminv(all_FArates); % num subjects x num presentations x num conditions
-d_primes = norminv(all_hitrates) - norminv(all_chance_rates);
+d_primes = norminv(all_hitrates) - norminv(all_FArates);
 % find subjects with d_primes of Inf or -Inf (to exclude)
 
 d_primes(d_primes == Inf) = nan;
@@ -378,12 +409,12 @@ d_primes(d_primes < 0) = nan;
 % xticks(1:2)
 % xticklabels({'scrambled','unscrambled'})
 % 
-figure;
-plot(squeeze(nanmean(d_primes,2))','-o');
-title('D prime (chance rate version)')
-%ylim([0,1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+% figure;
+% plot(squeeze(nanmean(d_primes,2))','-o');
+% title('D prime (chance rate version)')
+% %ylim([0,1])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
 % 
 % figure;boxplot(squeeze(nanmean(d_primes,2)))
 % ylabel('d prime')
@@ -392,21 +423,21 @@ xticklabels({'scrambled','unscrambled'})
 % xticks(1:2)
 % xticklabels({'scrambled','unscrambled'})
 
-figure;
-boxplot(squeeze(nanmean(all_difference_scores,2)))
-ylabel('difference score')
-xlabel('Condition')
-ylim([-2 2])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
-
-figure;
-histogram(difference_scores_condition1(:),'BinWidth',1)
-hold on
-histogram(difference_scores_condition2(:),'BinWidth',1)
-legend({'Scrambled','Unscrambled'})
-xlabel('Difference Score','FontSize',18)
-ylabel('Frequency of occurrence','FontSize',18)
+% figure;
+% boxplot(squeeze(nanmean(all_difference_scores,2)))
+% ylabel('difference score')
+% xlabel('Condition')
+% ylim([-2 2])
+% xticks(1:2)
+% xticklabels({'scrambled','unscrambled'})
+% 
+% figure;
+% histogram(difference_scores_condition1(:),'BinWidth',1)
+% hold on
+% histogram(difference_scores_condition2(:),'BinWidth',1)
+% legend({'Scrambled','Unscrambled'})
+% xlabel('Difference Score','FontSize',18)
+% ylabel('Frequency of occurrence','FontSize',18)
 
 %% Hit rate over entire experiment instead
 all_hitrates_new = [];
@@ -415,16 +446,23 @@ for isubject = 1:size(curr_subject_ID,1)
     num_hits_this_subject = [by_subject_behavior_info(isubject).num_hits(:).value];
     num_FAs_this_subject = [by_subject_behavior_info(isubject).num_FAs(:).value];
     conditions_this_subject = [by_subject_behavior_info(isubject).condition(:).value];
-    num_target_words = [by_subject_behavior_info(isubject).num_target_color_words(:).value];
-    num_masker_words = [by_subject_behavior_info(isubject).num_masker_words(:).value];
+    num_target_color_words = [by_subject_behavior_info(isubject).num_target_color_words(:).value];
+    num_target_object_words = [by_subject_behavior_info(isubject).num_target_object_words(:).value];
 
-    all_hitrates_new(isubject,1) = sum(num_hits_this_subject(conditions_this_subject == 1))/sum(num_target_words(conditions_this_subject == 1));
-    all_hitrates_new(isubject,2) = sum(num_hits_this_subject(conditions_this_subject == 2))/sum(num_target_words(conditions_this_subject == 2));
-    all_FArates_new(isubject,1) = sum(num_FAs_this_subject(conditions_this_subject == 1))/sum(num_masker_words(conditions_this_subject == 1));
-    all_FArates_new(isubject,2) = sum(num_FAs_this_subject(conditions_this_subject == 2))/sum(num_masker_words(conditions_this_subject == 2));
+    all_hitrates_new(isubject,1) = sum(num_hits_this_subject(conditions_this_subject == 1))/sum(num_target_color_words(conditions_this_subject == 1));
+    all_hitrates_new(isubject,2) = sum(num_hits_this_subject(conditions_this_subject == 2))/sum(num_target_color_words(conditions_this_subject == 2));
+    all_hitrates_new(isubject,3) = sum(num_hits_this_subject(conditions_this_subject == 3))/sum(num_target_color_words(conditions_this_subject == 3));
+    all_hitrates_new(isubject,4) = sum(num_hits_this_subject(conditions_this_subject == 4))/sum(num_target_color_words(conditions_this_subject == 4));
+
+    all_FArates_new(isubject,1) = sum(num_FAs_this_subject(conditions_this_subject == 1))/sum(num_target_object_words(conditions_this_subject == 1));
+    all_FArates_new(isubject,2) = sum(num_FAs_this_subject(conditions_this_subject == 2))/sum(num_target_object_words(conditions_this_subject == 2));
+    all_FArates_new(isubject,3) = sum(num_FAs_this_subject(conditions_this_subject == 3))/sum(num_target_object_words(conditions_this_subject == 3));
+    all_FArates_new(isubject,4) = sum(num_FAs_this_subject(conditions_this_subject == 4))/sum(num_target_object_words(conditions_this_subject == 4));
 
     all_dprimes_new(isubject,1) = norminv(all_hitrates_new(isubject,1)) - norminv(all_FArates_new(isubject,1));
     all_dprimes_new(isubject,2) = norminv(all_hitrates_new(isubject,2)) - norminv(all_FArates_new(isubject,2));
+    all_dprimes_new(isubject,3) = norminv(all_hitrates_new(isubject,3)) - norminv(all_FArates_new(isubject,3));
+    all_dprimes_new(isubject,4) = norminv(all_hitrates_new(isubject,4)) - norminv(all_FArates_new(isubject,4));
     
 end
 
@@ -432,19 +470,25 @@ figure;
 plot(all_hitrates_new','-o');
 title('hit rates')
 ylim([0 1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+ylabel('Hit Rate','FontSize',18)
+xticks(1:4)
+xticklabels({'scrambled diff talker','scrambled same talker','unscrambled diff talker','unscrambled same talker'})
+xlabel('Condition','FontSize',18)
 
 figure;
 plot(all_FArates_new','-o');
 title('FA rates')
 ylim([0 1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+ylabel('False Alarm Rate','FontSize',18)
+xticks(1:4)
+xticklabels({'scrambled diff talker','scrambled same talker','unscrambled diff talker','unscrambled same talker'})
+xlabel('Condition','FontSize',18)
 
 figure;
 plot(all_dprimes_new','-o');
 title('D prime')
 %ylim([0,1])
-xticks(1:2)
-xticklabels({'scrambled','unscrambled'})
+ylabel('d-prime','FontSize',18)
+xticks(1:4)
+xticklabels({'scrambled diff talker','scrambled same talker','unscrambled diff talker','unscrambled same talker'})
+xlabel('Condition','FontSize',18)

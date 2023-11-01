@@ -22,7 +22,6 @@
  
 %curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
 
-nSubjects = 1;
 fs = 256; 
 subID = ["test274"];  
 erp_window_start_time = -100; % 100 ms before onset of word

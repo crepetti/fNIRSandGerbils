@@ -5,7 +5,7 @@
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
 addpath('C:\Users\benri\Documents\eeglab2023.0');
-subID = 'newpilot93';
+subID = 'newpilot912';
 filename = ['C:\Users\benri\Documents\GitHub\fNIRSandGerbils\', subID, '.bdf'];
 eeglab
 

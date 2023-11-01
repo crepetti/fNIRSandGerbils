@@ -5,8 +5,8 @@
 % script to calculate ERPs for scrambled and unscrambled word onsets in
 % fNIRS and Gerbils
 
-dir = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\';
-dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\fNIRSandGerbils.xlsx';
+dir = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\';
+dir_fnirsandgerbils = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\fNIRSandGerbils.xlsx';
 curr_subject_ID = char('newpilot93');
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
@@ -20,7 +20,7 @@ num_tot_trials = 140; % look into this
 eeglab;
 %Load in pre-processed datasets
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-EEG = pop_loadset('filename',['newpilot93_ICAdone.set'],'filepath',[dir,'\prepro_epoched_data']);
+EEG = pop_loadset('filename',cat(2,curr_subject_ID,'_ICAdone.set'),'filepath',[dir,'\prepro_epoched_data']);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off'); 
 EEG = eeg_checkset( EEG );
 fs = EEG.srate;
@@ -209,8 +209,15 @@ EEG = eeg_checkset( EEG );
         end
     end
 
+    %% Going to build a 4 conditions x 6 word types x time array for this subject
+    % 1) Same Talker scrambled, 2) Same Talker unsrambled, 3) Diff Talker scrambled,
+    % 4) Diff talker unscrambled
+
+    % 1) red, 2) green , 3) white , 4) blue , 5) object, 6) masker 
+    meanERPArray = [];
+
     %% Plotting
-    addpath C:\Users\ema36\OneDrive\Documents\errorbar_files\errorbar_files
+    %addpath C:\Users\ema36\OneDrive\Documents\errorbar_files\errorbar_files
     %% Same Talker Plot
     figure;
     scrambled_frontocentral_erp = [];
@@ -254,6 +261,10 @@ EEG = eeg_checkset( EEG );
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
+    meanERPArray(1,1,:) = scrambled_mean_to_plot;
+    meanERPArray(2,1,:) = unscrambled_mean_to_plot;
+
+
     %% green ST
     % scrambled vs unscrambled green
     subplot(2,3,2)
@@ -295,7 +306,11 @@ EEG = eeg_checkset( EEG );
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unccrambled white
+    meanERPArray(1,2,:) = scrambled_mean_to_plot;
+    meanERPArray(2,2,:) = unscrambled_mean_to_plot;
+
+
+    %% scrambled vs unccrambled white
     subplot(2,3,4)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -335,7 +350,11 @@ EEG = eeg_checkset( EEG );
         legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-    % scrambled vs unscrambled blue
+    meanERPArray(1,3,:) = scrambled_mean_to_plot;
+    meanERPArray(2,3,:) = unscrambled_mean_to_plot;
+
+
+    %% scrambled vs unscrambled blue
     subplot(2,3,5)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -375,7 +394,10 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % All Color vs Object
+    meanERPArray(1,4,:) = scrambled_mean_to_plot;
+    meanERPArray(2,4,:) = unscrambled_mean_to_plot;
+
+    %% scrambled vs unscrambled object
     subplot(2,3,3)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -416,7 +438,10 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % Maskers
+    meanERPArray(1,5,:) = scrambled_mean_to_plot;
+    meanERPArray(2,5,:) = unscrambled_mean_to_plot;
+
+    %% scrambled vs unscrambled masker word
      subplot(2,3,6)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -445,11 +470,11 @@ ylim([-3 4])
 
 
     scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,3]); %averaging across trials
-    scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,3])/sqrt(num_tot_trials); %getting SEM across trials
+    scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,3])/sqrt(size(scrambled_frontocentral_erp_baselined,3)); %getting SEM across trials
     shadedErrorBar(single_onset_time,scrambled_mean_to_plot,scrambled_SEM_to_plot,'lineProps','-r')
     hold on
     unscrambled_mean_to_plot = mean(unscrambled_frontocentral_erp_baselined,[1,3]); %averaging across trials
-    unscrambled_SEM_to_plot = std(unscrambled_frontocentral_erp_baselined,[],[1,3])/sqrt(num_tot_trials); %getting SEM across trials
+    unscrambled_SEM_to_plot = std(unscrambled_frontocentral_erp_baselined,[],[1,3])/sqrt(size(unscrambled_frontocentral_erp_baselined,3)); %getting SEM across trials
     shadedErrorBar(single_onset_time,unscrambled_mean_to_plot,unscrambled_SEM_to_plot,'lineProps','-b')
     title('Masker Onsets','FontSize',14)
     xlabel('Time','FontSize',14)
@@ -457,6 +482,9 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
     sgtitle('Same Talker')
+
+    meanERPArray(1,6,:) = scrambled_mean_to_plot;
+    meanERPArray(2,6,:) = unscrambled_mean_to_plot;
 
 
     %% Diff Talker Plot
@@ -501,7 +529,10 @@ ylim([-3 4])
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unscrambled green
+    meanERPArray(3,1,:) = scrambled_mean_to_plot;
+    meanERPArray(4,1,:) = unscrambled_mean_to_plot;
+
+    %% scrambled vs unscrambled green
     subplot(2,3,2)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -541,7 +572,11 @@ ylim([-3 4])
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unccrambled white
+
+    meanERPArray(3,2,:) = scrambled_mean_to_plot;
+    meanERPArray(4,2,:) = unscrambled_mean_to_plot;
+
+    %% scrambled vs unccrambled white
     subplot(2,3,4)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -581,7 +616,10 @@ ylim([-3 4])
         legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % scrambled vs unscrambled blue
+    meanERPArray(3,3,:) = scrambled_mean_to_plot;
+    meanERPArray(4,3,:) = unscrambled_mean_to_plot;
+
+    %% scrambled vs unscrambled blue
     subplot(2,3,5)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -621,7 +659,10 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % All Color vs Object
+    meanERPArray(3,4,:) = scrambled_mean_to_plot;
+    meanERPArray(4,4,:) = unscrambled_mean_to_plot;
+
+    % scrambled vs unscrambled object
     subplot(2,3,3)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -662,7 +703,10 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
 
-    % Maskers
+    meanERPArray(3,5,:) = scrambled_mean_to_plot;
+    meanERPArray(4,5,:) = unscrambled_mean_to_plot;
+
+    %% scrambled vs unscrambled Masker words
      subplot(2,3,6)
     scrambled_frontocentral_erp = [];
     unscrambled_frontocentral_erp = [];
@@ -703,6 +747,12 @@ ylim([-3 4])
     legend({'scrambled','unscrambled'})
     ylim([-3 4])
     sgtitle('Diff Talker')
+
+    meanERPArray(3,6,:) = scrambled_mean_to_plot;
+    meanERPArray(4,6,:) = unscrambled_mean_to_plot;
+
+    save(append(dir,'\prepro_epoched_data\',string(curr_subject_ID),'meanERPArray.mat'),'meanERPArray')
+
 
 
     % All Colors
