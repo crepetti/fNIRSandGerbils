@@ -36,7 +36,7 @@
 addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all')
 addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all_long')
 addpath('D:\Experiments\fNIRSandGerbils\unprocessed\mike_all')
-
+addpath('D:\Experiments\fNIRSandGerbils\stim\')
 addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox')
 
 addpath('D:\Experiments\fNIRSandGerbils\AuditoryToolbox');
