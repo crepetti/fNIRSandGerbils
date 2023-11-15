@@ -2,7 +2,7 @@
 %% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 %% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 %% NEED BDF FILES
-dir = '/Users/ema36/OneDrive/Documents/fNIRSandGerbils\';
+dir = 'C:/Users/ema36/OneDrive/Documents/fNIRSandGerbils\pre_pro_epoched_data';
 addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0')
 addpath(dir)
 %% analyze_EEG_fNIRSandGerbils
@@ -11,8 +11,7 @@ addpath(dir)
 
 eeglab;
 % Define subject information (which BDFs to load)
-% curr_subject_ID = char('nooverlappilot2','nooverlappilot3');
-curr_subject_ID = char('newpilot917'); %% change per subject
+curr_subject_ID = char('7004'); %% change per subject
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
@@ -22,7 +21,7 @@ nsubjects = size(curr_subject_ID,1);
 
 for isubject = 1:nsubjects
     subID = curr_subject_ID(isubject,:);
-    bdf_filename = [dir,subID,'.bdf'];
+    bdf_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs/',subID,'.bdf'];
     ALLEEG = [];
     EEG = [];
     %^^reset everything peace of mind
@@ -97,7 +96,7 @@ for isubject = 1:nsubjects
     close;
     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'setname', [subID, 'ICA Cleaned'], 'gui', 'on');
 
-  EEG = pop_saveset( EEG, 'filename','newpilot917_ICA2.set','filepath',dir); %% change per subject
+  EEG = pop_saveset( EEG, 'filename', [curr_subject_ID , '_ICAdone.set'], 'filepath', 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\');
   [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
   eeglab redraw;

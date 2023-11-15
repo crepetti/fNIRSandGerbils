@@ -7,9 +7,9 @@
 addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
 pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
 addpath(pre_pro_epoched_data_folder)
-subID = '7004';
-range_A = 'A4';
-range_B = 'B4';
+subID = '7006';
+range_A = 'A6';
+range_B = 'B6';
 badchannels = 'channelsremoved.xlsx';
 BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
 % pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data';
@@ -55,30 +55,10 @@ EEG = eeg_checkset( EEG );
 
 %Marking out very obvious artifacts - pause here and manually do it
 disp('Clean Up Data Before Running ICA!');
+eeglab redraw
 pause
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 3,'setname',[subID, 'artifactmarked'],'gui','on');
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 4,'setname',[subID, 'artifactmarked'],'gui','on');
 EEG = pop_saveset( EEG, 'filename', [subID , '_artifactmarked.set'], 'filepath', pre_pro_epoched_data_folder);
-[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-%Running ICA
-% EEG = pop_runica(EEG, 'icatype', 'runcia', 'extended', 1, 'interrupt', 'on');
-% [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-% EEG = eeg_checkset( EEG );
-EEG = pop_runica(EEG, 'extended',1);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 4,'setname',[subID, 'ICA'],'gui','on');
-
-EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', pre_pro_epoched_data_folder);
-[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-pop_selectcomps(EEG,[1:32])
-% Pause to select components
-pause
-%channels_to_remove = str2num(input('Please enter which components to remove:'));
-components_to_remove = input('Please enter a comma-separated list of ICA components to remove (ex. [1,2,3]):');
-EEG = pop_subcomp( EEG, components_to_remove, 0);
-close
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 5,'setname',[subID, 'ICA Cleaned'],'gui','on');
-EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsremoved.set'], 'filepath', pre_pro_epoched_data_folder);
 [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 %Rejecting/Interpolate Bad Channels - make sure to save # of bad channels
@@ -91,7 +71,30 @@ EEG = pop_interp(EEG, channels_to_remove, 'spherical', [-1 16]);
 numchannels_removed = size(channels_to_remove, 2);
 writematrix(subID, badchannels, 'Sheet', 1,'Range', range_A);
 writematrix(numchannels_removed, badchannels, 'Sheet', 1, 'Range', range_B);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 3,'setname',[subID, 'Channels Removed'],'gui','on');
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 5,'setname',[subID, 'Channels Removed'],'gui','on');
+
+%EEG = pop_loadset('filename',[subID, '_artifactmarked.set'], 'filepath', pre_pro_epoched_data_folder);
+
+%Running ICA
+% EEG = pop_runica(EEG, 'icatype', 'runcia', 'extended', 1, 'interrupt', 'on');
+% [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
+% EEG = eeg_checkset( EEG );
+EEG = pop_runica(EEG, 'extended',1);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 6,'setname',[subID, 'ICA'],'gui','on');
+
+EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', pre_pro_epoched_data_folder);
+[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
+
+pop_selectcomps(EEG,[1:32])
+% Pause to select components
+pause
+%channels_to_remove = str2num(input('Please enter which components to remove:'));
+components_to_remove = input('Please enter a comma-separated list of ICA components to remove (ex. [1,2,3]):');
+EEG = pop_subcomp( EEG, components_to_remove, 0);
+close
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 7,'setname',[subID, 'ICA Cleaned'],'gui','on');
+EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsremoved.set'], 'filepath', pre_pro_epoched_data_folder);
+[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 %Saving Overall Pre-Processed Data
 EEG = pop_saveset( EEG, 'filename', [subID , '_ICAdone.set'], 'filepath', pre_pro_epoched_data_folder);
