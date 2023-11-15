@@ -10,10 +10,15 @@
 % Datasets with 3 or fewer non-adjacent, erratic channels 
 % (determined by visual inspection of ICA topographies and raw signal traces)
 % underwent interpolation (Delorme & Makeig, 2004). A final visual inspection removed any remaining contaminated trials. 
-
-dir = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils';
-dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
-curr_subject_ID = char('7002','7003');
+whos_using = 'Ben';
+if whos_using == 'Ben'
+    dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
+    dir_fnrisandgerbils = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
+else
+    dir = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\';
+    dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+end
+curr_subject_ID = char('7004','7007');
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
@@ -33,7 +38,7 @@ frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
 for isubject = 1:size(curr_subject_ID,1)
     subID = curr_subject_ID(isubject,:);
     [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-    EEG = pop_loadset('filename',cat(2,subID,'_ICAdone.set'),'filepath',[dir,'\prepro_epoched_data']);
+    EEG = pop_loadset('filename',cat(2,subID,'_ICAdone.set'),'filepath',[dir,'prepro_epoched_data']);
     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off');
     EEG = eeg_checkset( EEG );
     fs = EEG.srate;

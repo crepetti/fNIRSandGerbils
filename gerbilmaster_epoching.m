@@ -7,9 +7,16 @@ subID = '7006';
 % trigger 18687: scrambled_same_talker
 % trigger 35327:unscrambled_same_talker
 % Trigger 43519: scrambled_diff_talker
+whos_using = 'Ben';
 
-addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
-pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
+if whos_using == 'Ben'
+    addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
+    pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data';
+else
+    addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
+    pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
+end
+
 eeglab
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
 EEG = pop_loadset('filename', [subID, '_ICAdone.set'], 'filepath', pre_pro_epoched_data_folder);

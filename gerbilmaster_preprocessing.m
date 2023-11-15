@@ -4,14 +4,23 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
-pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
-addpath(pre_pro_epoched_data_folder)
-subID = '7006';
-range_A = 'A6';
-range_B = 'B6';
+whos_using = 'Ben';
+
+subID = '7007';
+range_A = 'A7';
+range_B = 'B7';
 badchannels = 'channelsremoved.xlsx';
-BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
+if whos_using == 'Ben'
+    addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
+    pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
+    addpath(pre_pro_epoched_data_folder)
+    BDF_filename = ['/home/ben/Documents/Gerbil BDFs/', subID, '.bdf'];
+else
+    addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
+    pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
+    addpath(pre_pro_epoched_data_folder)
+    BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
+end
 % pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data';
 % if ~exist(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))%new folder to save preprocess data
 %         mkdir(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))
@@ -19,7 +28,6 @@ BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', su
 % else
 %     disp('does not exist');
 % end
-eeglab
 
 %loading in BDF files and re-referencing to externals (mastoids/earlobes)
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
@@ -34,7 +42,11 @@ EEG = eeg_checkset( EEG );
 
 %adding in channel locations - FOR NOW DOING LOAD, WILL EDIT LATER!
 % EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\richardson_32_chanlocs.locs' 'filetype' 'locs'});
-EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+if whos_using == 'Ben'
+    EEG=pop_chanedit(EEG, 'load',{'/home/ben/Documents/GitHub/fNIRSandGerbils/chan_locs_cart.txt', 'filetype', 'sfp'});
+else
+    EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+end
 
 
 % [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
