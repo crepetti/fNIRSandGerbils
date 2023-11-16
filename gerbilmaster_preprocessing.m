@@ -4,14 +4,23 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
-pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
-addpath(pre_pro_epoched_data_folder)
-subID = '7004';
-range_A = 'A4';
-range_B = 'B4';
+whos_using = 'Ben';
+
+subID = '7007';
+range_A = 'A7';
+range_B = 'B7';
 badchannels = 'channelsremoved.xlsx';
-BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
+if whos_using == 'Ben'
+    addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
+    pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
+    addpath(pre_pro_epoched_data_folder)
+    BDF_filename = ['/home/ben/Documents/Gerbil BDFs/', subID, '.bdf'];
+else
+    addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
+    pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
+    addpath(pre_pro_epoched_data_folder)
+    BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
+end
 % pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data';
 % if ~exist(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))%new folder to save preprocess data
 %         mkdir(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))
@@ -19,7 +28,6 @@ BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', su
 % else
 %     disp('does not exist');
 % end
-eeglab
 
 %loading in BDF files and re-referencing to externals (mastoids/earlobes)
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
@@ -34,7 +42,11 @@ EEG = eeg_checkset( EEG );
 
 %adding in channel locations - FOR NOW DOING LOAD, WILL EDIT LATER!
 % EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\richardson_32_chanlocs.locs' 'filetype' 'locs'});
-EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+if whos_using == 'Ben'
+    EEG=pop_chanedit(EEG, 'load',{'/home/ben/Documents/GitHub/fNIRSandGerbils/chan_locs_cart.txt', 'filetype', 'sfp'});
+else
+    EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+end
 
 
 % [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
@@ -55,30 +67,10 @@ EEG = eeg_checkset( EEG );
 
 %Marking out very obvious artifacts - pause here and manually do it
 disp('Clean Up Data Before Running ICA!');
+eeglab redraw
 pause
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 3,'setname',[subID, 'artifactmarked'],'gui','on');
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 4,'setname',[subID, 'artifactmarked'],'gui','on');
 EEG = pop_saveset( EEG, 'filename', [subID , '_artifactmarked.set'], 'filepath', pre_pro_epoched_data_folder);
-[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-%Running ICA
-% EEG = pop_runica(EEG, 'icatype', 'runcia', 'extended', 1, 'interrupt', 'on');
-% [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-% EEG = eeg_checkset( EEG );
-EEG = pop_runica(EEG, 'extended',1);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 4,'setname',[subID, 'ICA'],'gui','on');
-
-EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', pre_pro_epoched_data_folder);
-[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-pop_selectcomps(EEG,[1:32])
-% Pause to select components
-pause
-%channels_to_remove = str2num(input('Please enter which components to remove:'));
-components_to_remove = input('Please enter a comma-separated list of ICA components to remove (ex. [1,2,3]):');
-EEG = pop_subcomp( EEG, components_to_remove, 0);
-close
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 5,'setname',[subID, 'ICA Cleaned'],'gui','on');
-EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsremoved.set'], 'filepath', pre_pro_epoched_data_folder);
 [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 %Rejecting/Interpolate Bad Channels - make sure to save # of bad channels
@@ -91,7 +83,30 @@ EEG = pop_interp(EEG, channels_to_remove, 'spherical', [-1 16]);
 numchannels_removed = size(channels_to_remove, 2);
 writematrix(subID, badchannels, 'Sheet', 1,'Range', range_A);
 writematrix(numchannels_removed, badchannels, 'Sheet', 1, 'Range', range_B);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 3,'setname',[subID, 'Channels Removed'],'gui','on');
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 5,'setname',[subID, 'Channels Removed'],'gui','on');
+
+%EEG = pop_loadset('filename',[subID, '_artifactmarked.set'], 'filepath', pre_pro_epoched_data_folder);
+
+%Running ICA
+% EEG = pop_runica(EEG, 'icatype', 'runcia', 'extended', 1, 'interrupt', 'on');
+% [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
+% EEG = eeg_checkset( EEG );
+EEG = pop_runica(EEG, 'extended',1);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 6,'setname',[subID, 'ICA'],'gui','on');
+
+EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', pre_pro_epoched_data_folder);
+[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
+
+pop_selectcomps(EEG,[1:32])
+% Pause to select components
+pause
+%channels_to_remove = str2num(input('Please enter which components to remove:'));
+components_to_remove = input('Please enter a comma-separated list of ICA components to remove (ex. [1,2,3]):');
+EEG = pop_subcomp( EEG, components_to_remove, 0);
+close
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 7,'setname',[subID, 'ICA Cleaned'],'gui','on');
+EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsremoved.set'], 'filepath', pre_pro_epoched_data_folder);
+[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 %Saving Overall Pre-Processed Data
 EEG = pop_saveset( EEG, 'filename', [subID , '_ICAdone.set'], 'filepath', pre_pro_epoched_data_folder);

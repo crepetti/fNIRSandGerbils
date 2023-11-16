@@ -4,6 +4,9 @@
 %% NEED ICA_DONE FILES
 % script to average subject ERPs and plot them
 % fNIRS and Gerbils
+
+% want to
+    % generate 6 graphs:red, blue, white, green, all colors, all maskers
 addpath 'C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0'
 dir = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\';
 dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\fNIRSandGerbils.xlsx';
@@ -19,29 +22,6 @@ erp_window_end_time = 500; % 500 ms after onset of word
 nsubjects = 2;
 num_tot_trials = 140; % look into this
 num_condition_trials = 35;
-
-eeglab;
-
-%% Load in pre-processed datasets - wasn't sure if this is necessary?
-% isubbylist = [1:nsubjects];
-% n = 1;
-% for isubby = isubbylist(n)
-%     subID = char(subIDarray(:,n));
-%     [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-%     EEG = pop_loadset('filename',[subID, '_ICAdone.set'],'filepath',[dir,'\prepro_epoched_data']);
-%     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off'); 
-%     EEG = eeg_checkset( EEG );
-%     fs = EEG.srate;
-%     tube_delay = fs/44100;
-%     shifting_latencies = mat2cell( cell2mat({EEG.event.latency}') + (tube_delay * fs) , length(EEG.event),1);
-%     shifting_latencies = shifting_latencies{:};
-%     for i = 1:numel(shifting_latencies)
-%         EEG.event(i).latency = shifting_latencies(i);
-%     end
-% EEG = eeg_checkset( EEG );
-% EEG = pop_saveset(EEG, [subID]);
-% n = n + 1;
-% end 
 
 %Go through epoch data and separate by color/target/scram vs unscram
 isubby = [1:nsubjects];
