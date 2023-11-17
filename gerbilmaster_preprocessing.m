@@ -6,9 +6,9 @@
 %-------------------------------------------------------------------------------------------------------------------
 whos_using = 'Ben';
 
-subID = '7007';
-range_A = 'A7';
-range_B = 'B7';
+subID = '7010';
+range_A = 'A10';
+range_B = 'B10';
 badchannels = 'channelsremoved.xlsx';
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
@@ -84,7 +84,7 @@ numchannels_removed = size(channels_to_remove, 2);
 writematrix(subID, badchannels, 'Sheet', 1,'Range', range_A);
 writematrix(numchannels_removed, badchannels, 'Sheet', 1, 'Range', range_B);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 5,'setname',[subID, 'Channels Removed'],'gui','on');
-
+EEG = eeg_checkset( EEG );
 %EEG = pop_loadset('filename',[subID, '_artifactmarked.set'], 'filepath', pre_pro_epoched_data_folder);
 
 %Running ICA
@@ -93,11 +93,11 @@ writematrix(numchannels_removed, badchannels, 'Sheet', 1, 'Range', range_B);
 % EEG = eeg_checkset( EEG );
 EEG = pop_runica(EEG, 'extended',1);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 6,'setname',[subID, 'ICA'],'gui','on');
-
+EEG = eeg_checkset( EEG );
 EEG = pop_saveset( EEG, 'filename', [subID , '_ICAcomponentsin.set'], 'filepath', pre_pro_epoched_data_folder);
 [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-pop_selectcomps(EEG,[1:32])
+EEG = eeg_checkset( EEG );
+pop_selectcomps(EEG,[1:size(EEG.icawinv,2)])
 % Pause to select components
 pause
 %channels_to_remove = str2num(input('Please enter which components to remove:'));
