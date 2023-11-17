@@ -19,7 +19,7 @@ else
     dir = 'C:\Users\ema36\OneDrivpop_epoche\Documents\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID = char('7007','7008');
+curr_subject_ID = char('7007','7008','7009','7010');
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
