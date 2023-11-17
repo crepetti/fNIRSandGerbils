@@ -11,14 +11,15 @@
 % (determined by visual inspection of ICA topographies and raw signal traces)
 % underwent interpolation (Delorme & Makeig, 2004). A final visual inspection removed any remaining contaminated trials. 
 whos_using = 'Ben';
-if whos_using == 'Ben'
+if all(whos_using == 'Ben')
+    addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
-    dir_fnrisandgerbils = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
+    dir_fnirsandgerbils = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
 else
-    dir = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\';
+    dir = 'C:\Users\ema36\OneDrivpop_epoche\Documents\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID = char('7004','7007');
+curr_subject_ID = char('7007','7008','7009','7010');
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
@@ -56,8 +57,11 @@ for isubject = 1:size(curr_subject_ID,1)
     %     EEG_unscrambled_st = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
     %     EEG_scrambled_dt = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
     %     EEG_unscrambled_dt = pop_epoch( EEG, {'11007'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
-    EEG_all = pop_epoch( EEG, {'18687' , '35327', '43519', '10495'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
-
+    if all(subID == '7007') || all(subID == '7008')
+        EEG_all = pop_epoch( EEG, {'18687' , '35327', '44031', '11007'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+    else
+        EEG_all = pop_epoch( EEG, {'18687' , '35327', '43519', '10495'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+    end
 
     % Find tOnset to isolate ERPs: loading in all_word_order & tOnset -->
     % THIS IS BELOW ALREADY
@@ -78,7 +82,7 @@ for isubject = 1:size(curr_subject_ID,1)
     
 
     % Find target word onset times
-    stim_info_filename = [dir,'\stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
+    stim_info_filename = [dir,'stim/s_',strtrim(curr_subject_ID(isubject,:)),'/',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
     load(stim_info_filename); % loads all_word_order (array of all words) and tOnset (the onset times within each trial)
     tOnset(end) = [];
     %target_word_indices = all_word_order == 'red' | all_word_order == 'white' | all_word_order == 'blue' | all_word_order == 'green';
@@ -161,7 +165,7 @@ for isubject = 1:size(curr_subject_ID,1)
             % condition 4 = unscrambled same talker
 
             % Reject epochs with amplitude above +/1 100 uV
-            if any(abs(detrend(all_epochs(frontocentral_channels,start_time:end_time,itrial))) > 100,'all')
+            if any(abs(detrend(all_epochs(frontocentral_channels,start_time:end_time,itrial))) > 30,'all')
                 continue
             end
 
