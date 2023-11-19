@@ -7,11 +7,14 @@ subID = '7009';
 % trigger 18687: scrambled_same_talker
 % trigger 35327:unscrambled_same_talker
 % Trigger 43519: scrambled_diff_talker
-whos_using = 'Ben';
+whos_using = 'Bon';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
-    pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data';
+    pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
+elseif whos_using == 'Bon' % Ben Laptop
+    addpath('\Users\benri\Documents\eeglab2023.0\')
+    pre_pro_epoched_data_folder = '\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
 else
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
