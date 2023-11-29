@@ -19,7 +19,7 @@ else
     dir = 'C:\Users\ema36\OneDrivpop_epoche\Documents\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID = char('7007','7008','7009','7010');
+curr_subject_ID = char('7006','7007','7008','7009','7010');
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
@@ -57,7 +57,7 @@ for isubject = 1:size(curr_subject_ID,1)
     %     EEG_unscrambled_st = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
     %     EEG_scrambled_dt = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
     %     EEG_unscrambled_dt = pop_epoch( EEG, {'11007'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
-    if all(subID == '7007') || all(subID == '7008')
+    if all(subID == '7007') || all(subID == '7008') || all(subID == '7009') || all(subID == '7010')
         EEG_all = pop_epoch( EEG, {'18687' , '35327', '44031', '11007'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
     else
         EEG_all = pop_epoch( EEG, {'18687' , '35327', '43519', '10495'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');

@@ -5,11 +5,11 @@
 all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2','1');
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('newpilot93','newpilot912','newpilot917');
+curr_subject_ID = char('7006','7007','7008','7009','7010');
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 % names, and click times by trial
-all_click_info = readtable('C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx','FileType','spreadsheet','Format','auto');
+all_click_info = readtable('/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx','FileType','spreadsheet','Format','auto');
 
 by_subject_behavior_info = struct(); % create empty structure for behavior info split up by subject
 all_subjects_click_times = []; % create empty array for all click times (used for histograms)
@@ -20,7 +20,7 @@ all_subjects_click_times_unscrambled = []; % create empty array for all click ti
 for isubject = 1:size(curr_subject_ID,1) % For each subject....
 
     % load words  by trial for this subject
-    stim_info_filename = ['C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_',strtrim(curr_subject_ID(isubject,:)),'\',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
+    stim_info_filename = ['/home/ben/Documents/GitHub/fNIRSandGerbils/stim/s_',strtrim(curr_subject_ID(isubject,:)),'/',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
     load(stim_info_filename) % loads all_word_order (array of all words) and tOnset (the onset times within each trial)
     
     this_subject_ID = strtrim(string(curr_subject_ID(isubject,:))); % define this subject ID
@@ -54,16 +54,30 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     clicks_not_counted = 0;
     for itrial = 1:n_trials % for each trial...
         % ....find the subjects click times for this trial....
-        variable = string(soundfiles_by_trial{itrial, 1});
-        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled_diff_talker\');
-        variable = erase(variable, '_scrambled_dt.wav');
-        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled_same_talker\');
-        variable = erase(variable, '_scrambled_st.wav');
-        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled_diff_talker\');
-        variable = erase(variable,  '_unscrambled_dt.wav');
-        variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled_same_talker\');
-        variable = erase(variable,  '_unscrambled_st.wav');
-        variable = str2num(variable);
+        if string(this_subject_ID) == '7008'
+variable = string(soundfiles_by_trial{itrial, 1});
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7007\scrambled_diff_talker\');
+            variable = erase(variable, '_scrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7007\scrambled_same_talker\');
+            variable = erase(variable, '_scrambled_st.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7007\unscrambled_diff_talker\');
+            variable = erase(variable,  '_unscrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7007\unscrambled_same_talker\');
+            variable = erase(variable,  '_unscrambled_st.wav');
+            variable = str2num(variable);
+        else
+
+            variable = string(soundfiles_by_trial{itrial, 1});
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled_diff_talker\');
+            variable = erase(variable, '_scrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\scrambled_same_talker\');
+            variable = erase(variable, '_scrambled_st.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled_diff_talker\');
+            variable = erase(variable,  '_unscrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_' + string(this_subject_ID) + '\unscrambled_same_talker\');
+            variable = erase(variable,  '_unscrambled_st.wav');
+            variable = str2num(variable);
+        end
         current_click_times = table2array(click_times(itrial,:));
         current_click_times = current_click_times(~isnan(current_click_times));
 
