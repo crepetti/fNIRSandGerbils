@@ -10,7 +10,7 @@
 % Datasets with 3 or fewer non-adjacent, erratic channels 
 % (determined by visual inspection of ICA topographies and raw signal traces)
 % underwent interpolation (Delorme & Makeig, 2004). A final visual inspection removed any remaining contaminated trials. 
-whos_using = 'Ben';
+whos_using = 'Ema';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
