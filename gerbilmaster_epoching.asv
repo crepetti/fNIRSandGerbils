@@ -29,13 +29,8 @@ EEG = pop_loadset('filename', [subID, '_ICAdone.set'], 'filepath', pre_pro_epoch
 EEG = eeg_checkset( EEG );
 
 %checking trigger latency distances
-distance_threshold = 2000;
 all_latencies = [EEG.urevent(:).latency];
-all_distances = diff(all_latencies);
-num_dist_below_threshold = sum(all_distances < distance_threshold);
-disp('Below is the number of instances where triggers are too close together');
-disp(num_dist_below_threshold);
-
+all_distances = 
 %scrambled same talker condition
 EEG_scrambled_st = pop_epoch( EEG, {'18687'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
 EEG_scrambled_st = eeg_checkset( EEG_scrambled_st );

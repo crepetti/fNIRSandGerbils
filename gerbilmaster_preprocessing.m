@@ -4,9 +4,9 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-whos_using = 'Ben';
+whos_using = 'Ema';
 
-subID = '7010';
+subID = '7011';
 range_A = 'A10';
 range_B = 'B10';
 badchannels = 'channelsremoved.xlsx';
