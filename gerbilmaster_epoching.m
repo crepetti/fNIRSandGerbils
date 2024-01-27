@@ -1,7 +1,7 @@
 %% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 %% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 %% EPOCHING
-subID = '7010';
+subID = '7007';
 
 % trigger 10495: unscrambled_diff_talker
 % trigger 18687: scrambled_same_talker
@@ -28,13 +28,21 @@ EEG = pop_loadset('filename', [subID, '_ICAdone.set'], 'filepath', pre_pro_epoch
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
 EEG = eeg_checkset( EEG );
 
+% remove extraneous triggers
+
 %checking trigger latency distances
 distance_threshold = 2000;
 all_latencies = [EEG.urevent(:).latency];
+all_latencies(~ismember([EEG.urevent(:).type],[18687,11007,44031,35327])) = [];
 all_distances = diff(all_latencies);
 num_dist_below_threshold = sum(all_distances < distance_threshold);
 disp('Below is the number of instances where triggers are too close together');
 disp(num_dist_below_threshold);
+figure; xline(all_latencies);
+
+
+where_below_threshold = find(all_distances < distance_threshold);
+
 
 %scrambled same talker condition
 EEG_scrambled_st = pop_epoch( EEG, {'18687'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
