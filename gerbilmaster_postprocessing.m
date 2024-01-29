@@ -139,14 +139,14 @@ for isubject = 1:size(curr_subject_ID,1)
             this_trial_target_onsets = this_condition_target_onsets(itrial).onsets; % find onsets of target words in this trial
             %% Background Onsets (masker onsets)
             for ionset = 1:length(tOnset)
-                resampled_search_time = (tOnset(ionset))/fs;%(44100/fs);
+                resampled_search_time = (tOnset(ionset))/(44100/fs);
                 [~,start_time] = min(abs(scrambled_time - ((resampled_search_time*1000)+erp_window_start_time) ) ); % ...find 100 ms before the time it starts (indexing where it's located in scrambled_time)
                 end_time = start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*256);
                 data_by_masker_onset = cat(3, data_by_masker_onset,these_epochs(:,start_time:end_time,itrial));
             end
             %% Within Target Onsets
             for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
-                resampled_search_time = (this_trial_target_onsets(ionset))/fs;%(44100/fs);
+                resampled_search_time = (this_trial_target_onsets(ionset))/(44100/fs);
                 [~,start_time] = min(abs(scrambled_time - ((resampled_search_time*1000)+erp_window_start_time) ) ); % ...find 100 ms before the time it starts (indexing where it's located in scrambled_time)
                 end_time = start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*256);
 
@@ -154,6 +154,7 @@ for isubject = 1:size(curr_subject_ID,1)
                 % Reject epochs with amplitude above +/1 100 uV
                 if any(abs(detrend(these_epochs(frontocentral_channels,start_time:end_time,itrial))) > 30,'all')
                     continue
+                    print('epoch rejected')
                 end
 
                 % Isolate ERP
