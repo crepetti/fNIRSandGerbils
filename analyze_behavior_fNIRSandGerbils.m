@@ -8,8 +8,10 @@ all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','
 curr_subject_ID = char('7006','7007','7008','7009','7010');
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
+fNIRSandGerbilsXL = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+stim_file = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\stim\s_'
 % names, and click times by trial
-all_click_info = readtable('/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx','FileType','spreadsheet','Format','auto');
+all_click_info = readtable(fNIRSandGerbilsXL,'FileType','spreadsheet','Format','auto');
 
 by_subject_behavior_info = struct(); % create empty structure for behavior info split up by subject
 all_subjects_click_times = []; % create empty array for all click times (used for histograms)
@@ -20,7 +22,7 @@ all_subjects_click_times_unscrambled = []; % create empty array for all click ti
 for isubject = 1:size(curr_subject_ID,1) % For each subject....
 
     % load words  by trial for this subject
-    stim_info_filename = ['/home/ben/Documents/GitHub/fNIRSandGerbils/stim/s_',strtrim(curr_subject_ID(isubject,:)),'/',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
+    stim_info_filename = [stim_file,strtrim(curr_subject_ID(isubject,:)),'/',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
     load(stim_info_filename) % loads all_word_order (array of all words) and tOnset (the onset times within each trial)
     
     this_subject_ID = strtrim(string(curr_subject_ID(isubject,:))); % define this subject ID
