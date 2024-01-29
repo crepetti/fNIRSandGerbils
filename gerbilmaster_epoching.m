@@ -1,13 +1,13 @@
 %% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 %% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 %% EPOCHING
-subID = '7007';
+subID = '7010';
 
 % trigger 10495: unscrambled_diff_talker
 % trigger 18687: scrambled_same_talker
 % trigger 35327:unscrambled_same_talker
 % Trigger 43519: scrambled_diff_talker
-whos_using = 'Ema';
+whos_using = 'Bon';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
@@ -26,6 +26,17 @@ EEG = pop_loadset('filename', [subID, '_ICAdone.set'], 'filepath', pre_pro_epoch
 
 %change ^^ after channel load changes
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
+EEG = eeg_checkset( EEG );
+
+% shift latencies
+EEG = eeg_checkset( EEG );
+fs = EEG.srate;
+tube_delay = fs/44100;
+shifting_latencies = mat2cell( cell2mat({EEG.event.latency}') + (tube_delay * fs) , length(EEG.event),1);
+shifting_latencies = shifting_latencies{:};
+for i = 1:numel(shifting_latencies)
+    EEG.event(i).latency = shifting_latencies(i);
+end
 EEG = eeg_checkset( EEG );
 
 % remove extraneous triggers
