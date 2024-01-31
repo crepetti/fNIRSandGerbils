@@ -17,7 +17,7 @@ if whos_using == 'Ben'
     BDF_filename = ['/home/ben/Documents/Gerbil BDFs/', subID, '.bdf'];
 else
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
-    pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\';
+    pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data';
     addpath(pre_pro_epoched_data_folder)
     BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
 end
@@ -45,7 +45,7 @@ EEG = eeg_checkset( EEG );
 if whos_using == 'Ben'
     EEG=pop_chanedit(EEG, 'load',{'/home/ben/Documents/GitHub/fNIRSandGerbils/chan_locs_cart.txt', 'filetype', 'sfp'});
 else
-    EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+    EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 end
 
 
