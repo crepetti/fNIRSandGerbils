@@ -620,10 +620,11 @@ while trial <= numtrials
         audiofilename = [this_foldername,'/',num2str(trial),'_unscrambled_dt', '.wav'];
         output = newTargetSound' + newMaskerSound;
         output = repmat(output,2,1)';
-        % Trigger = 0 0 1
+        % Trigger = 0 1 1
         trigger_channel_3 = zeros(size(output(:,1)));
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
+        trigger_channel_4(1) = 1;
         trigger_channel_5(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
