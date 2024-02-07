@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+
+# A log file for Gustav
+
+
+Experiment fNIRSandGerbils running subject 7019 started at 14:40:29 on 2024-02-04
+
+  Block 1 of 144 started at 14:40:32; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 144 ended at 14:40:52; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 2 of 144 started at 14:40:52; Condition: 2 ; masker = scrambled_same_talker
