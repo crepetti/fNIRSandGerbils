@@ -1,7 +1,7 @@
 %% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 %% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 %% EPOCHING
-subID = '7010';
+subID = '7011';
 
 % trigger 10495: unscrambled_diff_talker
 % trigger 18687: scrambled_same_talker
