@@ -1,13 +1,13 @@
 %% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 %% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 %% EPOCHING
-subID = '7011';
+subID = '7022';
 
 % trigger 10495: unscrambled_diff_talker
 % trigger 18687: scrambled_same_talker
 % trigger 35327:unscrambled_same_talker
 % Trigger 43519: scrambled_diff_talker
-whos_using = 'Ema';
+whos_using = 'Ben';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
@@ -42,21 +42,58 @@ EEG = eeg_checkset( EEG );
 % remove extraneous triggers
 
 %checking trigger latency distances
-distance_threshold = 2000;
+distance_threshold = 20;
 all_latencies = [EEG.urevent(:).latency];
-all_latencies(~ismember([EEG.urevent(:).type],[18687,11007,44031,35327])) = [];
+all_types = [EEG.urevent(:).type];
+
+% if double(string(subID)) == 7017
+%     all_latencies(~ismember([EEG.urevent(:).type],[30975,31999,65279,31487])) = [];
+%     all_types(~ismember([EEG.urevent(:).type],[30975,31999,65279,31487])) = [];
+% elseif double(string(subID)) == 7021
+%       all_latencies(~ismember([EEG.urevent(:).type],[32511,31999,30975,31487])) = [];
+%       all_types(~ismember([EEG.urevent(:).type],[32511,31999,30975,31487])) = [];
+% elseif double(string(subID)) == 7022
+% all_latencies(~ismember([EEG.urevent(:).type],[30975,31999,65279,32511])) = [];
+% all_types(~ismember([EEG.urevent(:).type],[30975,31999,65279,32511])) = [];
+% else
+%  all_latencies(~ismember([EEG.urevent(:).type],[18687,11007,44031,35327])) = [];
+%  all_types(~ismember([EEG.urevent(:).type],[18687,11007,44031,35327])) = [];
+% end
 all_distances = diff(all_latencies);
 num_dist_below_threshold = sum(all_distances < distance_threshold);
 disp('Below is the number of instances where triggers are too close together');
 disp(num_dist_below_threshold);
 figure; xline(all_latencies);
 
+i = 1;
+urevents_to_remove = [];
+while i < numel(all_latencies)
+    if all_latencies(i+1) - all_latencies(i) < 10*fs && all_types(i+1) == 30975
+        urevents_to_remove = [urevents_to_remove, i+1];
+    end
+            i = i+1;
+end
+
 
 where_below_threshold = find(all_distances < distance_threshold);
-
+% remove from EEG.event and EEG.urevent
+z = {EEG.event(:).urevent};
+z(find(cellfun(@isempty,z))) = {0};
+events_to_remove = [];
+for j = 1:length(urevents_to_remove)
+    this_urevent = urevents_to_remove(j);
+    events_to_remove = [events_to_remove, find(string(z) == string(this_urevent))];
+end
+EEG.event(events_to_remove) = [];
+EEG.urevent(urevents_to_remove) = [];
 
 %scrambled same talker condition
+if double(string(subID)) == 7017 || double(string(subID)) == 7022
+    EEG_scrambled_st = pop_epoch( EEG, {'31999'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
+
+else
 EEG_scrambled_st = pop_epoch( EEG, {'18687'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
+end
 EEG_scrambled_st = eeg_checkset( EEG_scrambled_st );
 EEG_scrambled_st = pop_rmbase( EEG_scrambled_st, [], []);
 [ALLEEG EEG_scrambled_st CURRENTSET] = pop_newset(ALLEEG, EEG_scrambled_st, 2, 'gui', 'off');
@@ -64,7 +101,14 @@ EEG_scrambled_st = eeg_checkset( EEG_scrambled_st );
 save([pre_pro_epoched_data_folder, subID, 'scrambled_st_epoch.mat'], "EEG_scrambled_st")
 
 %unscrambled same talker condition
+if double(string(subID)) == 7017 || double(string(subID)) == 7022
+    EEG_unscrambled_st = pop_epoch( EEG, {'30975'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
+
+
+else
+
 EEG_unscrambled_st = pop_epoch( EEG, {'35327'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
+end
 EEG_unscrambled_st = eeg_checkset( EEG_unscrambled_st );
 EEG_unscrambled_st = pop_rmbase( EEG_unscrambled_st, [], []);
 [ALLEEG EEG_unscrambled_st CURRENTSET] = pop_newset(ALLEEG, EEG_unscrambled_st, 2, 'gui', 'off');
@@ -73,7 +117,12 @@ save([pre_pro_epoched_data_folder, subID , 'unscrambled_st_epoch.mat'], "EEG_uns
 
 %scrambled diff talker condition
 %43519
+if double(string(subID)) == 7017 || double(string(subID)) == 7022
+    EEG_scrambled_dt = pop_epoch( EEG, {'65279'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
+
+else
 EEG_scrambled_dt = pop_epoch( EEG, {'44031'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
+end
 EEG_scrambled_dt = eeg_checkset( EEG_scrambled_dt );
 EEG_scrambled_dt = pop_rmbase( EEG_scrambled_dt, [], []);
 [ALLEEG EEG_scrambled_dt CURRENTSET] = pop_newset(ALLEEG, EEG_scrambled_dt, 2, 'gui', 'off');
@@ -82,7 +131,14 @@ save([pre_pro_epoched_data_folder, subID, 'scrambled_dt_epoch.mat'], "EEG_scramb
 
 %unscrambled diff talker condition
 %10495
+if double(string(subID)) == 7017 
+    EEG_unscrambled_dt = pop_epoch( EEG, {'31487'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
+elseif double(string(subID)) == 7022
+        EEG_unscrambled_dt = pop_epoch( EEG, {'32511'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
+
+else
 EEG_unscrambled_dt = pop_epoch( EEG, {'11007'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
+end
 EEG_unscrambled_dt = eeg_checkset( EEG_unscrambled_dt );
 EEG_unscrambled_dt = pop_rmbase( EEG_unscrambled_dt, [], []);
 [ALLEEG EEG_unscrambled_dt CURRENTSET] = pop_newset(ALLEEG, EEG_unscrambled_dt, 2, 'gui', 'off');
@@ -90,7 +146,12 @@ EEG_unscrambled_dt = eeg_checkset( EEG_unscrambled_dt );
 save([pre_pro_epoched_data_folder, subID , 'unscrambled_dt_epoch.mat'], "EEG_unscrambled_dt")
 
 %all epochs
+if double(string(subID)) == 7017 || double(string(subID)) == 7022
+    EEG = pop_epoch( EEG, {'31999' , '30975', '65279', '31487'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+
+else
 EEG = pop_epoch( EEG, {'18687' , '35327', '44031', '11007'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+end
 EEG = eeg_checkset( EEG );
 EEG = pop_rmbase( EEG, [], []);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');

@@ -4,11 +4,11 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-whos_using = 'Ema';
+whos_using = 'Ben';
 
-subID = '7011';
-range_A = 'A10';
-range_B = 'B10';
+subID = '7022';
+range_A = 'A22';
+range_B = 'B22';
 badchannels = 'channelsremoved.xlsx';
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
