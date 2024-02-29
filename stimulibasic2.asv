@@ -54,7 +54,7 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 144;
+numtrials = 8;
 numpracticetrials = 10;
 
 conditionarray = [ones(1, numtrials/4), 2*ones(1, numtrials/4), 3*ones(1, numtrials/4), 4*ones(1, numtrials/4)];
@@ -597,9 +597,10 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs)= 1;
-        %trigger_channel_4(1:0.01*fs)= 1;
+        trigger_channel_3(1)= 1;
+        trigger_channel_4(1)= 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
+        audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
     elseif scramblingindex == 1 && talkerindex == 0 % scrambled same talker
@@ -612,9 +613,10 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs) = 1;
-        %trigger_channel_6(1:0.01*fs) = 1;
+        trigger_channel_5(1) = 1;
+        trigger_channel_6(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
+        audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
     elseif scramblingindex == 0 && talkerindex == 1 % unscrambled diff talker
@@ -627,9 +629,10 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs) = 1;
-        %trigger_channel_5(1:0.01*fs) = 1;
+        trigger_channel_3(1) = 1;
+        trigger_channel_5(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
+        audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
     elseif scramblingindex == 1 && talkerindex == 1 % scrambled diff talker
@@ -637,19 +640,18 @@ while trial <= numtrials
         audiofilename = [this_foldername,'/',num2str(trial),'_scrambled_dt', '.wav'];
         output = newTargetSound' + newMaskerSound;
         output = repmat(output,2,1)';
-        % Trigger = 0 1 0 1
+        % Trigger = 1 0 1
         trigger_channel_3 = zeros(size(output(:,1)));
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs) = 1;
-        %trigger_channel_6(1:0.01*fs) = 1;
+        trigger_channel_4(1) = 1;
+        trigger_channel_6(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
+        audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
         disp(audiofilename)
     end
-
-    
     
     num_color_words_this_trial = sum(ismember(target_word_order,all_color_words));
     if num_color_words_this_trial < 3
