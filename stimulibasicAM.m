@@ -37,7 +37,7 @@
 addpath('/home/ben/Documents/GitHub/fNIRSandGerbils/unprocessed/bob_all')
 addpath('/home/ben/Documents/GitHub/fNIRSandGerbils/unprocessed/bob_all_long')
 addpath('/home/ben/Documents/GitHub/fNIRSandGerbils/unprocessed/mike_all')
-addpath('/home/ben/Documents/GitHub/fNIRSandGerbils/fNIRSandGerbils/stim/')
+addpath('/home/ben/Documents/GitHub/fNIRSandGerbils/stim/')
 addpath('/home/ben/Documents/GitHub/fNIRSandGerbils/AuditoryToolbox')
 
 
@@ -91,7 +91,7 @@ practice_bob_or_mike = randsample(practice_bob_or_mike,numpracticetrials);
 all_masker_word_order = strings(numtrials,numtotalwords);
 
 % set rms
-rmsset = 0.0632456;
+rmsset = 0.0356;
 % generate folder
 foldername = ['stim/s_',subjectID];
 if ~isfolder(foldername) % if this folder already exists, we will overwrite those stimuli
@@ -241,7 +241,11 @@ while practicetrial <= numpracticetrials
     end
     
     %% Scramble masker sound if necessary
-    this_masker_envelope = abs(hilbert(newMaskerSound))';
+    % find envelope first (half wave rectify, low pass filter at 125 Hz)
+    this_masker_envelope = newMaskerSound;
+    this_masker_envelope(this_masker_envelope < 0) = 0;
+    [b,a] = butter(4,125/fs);
+    this_masker_envelope = filter(b,a,this_masker_envelope)';
     if (scramblingindex == 1)
         newMaskerSound = scrambling(newMaskerSound, fs);
     end
@@ -494,7 +498,10 @@ while trial <= numtrials
     end
     
     %% Scramble masker sound if necessary
-    this_masker_envelope = abs(hilbert(newMaskerSound))';
+    this_masker_envelope = newMaskerSound;
+    this_masker_envelope(this_masker_envelope < 0) = 0;
+    [b,a] = butter(4,125/fs);
+    this_masker_envelope = filter(b,a,this_masker_envelope)';
     if (scramblingindex == 1)
         newMaskerSound = scrambling(newMaskerSound, fs);
     end
