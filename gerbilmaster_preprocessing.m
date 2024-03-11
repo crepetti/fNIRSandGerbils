@@ -4,22 +4,27 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-whos_using = 'Ben';
+whos_using = 'Bon';
 
-subID = '7022';
-range_A = 'A22';
-range_B = 'B22';
+subID = '7024';
+range_A = 'A24';
+range_B = 'B24';
 badchannels = 'channelsremoved.xlsx';
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
     addpath(pre_pro_epoched_data_folder)
     BDF_filename = ['/home/ben/Documents/Gerbil BDFs/', subID, '.bdf'];
-else
+elseif whos_using == 'Ema'
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data';
     addpath(pre_pro_epoched_data_folder)
     BDF_filename = ['C:\Users\ema36\OneDrive\Documents\LiMN Things\Gerbil BDFs\', subID, '.bdf'];
+elseif whos_using == 'Bon'
+    addpath('C:\Users\benri\Documents\eeglab2023.1');
+    pre_pro_epoched_data_folder = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
+    addpath(pre_pro_epoched_data_folder)
+    BDF_filename = ['C:\Users\benri\Downloads\', subID, '.bdf'];
 end
 % pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data';
 % if ~exist(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))%new folder to save preprocess data
@@ -44,8 +49,10 @@ EEG = eeg_checkset( EEG );
 % EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\richardson_32_chanlocs.locs' 'filetype' 'locs'});
 if whos_using == 'Ben'
     EEG=pop_chanedit(EEG, 'load',{'/home/ben/Documents/GitHub/fNIRSandGerbils/chan_locs_cart.txt', 'filetype', 'sfp'});
-else
+elseif whos_using == 'Ema'
     EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+elseif whos_using == 'Bon'
+    EEG=pop_chanedit(EEG, 'load',{'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 end
 
 

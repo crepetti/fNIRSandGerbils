@@ -6,7 +6,7 @@
 % Datasets with 3 or fewer non-adjacent, erratic channels 
 % (determined by visual inspection of ICA topographies and raw signal traces)
 % underwent interpolation (Delorme & Makeig, 2004). A final visual inspection removed any remaining contaminated trials. 
-whos_using = 'Ben';
+whos_using = 'Bon';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -14,12 +14,12 @@ if all(whos_using == 'Ben')
 elseif all(whos_using == 'Bon')
     addpath('C:\Users\benri\Documents\eeglab2023.1');
     dir = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\';
-    dir_fnirsandgerbils = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbilss\data\fNIRSandGerbils.xlsx';   
+    dir_fnirsandgerbils = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';   
 else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID = char('7006','7007','7008','7009','7010','7017','7022');
+curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024'); % ,
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];
