@@ -86,7 +86,7 @@ pop_spectopo(EEG, 1);
 pause
 channels_to_remove = input('Please enter a comma-separated list of channels indices to interpolate (ex. [1 2 3]):');
 % EEG = pop_select(EEG, 'channel', channels_to_remove);
-EEG = pop_interp(EEG, channels_to_remove, 'spherical', [-1 16]);
+EEG = pop_interp(EEG, channels_to_remove, 'spherical');
 numchannels_removed = size(channels_to_remove, 2);
 writematrix(subID, badchannels, 'Sheet', 1,'Range', range_A);
 writematrix(numchannels_removed, badchannels, 'Sheet', 1, 'Range', range_B);
