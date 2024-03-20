@@ -129,48 +129,48 @@ while practicetrial <= numpracticetrials
     
     %mix them in a bucket and randomize them, sample without replacements showing up, but also randomizing so that color and masker words are mixed
     num_words_total = length(masker_words_to_use) + length(color_words_to_use);
-    final_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
+    masker_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
     
     %% Duplicate Check
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
     while duplicateindex <= numtotalwords - 3
-        duplicatecheck(duplicateindex) = final_word_order(duplicateindex);
-        if duplicatecheck(duplicateindex) == final_word_order(duplicateindex + 1)
+        duplicatecheck(duplicateindex) = masker_word_order(duplicateindex);
+        if duplicatecheck(duplicateindex) == masker_word_order(duplicateindex + 1)
             if ismember(duplicatecheck(duplicateindex), all_color_words) == 1
-                final_word_order(duplicateindex) = randsample(all_color_words(all_color_words ~= duplicatecheck(duplicateindex)), 1, 'false');
+                masker_word_order(duplicateindex) = randsample(all_color_words(all_color_words ~= duplicatecheck(duplicateindex)), 1, 'false');
             elseif ismember(duplicatecheck(duplicateindex), all_object_words) == 1
-                final_word_order(duplicateindex) = randsample(all_object_words(all_object_words ~= duplicatecheck(duplicateindex)), 1, 'false');
+                masker_word_order(duplicateindex) = randsample(all_object_words(all_object_words ~= duplicatecheck(duplicateindex)), 1, 'false');
             else
                 duplicateindex = duplicateindex + 0;
             end
         end
         % make sure no color words are next to each other (if within two,
         % switch it with someone else
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
-            final_word_order(duplicateindex + 1) = randsample(all_object_words,1,1);
+        if ismember(masker_word_order(duplicateindex), all_color_words) && ismember(masker_word_order(duplicateindex + 1), all_color_words)
+            masker_word_order(duplicateindex + 1) = randsample(all_object_words,1,1);
         end
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 2), all_color_words)
-            final_word_order(duplicateindex + 2) = randsample(all_object_words,1,1);            
+        if ismember(masker_word_order(duplicateindex), all_color_words) && ismember(masker_word_order(duplicateindex + 2), all_color_words)
+            masker_word_order(duplicateindex + 2) = randsample(all_object_words,1,1);            
         end
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 3), all_color_words)
-            final_word_order(duplicateindex + 3) = randsample(all_object_words,1,1);          
+        if ismember(masker_word_order(duplicateindex), all_color_words) && ismember(masker_word_order(duplicateindex + 3), all_color_words)
+            masker_word_order(duplicateindex + 3) = randsample(all_object_words,1,1);          
         end
         duplicateindex = duplicateindex + 1;
         
     end
     % no color words in the first three words
     for ifirstcheck = 1:3
-        if ismember(final_word_order(ifirstcheck),all_color_words)
-            final_word_order(ifirstcheck) = randsample(all_object_words(all_object_words ~= final_word_order(ifirstcheck)), 1, 'false');
+        if ismember(masker_word_order(ifirstcheck),all_color_words)
+            masker_word_order(ifirstcheck) = randsample(all_object_words(all_object_words ~= masker_word_order(ifirstcheck)), 1, 'false');
         end
     end
     % no color words in the last three words
     
     for ilastcheck = num_words_total-3:num_words_total
-        if ismember(final_word_order(ilastcheck),all_color_words)
-            final_word_order(ilastcheck) = randsample(all_object_words(all_object_words ~= final_word_order(ilastcheck)), 1, 'false');
+        if ismember(masker_word_order(ilastcheck),all_color_words)
+            masker_word_order(ilastcheck) = randsample(all_object_words(all_object_words ~= masker_word_order(ilastcheck)), 1, 'false');
         end
     end
     
@@ -179,9 +179,9 @@ while practicetrial <= numpracticetrials
     soundArray = strings(1, numtotalwords);
     while loadsoundindex <= numtotalwords
         if bob_or_mike_index == 0
-            word_filename = append('unprocessed/bob_all/',final_word_order(loadsoundindex), '_short.wav');
+            word_filename = append('unprocessed/bob_all/',masker_word_order(loadsoundindex), '_short.wav');
         elseif bob_or_mike_index == 1
-            word_filename = append('unprocessed/mike_all/',final_word_order(loadsoundindex), '_short.wav');
+            word_filename = append('unprocessed/mike_all/',masker_word_order(loadsoundindex), '_short.wav');
         end
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
@@ -302,9 +302,9 @@ while practicetrial <= numpracticetrials
     for i = 1:length(target_word_order)
         % find the closest word in final word order
         [~,masker_word_index] = min(abs(tOnset - target_onsets(i)));
-        if target_word_order(i) == final_word_order(masker_word_index) && ismember(target_word_order(i),all_color_words)
+        if target_word_order(i) == masker_word_order(masker_word_index) && ismember(target_word_order(i),all_color_words)
             target_word_order(i) = randsample(all_color_words(all_color_words ~= target_word_order(i)),1);
-        elseif target_word_order(i) == final_word_order(masker_word_index) && ismember(target_word_order(i),all_object_words)
+        elseif target_word_order(i) == masker_word_order(masker_word_index) && ismember(target_word_order(i),all_object_words)
             target_word_order(i) = randsample(all_object_words(all_object_words ~= target_word_order(i)),1);
         end
     end
@@ -386,59 +386,59 @@ while trial <= numtrials
     
     %mix them in a bucket and randomize them, sample without replacements showing up, but also randomizing so that color and masker words are mixed
     num_words_total = length(masker_words_to_use) + length(color_words_to_use);
-    final_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
+    masker_word_order = randsample([masker_words_to_use, color_words_to_use], num_words_total, false);
     
     %% Duplicate Check
     %check for two words in a row (if color, do color, if masker, do masker)
     duplicateindex = 1;
     duplicatecheck = strings(1,numtotalwords);
     while duplicateindex <= numtotalwords - 3
-        duplicatecheck(duplicateindex) = final_word_order(duplicateindex);
-        if duplicatecheck(duplicateindex) == final_word_order(duplicateindex + 1)
+        duplicatecheck(duplicateindex) = masker_word_order(duplicateindex);
+        if duplicatecheck(duplicateindex) == masker_word_order(duplicateindex + 1)
             if ismember(duplicatecheck(duplicateindex), all_color_words) == 1
-                final_word_order(duplicateindex) = randsample(all_color_words(all_color_words ~= duplicatecheck(duplicateindex)), 1, 'false');
+                masker_word_order(duplicateindex) = randsample(all_color_words(all_color_words ~= duplicatecheck(duplicateindex)), 1, 'false');
             elseif ismember(duplicatecheck(duplicateindex), all_object_words) == 1
-                final_word_order(duplicateindex) = randsample(all_object_words(all_object_words ~= duplicatecheck(duplicateindex)), 1, 'false');
+                masker_word_order(duplicateindex) = randsample(all_object_words(all_object_words ~= duplicatecheck(duplicateindex)), 1, 'false');
             else
                 duplicateindex = duplicateindex + 0;
             end
         end
         % make sure no color words are next to each other (if within two,
         % switch it with someone else
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 1), all_color_words)
-            final_word_order(duplicateindex + 1) = randsample(all_object_words,1,1);
+        if ismember(masker_word_order(duplicateindex), all_color_words) && ismember(masker_word_order(duplicateindex + 1), all_color_words)
+            masker_word_order(duplicateindex + 1) = randsample(all_object_words,1,1);
         end
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 2), all_color_words)
-            final_word_order(duplicateindex + 2) = randsample(all_object_words,1,1);            
+        if ismember(masker_word_order(duplicateindex), all_color_words) && ismember(masker_word_order(duplicateindex + 2), all_color_words)
+            masker_word_order(duplicateindex + 2) = randsample(all_object_words,1,1);            
         end
-        if ismember(final_word_order(duplicateindex), all_color_words) && ismember(final_word_order(duplicateindex + 3), all_color_words)
-            final_word_order(duplicateindex + 3) = randsample(all_object_words,1,1);          
+        if ismember(masker_word_order(duplicateindex), all_color_words) && ismember(masker_word_order(duplicateindex + 3), all_color_words)
+            masker_word_order(duplicateindex + 3) = randsample(all_object_words,1,1);          
         end
         duplicateindex = duplicateindex + 1;
         
     end
     % no color words in the first three words
     for ifirstcheck = 1:3
-        if ismember(final_word_order(ifirstcheck),all_color_words)
-            final_word_order(ifirstcheck) = randsample(all_object_words(all_object_words ~= final_word_order(ifirstcheck)), 1, 'false');
+        if ismember(masker_word_order(ifirstcheck),all_color_words)
+            masker_word_order(ifirstcheck) = randsample(all_object_words(all_object_words ~= masker_word_order(ifirstcheck)), 1, 'false');
         end
     end
     % no color words in the last three words
     
     for ilastcheck = num_words_total-3:num_words_total
-        if ismember(final_word_order(ilastcheck),all_color_words)
-            final_word_order(ilastcheck) = randsample(all_object_words(all_object_words ~= final_word_order(ilastcheck)), 1, 'false');
+        if ismember(masker_word_order(ilastcheck),all_color_words)
+            masker_word_order(ilastcheck) = randsample(all_object_words(all_object_words ~= masker_word_order(ilastcheck)), 1, 'false');
         end
     end
-    
+
     % load the small audio files, filter, level correct and then put into a larger array
     loadsoundindex = 1;
     soundArray = strings(1, numtotalwords);
     while loadsoundindex <= numtotalwords
         if bob_or_mike_index == 0
-            word_filename = append('unprocessed/bob_all/',final_word_order(loadsoundindex), '_short.wav');
+            word_filename = append('unprocessed/bob_all/',masker_word_order(loadsoundindex), '_short.wav');
         elseif bob_or_mike_index == 1
-            word_filename = append('unprocessed/mike_all/',final_word_order(loadsoundindex), '_short.wav');
+            word_filename = append('unprocessed/mike_all/',masker_word_order(loadsoundindex), '_short.wav');
         end
         soundArray(loadsoundindex) = word_filename;
         loadsoundindex = loadsoundindex + 1;
@@ -553,13 +553,19 @@ while trial <= numtrials
     target_word_order = [target_color_word_order,target_object_word_order];
     target_word_order = target_word_order(randperm(length(target_word_order)));
 
+
+    % disp('Number of Target Words Total')
+    % disp(length(target_word_order))
+    % disp('Number of Target Color Words')
+    % disp(sum(ismember(target_word_order,all_color_words)))
+
     % ensure target word is never near the same word in the masker sound
     for i = 1:length(target_word_order)
         % find the closest word in final word order
         [~,masker_word_index] = min(abs(tOnset - target_onsets(i)));
-        if target_word_order(i) == final_word_order(masker_word_index) && ismember(target_word_order(i),all_color_words)
+        if target_word_order(i) == masker_word_order(masker_word_index) && ismember(target_word_order(i),all_color_words)
             target_word_order(i) = randsample(all_color_words(all_color_words ~= target_word_order(i)),1);
-        elseif target_word_order(i) == final_word_order(masker_word_index) && ismember(target_word_order(i),all_object_words)
+        elseif target_word_order(i) == masker_word_order(masker_word_index) && ismember(target_word_order(i),all_object_words)
             target_word_order(i) = randsample(all_object_words(all_object_words ~= target_word_order(i)),1);
         end
     end
@@ -676,7 +682,7 @@ while trial <= numtrials
     if num_color_words_this_trial < 3
         trial = trial;
     else
-        all_masker_word_order(trial,:) = final_word_order;
+        all_masker_word_order(trial,:) = masker_word_order;
         all_target_onsets(trial).onsets = target_onsets;
         all_target_words(trial).words = target_word_order;
         trial = trial + 1;
