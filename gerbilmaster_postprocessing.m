@@ -6,7 +6,7 @@
 % Datasets with 3 or fewer non-adjacent, erratic channels 
 % (determined by visual inspection of ICA topographies and raw signal traces)
 % underwent interpolation (Delorme & Makeig, 2004). A final visual inspection removed any remaining contaminated trials. 
-whos_using = 'Bon';
+whos_using = 'Ema';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -1444,17 +1444,21 @@ xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
 ylim([-3 4])
+xlim([-100 600])
+
 
 subplot(1,3,2)
 hold on
 shadedErrorBar(single_onset_time,scrambled_object_mean_to_plot,scrambled_object_SEM_to_plot,'lineProps','-r')
 shadedErrorBar(single_onset_time,unscrambled_object_mean_to_plot,unscrambled_object_SEM_to_plot,'lineProps','-b')
 
-title('Target Object Word','FontSize',14)
+title('Distracting Object Word','FontSize',14)
 xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
 ylim([-3 4])
+xlim([-100 600])
+
 
 subplot(1,3,3)
 hold on
@@ -1466,6 +1470,8 @@ xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
 ylim([-3 4])
+xlim([-100 600])
+
 
 %% Same vs. Different talker
 %% Figure by word type
@@ -1491,7 +1497,7 @@ hold on
 shadedErrorBar(single_onset_time,mean(meanERPArray(1,5,:),[1,2]),mean(semERPArray(1,5,:),[1,2]),'lineProps','-g')
 shadedErrorBar(single_onset_time,mean(meanERPArray(3,5,:),[1,2]),mean(semERPArray(3,5,:),[1,2]),'lineProps','-m')
 
-title('Scrambled Target Object Word','FontSize',14)
+title('Scrambled Distracting Object Word','FontSize',14)
 xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Same Talker','Different Talker'})
@@ -1531,7 +1537,7 @@ hold on
 shadedErrorBar(single_onset_time,mean(meanERPArray(2,5,:),[1,2]),mean(semERPArray(2,5,:),[1,2]),'lineProps','-g')
 shadedErrorBar(single_onset_time,mean(meanERPArray(4,5,:),[1,2]),mean(semERPArray(4,5,:),[1,2]),'lineProps','-m')
 
-title('Unscrambled Target Object Word','FontSize',14)
+title('Unscrambled Distracting Object Word','FontSize',14)
 xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Same Talker','Different Talker'})

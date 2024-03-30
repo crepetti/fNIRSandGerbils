@@ -6,7 +6,7 @@ all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','
 
 % Create array of subject IDs that you would like to analyze now
 curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024');
-user = 'Bon';
+user = 'Ema';
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 if user == 'Ema'
