@@ -54,8 +54,8 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 144;
-numpracticetrials = 10;
+numtrials = 4;
+numpracticetrials = 4;
 
 conditionarray = [ones(1, numtrials/4), 2*ones(1, numtrials/4), 3*ones(1, numtrials/4), 4*ones(1, numtrials/4)];
 conditionarray = randsample(conditionarray,numtrials);
