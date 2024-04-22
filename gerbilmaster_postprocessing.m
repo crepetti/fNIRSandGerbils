@@ -19,7 +19,7 @@ else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024'); % ,
+curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024', '7025'); % ,
 scrambled_by_target_onset = [];
 unscrambled_by_target_onset = [];
 unscrambled_by_masker_onset = [];

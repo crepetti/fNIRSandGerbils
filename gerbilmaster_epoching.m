@@ -1,13 +1,13 @@
 %% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 %% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 %% EPOCHING
-subID = '7023';
+subID = '7025';
 
 % trigger 10495: unscrambled_diff_talker
 % trigger 18687: scrambled_same_talker
 % trigger 35327:unscrambled_same_talker
 % Trigger 43519: scrambled_diff_talker
-whos_using = 'Bon';
+whos_using = 'Ema';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
@@ -94,7 +94,7 @@ EEG.urevent(urevents_to_remove) = [];
 % proper trigger types (sst = 18687, ust = 35327, sdt = 44031, udt = 11007)
 
 if double(string(subID)) >= 7023
-    fNIRSandGerbilsXL = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+    fNIRSandGerbilsXL = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
     all_click_info = readtable(fNIRSandGerbilsXL,'FileType','spreadsheet','Format','auto');
     which_rows_this_subject = find(all_click_info.S == string(subID)); % find the rows in the spreadsheet which belong to this subject
     conditions = all_click_info.Condition(which_rows_this_subject);

@@ -5,7 +5,7 @@
 all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2','1');
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024');
+curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024', '7025');
 user = 'Ema';
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
@@ -510,12 +510,12 @@ xlabel('Condition','FontSize',18)
 
 figure;
 hold on
-plot(all_dprimes_new','-ok');
-scatter(1:4,mean(all_dprimes_new,1),'or')
-errorbar(1:4,mean(all_dprimes_new,1),std(all_dprimes_new,[],1)./(sqrt(size(all_dprimes_new,1) - 1)),'r');
-title('D prime')
+plot(all_dprimes_new','-ok', 'LineWidth',1);
+scatter(1:4,mean(all_dprimes_new,1),'or','LineWidth',1)
+errorbar(1:4,mean(all_dprimes_new,1),std(all_dprimes_new,[],1)./(sqrt(size(all_dprimes_new,1) - 1)),'r', 'LineWidth',2);
+title('D-Primes vs Condition','FontSize',20)
 %ylim([0,1])
-ylabel('d-prime','FontSize',18)
+ylabel('d-prime','FontSize',18) 
 xticks(1:4)
 xticklabels({'scrambled diff talker','scrambled same talker','unscrambled diff talker','unscrambled same talker'})
 xlabel('Condition','FontSize',18)
