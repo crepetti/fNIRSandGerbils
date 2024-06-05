@@ -4,17 +4,17 @@
 %taking raw BDF file and saving it at .set file
 %order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-whos_using = 'Ema';
+whos_using = 'Ben';
 
-subID = '7030';
-range_A = 'A30';
-range_B = 'B30';
+subID = '7033';
+range_A = 'A33';
+range_B = 'B33';
 badchannels = 'channelsremoved.xlsx';
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
     addpath(pre_pro_epoched_data_folder)
-    BDF_filename = ['/home/ben/Documents/Gerbil BDFs/', subID, '.bdf'];
+    BDF_filename = ['/home/ben/Downloads/', subID, '.bdf'];
 elseif whos_using == 'Ema'
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data';
