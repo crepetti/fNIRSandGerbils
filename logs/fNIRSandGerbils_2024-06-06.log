@@ -1,0 +1,8 @@
+# -*- coding: utf-8 -*-
+
+# A log file for Gustav
+
+
+Experiment fNIRSandGerbils running subject 7036 started at 13:38:49 on 2024-06-06
+
+  Block 1 of 144 started at 13:39:29; Condition: 1 ; masker = scrambled_diff_talker

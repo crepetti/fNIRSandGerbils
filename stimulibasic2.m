@@ -1,5 +1,5 @@
 %% stimulibasic2.m
-% Authord: Benjamin Richardson, Emaya Anand
+% Author: Benjamin Richardson, Emaya Anand
 
 % Stimulus generation for fNIRSandGerbils experiment, new version August 2023.
 % This code generates 144 trials of speech stimuli. Each sound consists of
