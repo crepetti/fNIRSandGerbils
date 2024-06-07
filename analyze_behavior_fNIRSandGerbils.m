@@ -2,11 +2,10 @@
 %% Author: Benjamin Richardson
 
 % Create array of all subjects that have been run
-all_subject_ID = char('bentest','emayatest','victoriatest','stest','longtest1','longtest2','perfectdata','longtest3','longtest4','longtest5','nooverlappilot1','nooverlappilot2','1');
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('7006','7007','7008','7009','7010','7023','7024', '7025');
-user = 'Ema';
+curr_subject_ID = char('7006','7007','7008','7009','7010','7017','7022','7023','7024','7025');
+user = 'Ben';
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 if user == 'Ema'
@@ -15,6 +14,9 @@ if user == 'Ema'
 elseif user == 'Bon'
     fNIRSandGerbilsXL = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
     stim_file = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_';
+elseif user == 'Ben'
+    fNIRSandGerbilsXL = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
+    stim_file = '/home/ben/Documents/GitHub/fNIRSandGerbils/stim/s_';
 end
 % names, and click times by trial
 all_click_info = readtable(fNIRSandGerbilsXL,'FileType','spreadsheet','Format','auto');
@@ -54,7 +56,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     n_trials = length(trials); % find number of trials
     threshold_window_start = 0.2; % time in seconds from onset of word for start of hit/FA windows
     threshold_window_end = 0.8; % time in seconds from onset of word for end of hit/FA windows
-    double_click_threshold = 0.05; % distance between clicks at which it would be decided that it is a double click
+    double_click_threshold = 0.1; % distance between clicks at which it would be decided that it is a double click
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct(); % create structure for nearest click distances
 
@@ -71,6 +73,17 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
             variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7007\unscrambled_diff_talker\');
             variable = erase(variable,  '_unscrambled_dt.wav');
             variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7007\unscrambled_same_talker\');
+            variable = erase(variable,  '_unscrambled_st.wav');
+            variable = str2num(variable);
+        elseif string(this_subject_ID) == '7017'
+            variable = string(soundfiles_by_trial{itrial, 1});
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7016\scrambled_diff_talker\');
+            variable = erase(variable, '_scrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7016\scrambled_same_talker\');
+            variable = erase(variable, '_scrambled_st.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7016\unscrambled_diff_talker\');
+            variable = erase(variable,  '_unscrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7016\unscrambled_same_talker\');
             variable = erase(variable,  '_unscrambled_st.wav');
             variable = str2num(variable);
         else
