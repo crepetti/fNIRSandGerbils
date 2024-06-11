@@ -29,44 +29,12 @@ nsubjects = size(curr_subject_ID,1);
 word_length = 0.3;
 num_tot_trials = 144; % look into this
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
+fs = 256;
 
 % for isubject = 1:nsubjects
 % subID = curr_subject_ID(isubject,:);
 for isubject = 1:size(curr_subject_ID,1)
     subID = curr_subject_ID(isubject,:);
-%     [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-%     if isfile(cat(2,dir,'\prepro_epoched_data\',subID,'_ICAcomponentsremoved.fdt'))
-%         EEG = pop_loadset('filename',cat(2,subID,'_ICAcomponentsremoved.set'),'filepath',[dir,'\prepro_epoched_data']);
-%     else
-%         EEG = pop_loadset('filename',cat(2,subID,'_ICAdone.set'),'filepath',[dir,'\prepro_epoched_data']);
-%     end
-%     [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'gui','off');
-    fs = 256;
-
-    %% Epoching
-    %     EEG_scrambled_st = pop_epoch( EEG, {'45055'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
-    %     EEG_unscrambled_st = pop_epoch( EEG, {'36351'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
-    %     EEG_scrambled_dt = pop_epoch( EEG, {'19711'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
-    %     EEG_unscrambled_dt = pop_epoch( EEG, {'11007'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
-%     if all(subID == '7006')
-%         EEG_all = pop_epoch( EEG, {'18687' , '35327', '43519', '10495'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
-%     else
-%         EEG_all = pop_epoch( EEG, {'18687' , '35327', '44031', '11007'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
-%     end
-    % Find tOnset to isolate ERPs: loading in all_word_order & tOnset -->
-    % THIS IS BELOW ALREADY
-    % words_filename = [dir, subID, '_alltrialwords.mat'];
-    % load(words_filename);
-
-    % isolate ERPs
-    % scrambled_st_epochs= EEG_scrambled_st.data; % subject x num channels x num time points x num trials
-    % unscrambled_st_epochs= EEG_unscrambled_st.data; % subject x num channels x num time points x num trials
-    % scrambled_dt_epochs= EEG_scrambled_dt.data; % subject x num channels x num time points x num trials
-    % unscrambled_dt_epochs= EEG_unscrambled_dt.data; % subject x num channels x num time points x num trials
-
-
-    % Load click info to find condition
-
 
     % Find target word onset times
     stim_info_filename = [dir,'stim/s_',strtrim(curr_subject_ID(isubject,:)),'/',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
@@ -155,10 +123,9 @@ for isubject = 1:size(curr_subject_ID,1)
             for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
                 resampled_search_index = (this_trial_target_onsets(ionset));%/(44100/fs);
                 %[~,start_time] = min(abs(scrambled_time - ((resampled_search_time)+erp_window_start_time) ) ); % ...find 100 ms before the time it starts (indexing where it's located in scrambled_time)
-                %end_time = start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*256);
                 [~,start_time] = min(abs(scrambled_time - resampled_search_index));
 
-                start_time = start_time - 0.1*fs;
+                start_time = start_time - (0.1*fs);
                 end_time = start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*256);
 
                 % Reject epochs with amplitude above +/1 100 uV
@@ -215,7 +182,6 @@ for isubject = 1:size(curr_subject_ID,1)
             unscrambled_dt_by_target_color_onset = data_by_color_onset;
             unscrambled_dt_by_target_object_onset = data_by_object_onset;
             unscrambled_dt_by_masker_onset = data_by_masker_onset;
-
         elseif icondition == 4
             unscrambled_st_by_target_red_onset = data_by_red_onset;
             unscrambled_st_by_target_green_onset = data_by_green_onset;
@@ -269,8 +235,8 @@ for isubject = 1:size(curr_subject_ID,1)
     all_unscrambled_by_masker_onset(isubject,:,:) = squeeze(mean(cat(3,unscrambled_st_by_masker_onset,unscrambled_dt_by_masker_onset),3));
 
     % Plot for each subject
-    figure;
-    hold on
+    % figure;
+    % hold on
     
     single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(scrambled_st_by_target_color_onset,2));
 
@@ -300,27 +266,27 @@ for isubject = 1:size(curr_subject_ID,1)
     this_subject_unscrambled_object = this_subject_unscrambled_object - mean(all_this_subject(1:26,:),'all');
     this_subject_unscrambled_masker = this_subject_unscrambled_masker - mean(all_this_subject(1:26,:),'all');
 
-    subplot(1,3,1)
-    hold on
-    shadedErrorBar(single_onset_time,mean(this_subject_scrambled_color,2),std(this_subject_scrambled_color,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-r');
-    shadedErrorBar(single_onset_time,mean(this_subject_unscrambled_color,2),std(this_subject_unscrambled_color,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-b');
-    title('Target Color Word')
-    legend({'Scrambled','Unscrambled'})
-
-    subplot(1,3,2)
-    hold on
-    shadedErrorBar(single_onset_time,mean(this_subject_scrambled_object,2),std(this_subject_scrambled_object,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-r');
-    shadedErrorBar(single_onset_time,mean(this_subject_unscrambled_object,2),std(this_subject_unscrambled_object,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-b');
-    title('Target Object Word')
-    legend({'Scrambled','Unscrambled'})
-
-    subplot(1,3,3)
-    hold on
-    shadedErrorBar(single_onset_time,mean(this_subject_scrambled_masker,2),std(this_subject_scrambled_masker,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-r');
-    shadedErrorBar(single_onset_time,mean(this_subject_unscrambled_masker,2),std(this_subject_unscrambled_masker,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-b');
-    title('Masker Word')
-    legend({'Scrambled','Unscrambled'})
-    sgtitle(subID)
+    % subplot(1,3,1)
+    % hold on
+    % shadedErrorBar(single_onset_time,mean(this_subject_scrambled_color,2),std(this_subject_scrambled_color,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-r');
+    % shadedErrorBar(single_onset_time,mean(this_subject_unscrambled_color,2),std(this_subject_unscrambled_color,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-b');
+    % title('Target Color Word')
+    % legend({'Scrambled','Unscrambled'})
+    % 
+    % subplot(1,3,2)
+    % hold on
+    % shadedErrorBar(single_onset_time,mean(this_subject_scrambled_object,2),std(this_subject_scrambled_object,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-r');
+    % shadedErrorBar(single_onset_time,mean(this_subject_unscrambled_object,2),std(this_subject_unscrambled_object,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-b');
+    % title('Target Object Word')
+    % legend({'Scrambled','Unscrambled'})
+    % 
+    % subplot(1,3,3)
+    % hold on
+    % shadedErrorBar(single_onset_time,mean(this_subject_scrambled_masker,2),std(this_subject_scrambled_masker,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-r');
+    % shadedErrorBar(single_onset_time,mean(this_subject_unscrambled_masker,2),std(this_subject_unscrambled_masker,[],2)./(sqrt(size(this_subject_unscrambled_masker,2))-1),'LineProps','-b');
+    % title('Masker Word')
+    % legend({'Scrambled','Unscrambled'})
+    % sgtitle(subID)
 end
 
 %% Going to build a 4 conditions x 6 word types x time array for this subject
@@ -339,8 +305,7 @@ unscrambled_frontocentral_erp = [];
 scrambled_frontocentral_erp_baselined = [];
 unscrambled_frontocentral_erp_baselined = [];
 
-%% red ST
-% scrambled vs unscrambled red
+%% scrambled vs unscrambled red
 subplot(2,3,1)
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
 single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(scrambled_st_by_target_red_onset,2));
@@ -355,14 +320,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -382,8 +339,7 @@ meanERPArray(2,1,:) = unscrambled_mean_to_plot;
 
 semERPArray(1,1,:) = scrambled_SEM_to_plot;
 semERPArray(2,1,:) = unscrambled_SEM_to_plot;
-%% green ST
-% scrambled vs unscrambled green
+%% scrambled vs unscrambled green
 subplot(2,3,2)
 scrambled_frontocentral_erp = [];
 unscrambled_frontocentral_erp = [];
@@ -403,14 +359,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -450,14 +398,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -497,14 +437,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -544,14 +476,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -591,14 +515,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -641,14 +557,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -688,14 +596,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -737,14 +637,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -785,14 +677,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -880,14 +764,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -932,14 +808,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -974,14 +842,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -1016,14 +876,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -1059,14 +911,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -1101,14 +945,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -1144,14 +980,6 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_frontocentral_erp_baselined(isubject,ichannel,:) = (unscrambled_frontocentral_erp(isubject,ichannel,:) - mean(unscrambled_frontocentral_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(unscrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
     end
 end
-%      for k = 1:size(scrambled_frontocentral_erp_baselined,3) %variability across trials
-%         scrambled_frontocentral_erp_baselined(:,:,k) = detrend(scrambled_frontocentral_erp_baselined(:,:,k)')';
-%
-%     end
-%     for k = 1:size(unscrambled_frontocentral_erp_baselined,3)
-%         unscrambled_frontocentral_erp_baselined(:,:,k) = detrend(unscrambled_frontocentral_erp_baselined(:,:,k)')';
-%     end
-
 
 scrambled_mean_to_plot = mean(scrambled_frontocentral_erp_baselined,[1,2]); %averaging across trials
 scrambled_SEM_to_plot = std(scrambled_frontocentral_erp_baselined,[],[1,2])/(sqrt(nsubjects)-1); %getting SEM across trials; %getting SEM across subjects
@@ -1177,7 +1005,6 @@ sgtitle('Both Talker Conditions')
 %% average color word, average object word, and average masker responses in unscrambled vs scrambled
 figure;
 subplot(1,2,1) % unscrambled
-
 
 color_frontocentral_erp_baselined = [];
 object_frontocentral_erp_baselined = [];
@@ -1282,7 +1109,7 @@ hold on
 shadedErrorBar(single_onset_time,scrambled_object_mean_to_plot,scrambled_object_SEM_to_plot,'lineProps','-r')
 shadedErrorBar(single_onset_time,unscrambled_object_mean_to_plot,unscrambled_object_SEM_to_plot,'lineProps','-b')
 
-title('Distracting Object Word','FontSize',14)
+title('Non-Target Object Word','FontSize',14)
 xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
@@ -1388,4 +1215,142 @@ ylim([-4,4])
 xlim([-100 600])
 
 %% TOPOPLOTS
+eeglab;
 
+figure;
+hold on
+cmin = -3;
+cmax = 5;
+
+% Unscrambled
+color_erp_baselined_scrambled = [];
+object_erp_baselined_scrambled = [];
+masker_erp_baselined_scrambled = [];
+
+color_erp_baselined_unscrambled = [];
+object_erp_baselined_unscrambled = [];
+masker_erp_baselined_unscrambled = [];
+
+single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(unscrambled_st_by_target_red_onset,2));
+color_erp = squeeze(all_scrambled_by_color_onset);
+object_erp = squeeze(all_scrambled_by_object_onset);
+masker_erp = squeeze(all_scrambled_by_masker_onset);
+% average over presentations
+[~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
+[~,baseline_end_index] = min(abs(single_onset_time - 0));
+for isubject = 1:size(curr_subject_ID,1)
+    for ichannel = 1:32
+        color_erp_baselined_scrambled(isubject,ichannel,:) = (color_erp(isubject,ichannel,:) - mean(color_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(scrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
+        object_erp_baselined_scrambled(isubject,ichannel,:) = (object_erp(isubject,ichannel,:) - mean(object_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(scrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
+        masker_erp_baselined_scrambled(isubject,ichannel,:) = (masker_erp(isubject,ichannel,:) - mean(masker_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(scrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
+
+    end
+end
+
+single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(unscrambled_st_by_target_red_onset,2));
+color_erp = squeeze(all_unscrambled_by_color_onset);
+object_erp = squeeze(all_unscrambled_by_object_onset);
+masker_erp = squeeze(all_unscrambled_by_masker_onset);
+% average over presentations
+[~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
+[~,baseline_end_index] = min(abs(single_onset_time - 0));
+for isubject = 1:size(curr_subject_ID,1)
+    for ichannel = 1:32
+        color_erp_baselined_unscrambled(isubject,ichannel,:) = (color_erp(isubject,ichannel,:) - mean(color_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(scrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
+        object_erp_baselined_unscrambled(isubject,ichannel,:) = (object_erp(isubject,ichannel,:) - mean(object_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(scrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
+        masker_erp_baselined_unscrambled(isubject,ichannel,:) = (masker_erp(isubject,ichannel,:) - mean(masker_erp(isubject,ichannel,baseline_start_index:baseline_end_index),[3]));%./std(scrambled_by_target_onset(isubject,:,ichannel,baseline_start_index:baseline_end_index),[],[2,4]);
+
+    end
+end
+
+topoplot_indices = round(0:0.05*fs:(((erp_window_end_time - erp_window_start_time)/1000)*fs));
+topoplot_indices(1) = 1;
+topoplot_times = -100:50:750;
+
+iplot = 1;
+
+subplot(6,length(topoplot_indices)+ 1,iplot);
+text(-1,0.5,'Scrambled\newlineColor','Interpreter','tex','FontSize',18);
+axis off
+iplot = iplot+1;
+
+
+% Scrambled Color
+itime = 1;
+for itopo = topoplot_indices
+    subplot(6,length(topoplot_indices)+ 1,iplot);
+    this_data = mean(color_erp_baselined_scrambled(:,:,itopo), [1,3]);
+    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    title([num2str(topoplot_times(itime)),' ms'])
+    iplot = iplot + 1;
+    itime = itime + 1;
+end
+
+subplot(6,length(topoplot_indices)+ 1,iplot);
+text(-1,0.5,'Unscrambled\newlineColor','Interpreter','tex','FontSize',18);
+axis off
+iplot = iplot+1;
+
+% Unscrambled Color
+for itopo = topoplot_indices
+    subplot(6,length(topoplot_indices)+ 1,iplot);
+    this_data = mean(color_erp_baselined_unscrambled(:,:,itopo), [1,3]);
+    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    iplot = iplot + 1;
+end
+
+subplot(6,length(topoplot_indices)+ 1,iplot);
+text(-1,0.5,'Scrambled\newlineObject','Interpreter','tex','FontSize',18);
+axis off
+iplot = iplot+1;
+
+% Scrambled Object
+for itopo = topoplot_indices
+    subplot(6,length(topoplot_indices)+ 1,iplot);
+    this_data = mean(object_erp_baselined_scrambled(:,:,itopo), [1,3]);
+    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    iplot = iplot + 1;
+end
+
+subplot(6,length(topoplot_indices)+ 1,iplot);
+text(-1,0.5,'Unscrambled\newlineObject','Interpreter','tex','FontSize',18);
+axis off
+iplot = iplot+1;
+
+% Unscrambled Object
+for itopo = topoplot_indices
+    subplot(6,length(topoplot_indices)+ 1,iplot);
+    this_data = mean(object_erp_baselined_unscrambled(:,:,itopo), [1,3]);
+    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    iplot = iplot + 1;
+end
+
+subplot(6,length(topoplot_indices)+ 1,iplot);
+text(-1,0.5,'Scrambled\newlineMasker','Interpreter','tex','FontSize',18);
+axis off
+iplot = iplot+1;
+
+% Scrambled Masker
+for itopo = topoplot_indices
+    subplot(6,length(topoplot_indices)+ 1,iplot);
+    this_data = mean(masker_erp_baselined_scrambled(:,:,itopo), [1,3]);
+    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    iplot = iplot + 1;
+end
+
+subplot(6,length(topoplot_indices)+ 1,iplot);
+text(-1,0.5,'Unscrambled\newlineMasker','Interpreter','tex','FontSize',18);
+axis off
+iplot = iplot+1;
+
+
+% Unscrambled Masker
+for itopo = topoplot_indices
+    subplot(6,length(topoplot_indices)+ 1,iplot);
+    this_data = mean(masker_erp_baselined_unscrambled(:,:,itopo), [1,3]);
+    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    iplot = iplot + 1;
+    if itopo == topoplot_indices(end)
+        colorbar
+    end
+end
