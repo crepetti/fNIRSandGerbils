@@ -1,15 +1,17 @@
-%% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
-%% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
-%% PREPROCESSING
+% Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
+% Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
+% PREPROCESSING for Scrambled Speech Project
 %taking raw BDF file and saving it at .set file
-%order = preprocessing, epoch, postprocessing, multsubjects
+% order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
-whos_using = 'Ben';
 
-subID = '7033';
-range_A = 'A33';
+subID = '7033'; % Set current subject ID
+% Excel sheet parameters
+range_A = 'A33'; % Excel sheet 
 range_B = 'B33';
 badchannels = 'channelsremoved.xlsx';
+% Set directories
+whos_using = 'Ben'; % Choose user for directory stuff
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
@@ -26,17 +28,10 @@ elseif whos_using == 'Bon'
     addpath(pre_pro_epoched_data_folder)
     BDF_filename = ['C:\Users\benri\Downloads\', subID, '.bdf'];
 end
-% pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data';
-% if ~exist(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))%new folder to save preprocess data
-%         mkdir(strcat('C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\prepro_epoched_data\'))
-%         disp('exists');
-% else
-%     disp('does not exist');
-% end
 
-%loading in BDF files and re-referencing to externals (mastoids/earlobes)
-[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-EEG = pop_biosig(BDF_filename, 'ref', [33 34], 'blockepoch', 'off', 'refoptions', {'keepref', 'off'});
+% Load in BDF files and Re-referencing to Externals (mastoids/earlobes)
+[ALLEEG EEG CURRENTSET ALLCOM] = eeglab; % load EEGLAB
+EEG = pop_biosig(BDF_filename, 'ref', [33 34], 'blockepoch', 'off', 'refoptions', {'keepref', 'off'}); % load in data, set reference as channels 33, 34 (mastoids)
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'gui', 'off');
 EEG = eeg_checkset( EEG );
 
@@ -45,8 +40,7 @@ EEG = pop_select(EEG, 'nochannel', {'EXG3','EXG4','EXG5','EXG6','EXG7','EXG8','G
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1, 'gui', 'off');
 EEG = eeg_checkset( EEG );
 
-%adding in channel locations - FOR NOW DOING LOAD, WILL EDIT LATER!
-% EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\fNIRSandGerbils\richardson_32_chanlocs.locs' 'filetype' 'locs'});
+%adding in channel locations 
 if whos_using == 'Ben'
     EEG=pop_chanedit(EEG, 'load',{'/home/ben/Documents/GitHub/fNIRSandGerbils/chan_locs_cart.txt', 'filetype', 'sfp'});
 elseif whos_using == 'Ema'
@@ -56,7 +50,6 @@ elseif whos_using == 'Bon'
 end
 
 
-% [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
 EEG = eeg_checkset( EEG );
 
 %downsampling to 256 Hz
@@ -85,19 +78,14 @@ EEG = pop_saveset( EEG, 'filename', [subID , '_artifactmarked.set'], 'filepath',
 pop_spectopo(EEG, 1);
 pause
 channels_to_remove = input('Please enter a comma-separated list of channels indices to interpolate (ex. [1 2 3]):');
-% EEG = pop_select(EEG, 'channel', channels_to_remove);
 EEG = pop_interp(EEG, channels_to_remove, 'spherical');
 numchannels_removed = size(channels_to_remove, 2);
 writematrix(subID, badchannels, 'Sheet', 1,'Range', range_A);
 writematrix(numchannels_removed, badchannels, 'Sheet', 1, 'Range', range_B);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 5,'setname',[subID, 'Channels Removed'],'gui','on');
 EEG = eeg_checkset( EEG );
-%EEG = pop_loadset('filename',[subID, '_artifactmarked.set'], 'filepath', pre_pro_epoched_data_folder);
 
-%Running ICA
-% EEG = pop_runica(EEG, 'icatype', 'runcia', 'extended', 1, 'interrupt', 'on');
-% [ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
-% EEG = eeg_checkset( EEG );
+% Running ICA
 EEG = pop_runica(EEG, 'extended',1);
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 6,'setname',[subID, 'ICA'],'gui','on');
 EEG = eeg_checkset( EEG );
