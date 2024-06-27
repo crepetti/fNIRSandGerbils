@@ -27,7 +27,14 @@ elseif whos_using == 'Bon'
     pre_pro_epoched_data_folder = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
     addpath(pre_pro_epoched_data_folder)
     BDF_filename = ['C:\Users\benri\Downloads\', subID, '.bdf'];
+elseif whos_using == 'Maan'
+    addpath('C:\Users\maana\Documents\MATLAB\eeglab2023.0');
+    pre_pro_epoched_data_folder = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
+    addpath(pre_pro_epoched_data_folder)
+    BDF_filename = ['C:\Users\maana\Downloads\', subID, '.bdf'];
 end
+
+
 
 % Load in BDF files and Re-referencing to Externals (mastoids/earlobes)
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab; % load EEGLAB
@@ -47,6 +54,8 @@ elseif whos_using == 'Ema'
     EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 elseif whos_using == 'Bon'
     EEG=pop_chanedit(EEG, 'load',{'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
+elseif whos_using == 'Maan'
+    EEG=pop_chanedit(EEG, 'load',{'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 end
 
 
