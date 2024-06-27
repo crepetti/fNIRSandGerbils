@@ -17,9 +17,13 @@ if whos_using == 'Ben'
 elseif whos_using == 'Bon' % Ben Laptop
     addpath('\Users\benri\Documents\eeglab2023.0\')
     pre_pro_epoched_data_folder = '\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
-else
+elseif whos_using == 'Ema'
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data\';
+elseif whos_using == 'Maan' 
+    addpath('C:\Users\maana\Documents\MATLAB\eeglab2023.0');
+    pre_pro_epoched_data_folder = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
+
 end
 
 % Load dataset
