@@ -5,13 +5,13 @@
 % order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
 
-subID = '7033'; % Set current subject ID
+subID = '7036'; % Set current subject ID
 % Excel sheet parameters
-range_A = 'A33'; % Excel sheet 
-range_B = 'B33';
+range_A = 'A36'; % Excel sheet 
+range_B = 'B36';
 badchannels = 'channelsremoved.xlsx';
 % Set directories
-whos_using = 'Ben'; % Choose user for directory stuff
+whos_using = 'Maa'; % Choose user for directory stuff
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
@@ -27,7 +27,7 @@ elseif whos_using == 'Bon'
     pre_pro_epoched_data_folder = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
     addpath(pre_pro_epoched_data_folder)
     BDF_filename = ['C:\Users\benri\Downloads\', subID, '.bdf'];
-elseif whos_using == 'Maan'
+elseif whos_using == 'Maa'
     addpath('C:\Users\maana\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
     addpath(pre_pro_epoched_data_folder)
@@ -38,7 +38,7 @@ end
 
 % Load in BDF files and Re-referencing to Externals (mastoids/earlobes)
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab; % load EEGLAB
-EEG = pop_biosig(BDF_filename, 'ref', [33 34], 'blockepoch', 'off', 'refoptions', {'keepref', 'off'}); % load in data, set reference as channels 33, 34 (mastoids)
+EEG = pop_biosig(BDF_filename, 'ref', [65 66], 'blockepoch', 'off', 'refoptions', {'keepref', 'off'}); % load in data, set reference as channels 33, 34 (mastoids)
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'gui', 'off');
 EEG = eeg_checkset( EEG );
 
@@ -46,6 +46,7 @@ EEG = eeg_checkset( EEG );
 EEG = pop_select(EEG, 'nochannel', {'EXG3','EXG4','EXG5','EXG6','EXG7','EXG8','GSR1','GSR2','Erg1','Erg2','Resp','Plet','Temp'});
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1, 'gui', 'off');
 EEG = eeg_checkset( EEG );
+% 'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16','A17','A18','A19','A20','A21','A22','A23','A24','A25','A26','A27','A28','A29','A30','A31','A32',
 
 %adding in channel locations 
 if whos_using == 'Ben'
@@ -54,7 +55,7 @@ elseif whos_using == 'Ema'
     EEG=pop_chanedit(EEG, 'load',{'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 elseif whos_using == 'Bon'
     EEG=pop_chanedit(EEG, 'load',{'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
-elseif whos_using == 'Maan'
+elseif whos_using == 'Maa'
     EEG=pop_chanedit(EEG, 'load',{'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\chan_locs_cart.txt', 'filetype', 'sfp'});
 end
 

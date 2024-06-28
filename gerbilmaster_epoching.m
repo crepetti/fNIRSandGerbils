@@ -1,15 +1,10 @@
 % Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 % EPOCHING
-subID = '7038'; % set current subject ID
-
-% trigger 10495: unscrambled_diff_talker
-% trigger 18687: scrambled_same_talker
-% trigger 35327:unscrambled_same_talker
-% Trigger 43519: scrambled_diff_talker
+subID = '7010'; % set current subject ID
 
 % Set directories
-whos_using = 'Ben';
+whos_using = 'Maa';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
@@ -20,7 +15,7 @@ elseif whos_using == 'Bon' % Ben Laptop
 elseif whos_using == 'Ema'
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data\';
-elseif whos_using == 'Maan' 
+elseif whos_using == 'Maa' 
     addpath('C:\Users\maana\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
 
@@ -37,6 +32,9 @@ EEG = eeg_checkset( EEG );
 if double(string(subID)) >= 7023
     EEG.event(~ismember(string({EEG.event(:).type}),{'35071'})) = [];
     EEG.urevent(~ismember([EEG.urevent(:).type],[35071])) = [];
+else
+    EEG.event(~ismember(string({EEG.event(:).type}), {'11007','35327','44031','18687'})) = [];
+    EEG.urevent(~ismember([EEG.urevent(:).type],[11007,35327,44031,18687])) = [];
 end
 
 %check trigger latency distances, remove double triggers
