@@ -1,17 +1,17 @@
 % Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 % PREPROCESSING for Scrambled Speech Project
-%taking raw BDF file and saving it at .set file
+%tak22ing raw BDF file and saving it at .set file
 % order = preprocessing, epoch, postprocessing, multsubjects
 %-------------------------------------------------------------------------------------------------------------------
 
-subID = '7036'; % Set current subject ID
+subID = '7003'; % Set current subject ID
 % Excel sheet parameters
-range_A = 'A36'; % Excel sheet 
-range_B = 'B36';
+range_A = 'A3'; % Excel sheet 
+range_B = 'B3';
 badchannels = 'channelsremoved.xlsx';
 % Set directories
-whos_using = 'Maa'; % Choose user for directory stuff
+whos_using = 'Ben'; % Choose user for directory stuff
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
@@ -38,7 +38,7 @@ end
 
 % Load in BDF files and Re-referencing to Externals (mastoids/earlobes)
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab; % load EEGLAB
-EEG = pop_biosig(BDF_filename, 'ref', [65 66], 'blockepoch', 'off', 'refoptions', {'keepref', 'off'}); % load in data, set reference as channels 33, 34 (mastoids)
+EEG = pop_biosig(BDF_filename, 'ref', [33 34], 'blockepoch', 'off', 'refoptions', {'keepref', 'off'}); % load in data, set reference as channels 33, 34 (mastoids)
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'gui', 'off');
 EEG = eeg_checkset( EEG );
 

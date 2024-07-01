@@ -1,10 +1,10 @@
 % Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 % EPOCHING
-subID = '7022'; % set current subject ID
+subID = '7003'; % set current subject ID
 
 % Set directories
-whos_using = 'Bon';
+whos_using = 'Ben';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
@@ -35,7 +35,9 @@ if double(string(subID)) >= 7023
 elseif double(string(subID)) == 7022
     EEG.event(~ismember(string({EEG.event(:).type}), {'31999' , '30975', '65279', '31487'})) = [];
     EEG.urevent(~ismember([EEG.urevent(:).type],[31999,30975,65279,31487])) = [];
-
+elseif ismember(double(string(subID)), [7002, 7003, 7004])
+    EEG.event(~ismember(string({EEG.event(:).type}), {'35327','10495','43519','18687'})) = [];
+    EEG.urevent(~ismember([EEG.urevent(:).type],[35327,10495,43519,18687])) = [];
 else
     EEG.event(~ismember(string({EEG.event(:).type}), {'11007','35327','44031','18687'})) = [];
     EEG.urevent(~ismember([EEG.urevent(:).type],[11007,35327,44031,18687])) = [];
@@ -118,7 +120,7 @@ end
 if double(string(subID)) == 7017 || double(string(subID)) == 7022
     EEG_scrambled_st = pop_epoch( EEG, {'31999'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
 else
-    EEG_scrambled_st = pop_epoch( EEG, {'18687'}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
+    EEG_scrambled_st = pop_epoch( EEG, {"18687"}, [-1  16], 'newname', [subID, 'scrambled same talker epochs'], 'epochinfo', 'yes');
 end
 EEG_scrambled_st = eeg_checkset( EEG_scrambled_st );
 [ALLEEG EEG_scrambled_st CURRENTSET] = pop_newset(ALLEEG, EEG_scrambled_st, 2, 'gui', 'off');
@@ -129,7 +131,7 @@ save([pre_pro_epoched_data_folder, subID, 'scrambled_st_epoch.mat'], "EEG_scramb
 if double(string(subID)) == 7017 || double(string(subID)) == 7022
     EEG_unscrambled_st = pop_epoch( EEG, {'30975'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
 else
-    EEG_unscrambled_st = pop_epoch( EEG, {'35327'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
+    EEG_unscrambled_st = pop_epoch( EEG, {"35327"}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
 end
 EEG_unscrambled_st = eeg_checkset( EEG_unscrambled_st );
 [ALLEEG EEG_unscrambled_st CURRENTSET] = pop_newset(ALLEEG, EEG_unscrambled_st, 2, 'gui', 'off');
@@ -140,8 +142,10 @@ save([pre_pro_epoched_data_folder, subID , 'unscrambled_st_epoch.mat'], "EEG_uns
 %43519
 if double(string(subID)) == 7017 || double(string(subID)) == 7022
     EEG_scrambled_dt = pop_epoch( EEG, {'65279'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
+elseif ismember(double(string(subID)), [7002, 7003, 7004])
+    EEG_scrambled_dt = pop_epoch( EEG, {"43519"}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
 else
-    EEG_scrambled_dt = pop_epoch( EEG, {'44031'}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
+    EEG_scrambled_dt = pop_epoch( EEG, {"44031"}, [-1  16], 'newname', [subID, 'scrambled diff talker epochs'], 'epochinfo', 'yes');
 end
 EEG_scrambled_dt = eeg_checkset( EEG_scrambled_dt );
 [ALLEEG EEG_scrambled_dt CURRENTSET] = pop_newset(ALLEEG, EEG_scrambled_dt, 2, 'gui', 'off');
@@ -154,8 +158,10 @@ if double(string(subID)) == 7017
     EEG_unscrambled_dt = pop_epoch( EEG, {'31487'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
 elseif double(string(subID)) == 7022
     EEG_unscrambled_dt = pop_epoch( EEG, {'32511'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
+elseif ismember(double(string(subID)), [7002, 7003, 7004])
+    EEG_unscrambled_dt = pop_epoch( EEG, {'10495'}, [-1  16], 'newname', [subID, 'unscrambled same talker epochs'], 'epochinfo', 'yes');
 else
-    EEG_unscrambled_dt = pop_epoch( EEG, {'11007'}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
+    EEG_unscrambled_dt = pop_epoch( EEG, {"11007"}, [-1  16], 'newname', [subID, 'unscrambled diff talker epochs'], 'epochinfo', 'yes');
 end
 EEG_unscrambled_dt = eeg_checkset( EEG_unscrambled_dt );
 [ALLEEG EEG_unscrambled_dt CURRENTSET] = pop_newset(ALLEEG, EEG_unscrambled_dt, 2, 'gui', 'off');
@@ -166,8 +172,10 @@ save([pre_pro_epoched_data_folder, subID , 'unscrambled_dt_epoch.mat'], "EEG_uns
 
 if double(string(subID)) == 7017 || double(string(subID)) == 7022
     EEG = pop_epoch( EEG, {'31999' , '30975', '65279', '31487'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+elseif ismember(double(string(subID)), [7002, 7003, 7004])
+    EEG = pop_epoch( EEG, {"35327","10495","43519","18687"}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
 else
-    EEG = pop_epoch( EEG, {'18687' , '35327', '44031', '11007'}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
+    EEG = pop_epoch( EEG, {"18687" , "35327", "44031", "11007"}, [-1  16], 'newname', [subID, 'all epochs'], 'epochinfo', 'yes');
 end
 EEG = eeg_checkset( EEG );
 [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');

@@ -3,7 +3,7 @@
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 
 % Set directories
-whos_using = 'Bon';
+whos_using = 'Ben';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -16,7 +16,7 @@ else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID =  char('7006','7007','7008','7009','7010');%,'7017','7022','7023','7024','7025','7030','7033'); % ,
+curr_subject_ID =  char('7002','7004','7006','7007','7008','7010','7023','7024','7025','7030','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -135,7 +135,7 @@ for isubject = 1:size(curr_subject_ID,1)
                 % Put it into appropriate matrix
                 if this_condition_target_words(itrial).words(ionset) == 'red'
                     data_by_red_onset = cat(3, data_by_red_onset,this_erp);
-                    data_by_color_onset = cat(3, data_by_color_onset ,these_epochs(:,start_time:end_time,itrial));
+                    data_by_color_onset = cat(3, data_by_color_onset ,this_erp);
 
                 elseif this_condition_target_words(itrial).words(ionset) == 'green'
                     data_by_green_onset = cat(3, data_by_green_onset,this_erp);
@@ -165,10 +165,11 @@ for isubject = 1:size(curr_subject_ID,1)
                 if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > 100,'all')
                     continue
                     print('epoch rejected')
+                    add variance here
                 end
 
                 this_erp = these_epochs(:,start_time:end_time,itrial);
-                data_by_masker_onset = cat(3, data_by_masker_onset,these_epochs(:,start_time:end_time,itrial));
+                data_by_masker_onset = cat(3, data_by_masker_onset,this_erp);
             end
             
         end
@@ -335,11 +336,6 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(1,1,:) = scrambled_mean_to_plot;
-meanERPArray(2,1,:) = unscrambled_mean_to_plot;
-
-semERPArray(1,1,:) = scrambled_SEM_to_plot;
-semERPArray(2,1,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled green
 subplot(2,3,2)
 
@@ -370,11 +366,6 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(1,2,:) = scrambled_mean_to_plot;
-meanERPArray(2,2,:) = unscrambled_mean_to_plot;
-
-semERPArray(1,2,:) = scrambled_SEM_to_plot;
-semERPArray(2,2,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unccrambled white
 subplot(2,3,4)
 
@@ -405,11 +396,7 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(1,3,:) = scrambled_mean_to_plot;
-meanERPArray(2,3,:) = unscrambled_mean_to_plot;
 
-semERPArray(1,3,:) = scrambled_SEM_to_plot;
-semERPArray(2,3,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled blue
 subplot(2,3,5)
 
@@ -440,11 +427,7 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(1,4,:) = scrambled_mean_to_plot;
-meanERPArray(2,4,:) = unscrambled_mean_to_plot;
 
-semERPArray(1,4,:) = scrambled_SEM_to_plot;
-semERPArray(2,4,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled object
 subplot(2,3,3)
 
@@ -475,11 +458,7 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(1,5,:) = scrambled_mean_to_plot;
-meanERPArray(2,5,:) = unscrambled_mean_to_plot;
 
-semERPArray(1,5,:) = scrambled_SEM_to_plot;
-semERPArray(2,5,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled masker word
 subplot(2,3,6)
 
@@ -511,11 +490,6 @@ legend({'scrambled','unscrambled'})
 ylim([-3 4])
 sgtitle('Same Talker')
 
-meanERPArray(1,6,:) = scrambled_mean_to_plot;
-meanERPArray(2,6,:) = unscrambled_mean_to_plot;
-
-semERPArray(1,6,:) = scrambled_SEM_to_plot;
-semERPArray(2,6,:) = unscrambled_SEM_to_plot;
 %% Diff Talker Plot
 figure;
 
@@ -548,11 +522,6 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(3,1,:) = scrambled_mean_to_plot;
-meanERPArray(4,1,:) = unscrambled_mean_to_plot;
-
-semERPArray(3,1,:) = scrambled_SEM_to_plot;
-semERPArray(4,1,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled green
 subplot(2,3,2)
 
@@ -584,12 +553,6 @@ legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
 
-
-meanERPArray(3,2,:) = scrambled_mean_to_plot;
-meanERPArray(4,2,:) = unscrambled_mean_to_plot;
-
-semERPArray(3,2,:) = scrambled_SEM_to_plot;
-semERPArray(4,2,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unccrambled white
 subplot(2,3,4)
 
@@ -620,12 +583,6 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-
-meanERPArray(3,3,:) = scrambled_mean_to_plot;
-meanERPArray(4,3,:) = unscrambled_mean_to_plot;
-
-semERPArray(3,3,:) = scrambled_SEM_to_plot;
-semERPArray(4,3,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled blue
 subplot(2,3,5)
 
@@ -656,12 +613,6 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-
-meanERPArray(3,4,:) = scrambled_mean_to_plot;
-meanERPArray(4,4,:) = unscrambled_mean_to_plot;
-
-semERPArray(3,4,:) = scrambled_SEM_to_plot;
-semERPArray(4,4,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled object
 subplot(2,3,3)
 
@@ -700,11 +651,6 @@ ylabel('Voltage (uV)','FontSize',14)
 legend({'scrambled','unscrambled'})
 ylim([-3 4])
 
-meanERPArray(3,5,:) = scrambled_mean_to_plot;
-meanERPArray(4,5,:) = unscrambled_mean_to_plot;
-
-semERPArray(3,5,:) = scrambled_SEM_to_plot;
-semERPArray(4,5,:) = unscrambled_SEM_to_plot;
 %% scrambled vs unscrambled Masker words
 subplot(2,3,6)
 
@@ -737,11 +683,6 @@ ylim([-3 4])
 
 sgtitle('Diff Talker')
 
-meanERPArray(3,6,:) = scrambled_mean_to_plot;
-meanERPArray(4,6,:) = unscrambled_mean_to_plot;
-
-semERPArray(3,6,:) = scrambled_SEM_to_plot;
-semERPArray(4,6,:) = unscrambled_SEM_to_plot;
 
 %% Collapsed same and different talker
 figure;
@@ -1027,7 +968,7 @@ xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
 ylim([-3 4])
-xlim([-100 600])
+xlim([-100 750])
 
 
 subplot(1,3,2)
@@ -1040,7 +981,7 @@ xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
 ylim([-3 4])
-xlim([-100 600])
+xlim([-100 750])
 
 
 subplot(1,3,3)
@@ -1053,92 +994,91 @@ xlabel('Time (ms)','FontSize',14)
 ylabel('Voltage (uV)','FontSize',14)
 legend({'Scrambled','Unscrambled'})
 ylim([-3 4])
-xlim([-100 600])
+xlim([-100 750])
 
 
-%% Same vs. Different talker
-%% Figure by word type
-figure;
-
-% scrambled color
-subplot(2,3,1)
-hold on
-shadedErrorBar(single_onset_time,mean(meanERPArray(1,[1,2,3,4],:),[1,2]),mean(semERPArray(1,[1,2,3,4],:),[1,2]),'lineProps','-g')
-shadedErrorBar(single_onset_time,mean(meanERPArray(3,[1,2,3,4],:),[1,2]),mean(semERPArray(3,[1,2,3,4],:),[1,2]),'lineProps','-m')
-
-
-title('Scrambled Target Color Word','FontSize',14)
-xlabel('Time (ms)','FontSize',14)
-ylabel('Voltage (uV)','FontSize',14)
-legend({'Same Talker','Different Talker'})
-ylim([-4,4])
-xlim([-100 600])
-
-% scrambled object 
-subplot(2,3,2)
-hold on
-shadedErrorBar(single_onset_time,mean(meanERPArray(1,5,:),[1,2]),mean(semERPArray(1,5,:),[1,2]),'lineProps','-g')
-shadedErrorBar(single_onset_time,mean(meanERPArray(3,5,:),[1,2]),mean(semERPArray(3,5,:),[1,2]),'lineProps','-m')
-
-title('Scrambled Distracting Object Word','FontSize',14)
-xlabel('Time (ms)','FontSize',14)
-ylabel('Voltage (uV)','FontSize',14)
-legend({'Same Talker','Different Talker'})
-ylim([-4,4])
-xlim([-100 600])
-
-% scrambled masker 
-subplot(2,3,3)
-hold on
-shadedErrorBar(single_onset_time,mean(meanERPArray(1,6,:),[1,2]),mean(semERPArray(1,6,:),[1,2]),'lineProps','-g')
-shadedErrorBar(single_onset_time,mean(meanERPArray(3,6,:),[1,2]),mean(semERPArray(3,6,:),[1,2]),'lineProps','-m')
-
-title('Scrambled Masker Word','FontSize',14)
-xlabel('Time (ms)','FontSize',14)
-ylabel('Voltage (uV)','FontSize',14)
-legend({'Same Talker','Different Talker'})
-ylim([-4,4])
-xlim([-100 600])
-
-% unscrambled color
-subplot(2,3,4)
-hold on
-shadedErrorBar(single_onset_time,mean(meanERPArray(2,[1,2,3,4],:),[1,2]),mean(semERPArray(2,[1,2,3,4],:),[1,2]),'lineProps','-g')
-shadedErrorBar(single_onset_time,mean(meanERPArray(4,[1,2,3,4],:),[1,2]),mean(semERPArray(4,[1,2,3,4],:),[1,2]),'lineProps','-m')
-
-
-title('Unscrambled Target Color Word','FontSize',14)
-xlabel('Time (ms)','FontSize',14)
-ylabel('Voltage (uV)','FontSize',14)
-legend({'Same Talker','Different Talker'})
-ylim([-4,4])
-xlim([-100 600])
-
-% unscrambled object 
-subplot(2,3,5)
-hold on
-shadedErrorBar(single_onset_time,mean(meanERPArray(2,5,:),[1,2]),mean(semERPArray(2,5,:),[1,2]),'lineProps','-g')
-shadedErrorBar(single_onset_time,mean(meanERPArray(4,5,:),[1,2]),mean(semERPArray(4,5,:),[1,2]),'lineProps','-m')
-
-title('Unscrambled Distracting Object Word','FontSize',14)
-xlabel('Time (ms)','FontSize',14)
-ylabel('Voltage (uV)','FontSize',14)
-legend({'Same Talker','Different Talker'})
-ylim([-4,4])
-xlim([-100 600])
-
-% unscrambled masker 
-subplot(2,3,6)
-hold on
-shadedErrorBar(single_onset_time,mean(meanERPArray(2,6,:),[1,2]),mean(semERPArray(2,6,:),[1,2]),'lineProps','-g')
-shadedErrorBar(single_onset_time,mean(meanERPArray(4,6,:),[1,2]),mean(semERPArray(4,6,:),[1,2]),'lineProps','-m')
-
-title('Unscrambled Masker Word','FontSize',14)
-xlabel('Time (ms)','FontSize',14)
-ylabel('Voltage (uV)','FontSize',14)
-legend({'Same Talker','Different Talker'})
-ylim([-4,4])
-xlim([-100 600])
+% %% Figure by word type
+% figure;
+% 
+% % scrambled color
+% subplot(2,3,1)
+% hold on
+% shadedErrorBar(single_onset_time,mean(meanERPArray(1,[1,2,3,4],:),[1,2]),mean(semERPArray(1,[1,2,3,4],:),[1,2]),'lineProps','-g')
+% shadedErrorBar(single_onset_time,mean(meanERPArray(3,[1,2,3,4],:),[1,2]),mean(semERPArray(3,[1,2,3,4],:),[1,2]),'lineProps','-m')
+% 
+% 
+% title('Scrambled Target Color Word','FontSize',14)
+% xlabel('Time (ms)','FontSize',14)
+% ylabel('Voltage (uV)','FontSize',14)
+% legend({'Same Talker','Different Talker'})
+% ylim([-4,4])
+% xlim([-100 600])
+% 
+% % scrambled object 
+% subplot(2,3,2)
+% hold on
+% shadedErrorBar(single_onset_time,mean(meanERPArray(1,5,:),[1,2]),mean(semERPArray(1,5,:),[1,2]),'lineProps','-g')
+% shadedErrorBar(single_onset_time,mean(meanERPArray(3,5,:),[1,2]),mean(semERPArray(3,5,:),[1,2]),'lineProps','-m')
+% 
+% title('Scrambled Distracting Object Word','FontSize',14)
+% xlabel('Time (ms)','FontSize',14)
+% ylabel('Voltage (uV)','FontSize',14)
+% legend({'Same Talker','Different Talker'})
+% ylim([-4,4])
+% xlim([-100 600])
+% 
+% % scrambled masker 
+% subplot(2,3,3)
+% hold on
+% shadedErrorBar(single_onset_time,mean(meanERPArray(1,6,:),[1,2]),mean(semERPArray(1,6,:),[1,2]),'lineProps','-g')
+% shadedErrorBar(single_onset_time,mean(meanERPArray(3,6,:),[1,2]),mean(semERPArray(3,6,:),[1,2]),'lineProps','-m')
+% 
+% title('Scrambled Masker Word','FontSize',14)
+% xlabel('Time (ms)','FontSize',14)
+% ylabel('Voltage (uV)','FontSize',14)
+% legend({'Same Talker','Different Talker'})
+% ylim([-4,4])
+% xlim([-100 600])
+% 
+% % unscrambled color
+% subplot(2,3,4)
+% hold on
+% shadedErrorBar(single_onset_time,mean(meanERPArray(2,[1,2,3,4],:),[1,2]),mean(semERPArray(2,[1,2,3,4],:),[1,2]),'lineProps','-g')
+% shadedErrorBar(single_onset_time,mean(meanERPArray(4,[1,2,3,4],:),[1,2]),mean(semERPArray(4,[1,2,3,4],:),[1,2]),'lineProps','-m')
+% 
+% 
+% title('Unscrambled Target Color Word','FontSize',14)
+% xlabel('Time (ms)','FontSize',14)
+% ylabel('Voltage (uV)','FontSize',14)
+% legend({'Same Talker','Different Talker'})
+% ylim([-4,4])
+% xlim([-100 750])
+% 
+% % unscrambled object 
+% subplot(2,3,5)
+% hold on
+% shadedErrorBar(single_onset_time,mean(meanERPArray(2,5,:),[1,2]),mean(semERPArray(2,5,:),[1,2]),'lineProps','-g')
+% shadedErrorBar(single_onset_time,mean(meanERPArray(4,5,:),[1,2]),mean(semERPArray(4,5,:),[1,2]),'lineProps','-m')
+% 
+% title('Unscrambled Distracting Object Word','FontSize',14)
+% xlabel('Time (ms)','FontSize',14)
+% ylabel('Voltage (uV)','FontSize',14)
+% legend({'Same Talker','Different Talker'})
+% ylim([-4,4])
+% xlim([-100 750])
+% 
+% % unscrambled masker 
+% subplot(2,3,6)
+% hold on
+% shadedErrorBar(single_onset_time,mean(meanERPArray(2,6,:),[1,2]),mean(semERPArray(2,6,:),[1,2]),'lineProps','-g')
+% shadedErrorBar(single_onset_time,mean(meanERPArray(4,6,:),[1,2]),mean(semERPArray(4,6,:),[1,2]),'lineProps','-m')
+% 
+% title('Unscrambled Masker Word','FontSize',14)
+% xlabel('Time (ms)','FontSize',14)
+% ylabel('Voltage (uV)','FontSize',14)
+% legend({'Same Talker','Different Talker'})
+% ylim([-4,4])
+% xlim([-100 750])
 
 %% TOPOPLOTS
 eeglab;
