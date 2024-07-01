@@ -3,7 +3,7 @@
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 
 % Set directories
-whos_using = 'Ben';
+whos_using = 'Bon';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -16,7 +16,7 @@ else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID =  char('7038');% char('7006','7007','7008','7009','7010','7017','7022','7023','7024','7025','7030','7033'); % ,
+curr_subject_ID =  char('7006','7007','7008','7009','7010');%,'7017','7022','7023','7024','7025','7030','7033'); % ,
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
