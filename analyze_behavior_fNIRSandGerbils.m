@@ -4,16 +4,16 @@
 % Create array of all subjects that have been run
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('7006','7007','7008','7009','7010','7017','7022','7023','7024','7025');
-user = 'Ben';
+curr_subject_ID = char('7002','7004','7006','7007','7008','7010','7023','7024','7025','7030','7033','7035','7036','7038','7039','7040');
+user = 'Bon';
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 if user == 'Ema'
     fNIRSandGerbilsXL = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
     stim_file = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\stim\s_';
 elseif user == 'Bon'
-    fNIRSandGerbilsXL = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
-    stim_file = 'C:\Users\benri\Documents\GitHub\fNIRSandGerbils\stim\s_';
+    fNIRSandGerbilsXL = 'D:\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+    stim_file = 'D:\GitHub\fNIRSandGerbils\stim\s_';
 elseif user == 'Ben'
     fNIRSandGerbilsXL = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
     stim_file = '/home/ben/Documents/GitHub/fNIRSandGerbils/stim/s_';
@@ -84,6 +84,17 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
             variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7016\unscrambled_diff_talker\');
             variable = erase(variable,  '_unscrambled_dt.wav');
             variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7016\unscrambled_same_talker\');
+            variable = erase(variable,  '_unscrambled_st.wav');
+            variable = str2num(variable);
+        elseif string(this_subject_ID) == '7035'
+            variable = string(soundfiles_by_trial{itrial, 1});
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7034\scrambled_diff_talker\');
+            variable = erase(variable, '_scrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7034\scrambled_same_talker\');
+            variable = erase(variable, '_scrambled_st.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7034\unscrambled_diff_talker\');
+            variable = erase(variable,  '_unscrambled_dt.wav');
+            variable = erase(variable, 'D:\Experiments\fNIRSandGerbils\stim\s_7034\unscrambled_same_talker\');
             variable = erase(variable,  '_unscrambled_st.wav');
             variable = str2num(variable);
         else
