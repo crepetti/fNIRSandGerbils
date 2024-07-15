@@ -123,7 +123,3 @@ eeglab redraw;
 
 
 
-
-
-
-

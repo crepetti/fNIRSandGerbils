@@ -1,17 +1,17 @@
 % Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 % EPOCHING
-subID = '7003'; % set current subject ID
+subID = '7002'; % set current subject ID
 
 % Set directories
-whos_using = 'Ben';
+whos_using = 'Bon';
 
 if whos_using == 'Ben'
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1/')
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
 elseif whos_using == 'Bon' % Ben Laptop
     addpath('\Users\benri\Documents\eeglab2023.0\')
-    pre_pro_epoched_data_folder = '\Users\benri\Documents\GitHub\fNIRSandGerbils\prepro_epoched_data\';
+    pre_pro_epoched_data_folder = 'D:\GitHub\fNIRSandGerbils\prepro_epoched_data\';
 elseif whos_using == 'Ema'
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data\';

@@ -16,7 +16,7 @@ else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID =  char('7002','7004','7006','7007','7008','7010','7023','7024','7025','7030','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -30,6 +30,7 @@ fs = 256;
 %% For each subject.....
 for isubject = 1:size(curr_subject_ID,1)
     subID = curr_subject_ID(isubject,:); % set subject ID
+    disp(subID)
 
     % Load word onset times data
     stim_info_filename = [dir,'stim/s_',strtrim(curr_subject_ID(isubject,:)),'/',strtrim(curr_subject_ID(isubject,:)),'_alltrialwords.mat'];
@@ -107,8 +108,8 @@ for isubject = 1:size(curr_subject_ID,1)
 
 
         % Define time vector for extracting target ERPs
-        scrambled_time = this_condition_EEG.times; % in milliseconds
-        unscrambled_time = this_condition_EEG.times; % in milliseconds
+        eeg_time = this_condition_EEG.times; % in milliseconds
+        audio_time = linspace(eeg_time(1),eeg_time(end),((eeg_time(end) - eeg_time(1))/1000)*44100);
 
         % Define time vector for extracting masker ERPs
         stimulus_length = 12; % seconds
@@ -120,11 +121,16 @@ for isubject = 1:size(curr_subject_ID,1)
             this_trial_target_onsets = this_condition_target_onsets(itrial).onsets; % find onsets of target words in this trial
             % Within Target Onsets
             for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
-                resampled_search_index = (this_trial_target_onsets(ionset));%/(44100/fs);
-                [~,start_time] = min(abs(scrambled_time - resampled_search_index)); % find index in time vector that corresponds
+                %resampled_search_time = floor((this_trial_target_onsets(ionset))*1000);
+                %[~,start_time] = min(abs(eeg_time - (resampled_search_time + erp_window_start_time)));
+                %[~,end_time] = min(abs(eeg_time - (resampled_search_time + erp_window_end_time)));
 
-                start_time = round(start_time + ((erp_window_start_time/1000)*fs)); % find ERP start index
-                end_time = round(start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*256)); % find ERP end index
+                start_time = floor((this_trial_target_onsets(ionset)  + (erp_window_start_time/1000))*fs) + fs;
+                end_time = floor((this_trial_target_onsets(ionset) + (erp_window_end_time/1000))*fs) + fs;
+                if end_time - start_time == 218
+                    end_time = end_time -1;
+                end
+
 
                 % Reject epochs with amplitude above +/- 100 uV
                 if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > 100,'all')
@@ -133,7 +139,8 @@ for isubject = 1:size(curr_subject_ID,1)
                 end
 
                 % Isolate ERP
-                this_erp = these_epochs(:,start_time:end_time,itrial);
+                this_erp = detrend(these_epochs(:,start_time:end_time,itrial));
+                single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(this_erp,2));
 
                 % Put it into appropriate matrix
                 if this_condition_target_words(itrial).words(ionset) == 'red'
@@ -213,7 +220,6 @@ for isubject = 1:size(curr_subject_ID,1)
 
     end
 
-    single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(scrambled_st_by_target_color_onset,2));
 
     [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
     [~,baseline_end_index] = min(abs(single_onset_time - 0));
@@ -229,44 +235,46 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_st_by_masker_onset,unscrambled_dt_by_masker_onset); % include masker or no??
 
     for ichannel = 1:32
-        all_scrambled_st_by_target_red_onset(isubject,ichannel,:) = squeeze(mean(scrambled_st_by_target_red_onset(ichannel,:,:) ,3));
-        all_scrambled_st_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_green_onset(ichannel,:,:)  ,3));
-        all_scrambled_st_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_blue_onset(ichannel,:,:)  ,3));
-        all_scrambled_st_by_target_white_onset(isubject,ichannel,:) = squeeze(mean(scrambled_st_by_target_white_onset(ichannel,:,:)  ,3));
-        all_scrambled_st_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_object_onset(ichannel,:,:)  ,3));
-    
-        all_unscrambled_st_by_target_red_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_red_onset(ichannel,:,:)  ,3));
-        all_unscrambled_st_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_green_onset(ichannel,:,:)  ,3));
-        all_unscrambled_st_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_blue_onset(ichannel,:,:)  ,3));
-        all_unscrambled_st_by_target_white_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_white_onset(ichannel,:,:)  ,3));
-        all_unscrambled_st_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_object_onset(ichannel,:,:)  ,3));
-    
-        all_scrambled_dt_by_target_red_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_red_onset(ichannel,:,:)  ,3));
-        all_scrambled_dt_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_green_onset(ichannel,:,:)  ,3));
-        all_scrambled_dt_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_blue_onset(ichannel,:,:)  ,3));
-        all_scrambled_dt_by_target_white_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_white_onset(ichannel,:,:)  ,3));
-        all_scrambled_dt_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_object_onset(ichannel,:,:)  ,3));
-    
-        all_unscrambled_dt_by_target_red_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_red_onset(ichannel,:,:)  ,3));
-        all_unscrambled_dt_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_green_onset(ichannel,:,:)  ,3));
-        all_unscrambled_dt_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_blue_onset(ichannel,:,:)  ,3));
-        all_unscrambled_dt_by_target_white_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_white_onset(ichannel,:,:)  ,3));
-        all_unscrambled_dt_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_object_onset(ichannel,:,:)  ,3));
-    
-        all_scrambled_dt_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_masker_onset(ichannel,:,:)  ,3));
-        all_scrambled_st_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_masker_onset(ichannel,:,:)  ,3));
-        all_unscrambled_st_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_masker_onset(ichannel,:,:)  ,3));
-        all_unscrambled_dt_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_masker_onset(ichannel,:,:)  ,3));
+        this_channel_target_baseline = mean(all_data_target_this_subject(ichannel,baseline_start_index:baseline_end_index,:),"all");
+        this_channel_masker_baseline = mean(all_data_masker_this_subject(ichannel,baseline_start_index:baseline_end_index,:),"all");
+%         all_scrambled_st_by_target_red_onset(isubject,ichannel,:) = squeeze(mean(scrambled_st_by_target_red_onset(ichannel,:,:) ,3));
+%         all_scrambled_st_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_green_onset(ichannel,:,:)  ,3));
+%         all_scrambled_st_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_blue_onset(ichannel,:,:)  ,3));
+%         all_scrambled_st_by_target_white_onset(isubject,ichannel,:) = squeeze(mean(scrambled_st_by_target_white_onset(ichannel,:,:)  ,3));
+%         all_scrambled_st_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_object_onset(ichannel,:,:)  ,3));
+%     
+%         all_unscrambled_st_by_target_red_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_red_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_st_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_green_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_st_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_blue_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_st_by_target_white_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_white_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_st_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_target_object_onset(ichannel,:,:)  ,3));
+%     
+%         all_scrambled_dt_by_target_red_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_red_onset(ichannel,:,:)  ,3));
+%         all_scrambled_dt_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_green_onset(ichannel,:,:)  ,3));
+%         all_scrambled_dt_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_blue_onset(ichannel,:,:)  ,3));
+%         all_scrambled_dt_by_target_white_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_white_onset(ichannel,:,:)  ,3));
+%         all_scrambled_dt_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_target_object_onset(ichannel,:,:)  ,3));
+%     
+%         all_unscrambled_dt_by_target_red_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_red_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_dt_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_green_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_dt_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_blue_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_dt_by_target_white_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_white_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_dt_by_target_object_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_target_object_onset(ichannel,:,:)  ,3));
+%     
+%         all_scrambled_dt_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_dt_by_masker_onset(ichannel,:,:)  ,3));
+%         all_scrambled_st_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_masker_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_st_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_st_by_masker_onset(ichannel,:,:)  ,3));
+%         all_unscrambled_dt_by_masker_onset(isubject,ichannel,:) =  squeeze(mean(unscrambled_dt_by_masker_onset(ichannel,:,:)  ,3));
     
         % for plotting big averages ignoring same vs diff talker
         
-        all_scrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_target_color_onset(ichannel,:,:)  ,scrambled_dt_by_target_color_onset(ichannel,:,:)  ),3));
-        all_scrambled_by_object_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,scrambled_st_by_target_object_onset(ichannel,:,:) ,scrambled_dt_by_target_object_onset(ichannel,:,:) ),3));
-        all_scrambled_by_masker_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_masker_onset(ichannel,:,:) ,scrambled_dt_by_masker_onset(ichannel,:,:) ),3));
+        all_scrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_target_color_onset(ichannel,:,:) - this_channel_target_baseline  ,scrambled_dt_by_target_color_onset(ichannel,:,:)  - this_channel_target_baseline),3));
+        all_scrambled_by_object_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,scrambled_st_by_target_object_onset(ichannel,:,:) - this_channel_target_baseline ,scrambled_dt_by_target_object_onset(ichannel,:,:) - this_channel_target_baseline),3));
+        all_scrambled_by_masker_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ,scrambled_dt_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ),3));
     
-        all_unscrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_color_onset(ichannel,:,:) ,unscrambled_dt_by_target_color_onset(ichannel,:,:) ),3));
-        all_unscrambled_by_object_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_object_onset(ichannel,:,:) ,unscrambled_dt_by_target_object_onset(ichannel,:,:) ),3));
-        all_unscrambled_by_masker_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,unscrambled_st_by_masker_onset(ichannel,:,:) ,unscrambled_dt_by_masker_onset(ichannel,:,:) ),3));
+        all_unscrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_color_onset(ichannel,:,:)- this_channel_target_baseline ,unscrambled_dt_by_target_color_onset(ichannel,:,:)- this_channel_target_baseline ),3));
+        all_unscrambled_by_object_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_object_onset(ichannel,:,:)- this_channel_target_baseline ,unscrambled_dt_by_target_object_onset(ichannel,:,:)- this_channel_target_baseline ),3));
+        all_unscrambled_by_masker_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,unscrambled_st_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ,unscrambled_dt_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ),3));
     end
 
     all_data_target(isubject,:,:,:) = cat(4,all_scrambled_by_color_onset(isubject,:,:,:),all_scrambled_by_object_onset(isubject,:,:,:),all_unscrambled_by_color_onset(isubject,:,:,:),all_unscrambled_by_object_onset(isubject,:,:,:));
@@ -302,21 +310,21 @@ end
 
 
 %% MASTER BASELINING
-for ichannel = 1:32
-        [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
-    [~,baseline_end_index] = min(abs(single_onset_time - 0));
-    this_target_baseline_mean = mean(all_data_target(:,ichannel,baseline_start_index:baseline_end_index,:),"all");
-    this_masker_baseline_mean = mean(all_data_masker(:,ichannel,baseline_start_index:baseline_end_index,:),"all");
-
-    all_scrambled_by_color_onset(:,ichannel,:) = all_scrambled_by_color_onset(:,ichannel,:) - this_target_baseline_mean;
-    all_scrambled_by_object_onset(:,ichannel,:) = all_scrambled_by_object_onset(:,ichannel,:) - this_target_baseline_mean;
-    all_scrambled_by_masker_onset(:,ichannel,:) = all_scrambled_by_masker_onset(:,ichannel,:) - this_target_baseline_mean;
-
-    all_unscrambled_by_color_onset(:,ichannel,:) = all_unscrambled_by_color_onset(:,ichannel,:) - this_target_baseline_mean;
-    all_unscrambled_by_object_onset(:,ichannel,:) = all_unscrambled_by_object_onset(:,ichannel,:) - this_target_baseline_mean;
-    all_unscrambled_by_masker_onset(:,ichannel,:) = all_unscrambled_by_masker_onset(:,ichannel,:) - this_target_baseline_mean;
-
-end
+% for ichannel = 1:32
+%         [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
+%     [~,baseline_end_index] = min(abs(single_onset_time - 0));
+%     this_target_baseline_mean = mean(all_data_target(:,ichannel,baseline_start_index:baseline_end_index,:),"all");
+%     this_masker_baseline_mean = mean(all_data_masker(:,ichannel,baseline_start_index:baseline_end_index,:),"all");
+% 
+%     all_scrambled_by_color_onset(:,ichannel,:) = all_scrambled_by_color_onset(:,ichannel,:) - this_target_baseline_mean;
+%     all_scrambled_by_object_onset(:,ichannel,:) = all_scrambled_by_object_onset(:,ichannel,:) - this_target_baseline_mean;
+%     all_scrambled_by_masker_onset(:,ichannel,:) = all_scrambled_by_masker_onset(:,ichannel,:) - this_target_baseline_mean;
+% 
+%     all_unscrambled_by_color_onset(:,ichannel,:) = all_unscrambled_by_color_onset(:,ichannel,:) - this_target_baseline_mean;
+%     all_unscrambled_by_object_onset(:,ichannel,:) = all_unscrambled_by_object_onset(:,ichannel,:) - this_target_baseline_mean;
+%     all_unscrambled_by_masker_onset(:,ichannel,:) = all_unscrambled_by_masker_onset(:,ichannel,:) - this_target_baseline_mean;
+% 
+% end
 
 
 %% Going to build a 4 conditions x 6 word types x time array for this subject
@@ -919,21 +927,21 @@ masker_frontocentral_erp = squeeze(mean(masker_frontocentral_erp,2));
 figure(3)
 hold on
 subplot(2,3,1)
-plot(squeeze(color_frontocentral_erp)')
+plot(single_onset_time,squeeze(color_frontocentral_erp)')
 xlabel('Time (ms)','FontSize',18)
 ylabel('Voltage (uV)','FontSize',18)
 title('Unscrambled Color')
 
 subplot(2,3,2)
 hold on
-plot(squeeze(object_frontocentral_erp)')
+plot(single_onset_time,squeeze(object_frontocentral_erp)')
 xlabel('Time (ms)','FontSize',18)
 ylabel('Voltage (uV)','FontSize',18)
 title('Unscrambled object')
 
 subplot(2,3,3)
 hold on
-plot(squeeze(masker_frontocentral_erp)')
+plot(single_onset_time,squeeze(masker_frontocentral_erp)')
 xlabel('Time (ms)','FontSize',18)
 ylabel('Voltage (uV)','FontSize',18)
 title('Uncrambled Masker')
@@ -975,21 +983,21 @@ masker_frontocentral_erp = mean(masker_frontocentral_erp,2);
 figure(3)
 hold on
 subplot(2,3,4)
-plot(squeeze(color_frontocentral_erp)')
+plot(single_onset_time,squeeze(color_frontocentral_erp)')
 xlabel('Time (ms)','FontSize',18)
 ylabel('Voltage (uV)','FontSize',18)
 title('Scrambled Color')
 
 subplot(2,3,5)
 hold on
-plot(squeeze(object_frontocentral_erp)')
+plot(single_onset_time,squeeze(object_frontocentral_erp)')
 xlabel('Time (ms)','FontSize',18)
 ylabel('Voltage (uV)','FontSize',18)
 title('Scrambled object')
 
 subplot(2,3,6)
 hold on
-plot(squeeze(masker_frontocentral_erp)')
+plot(single_onset_time,squeeze(masker_frontocentral_erp)')
 xlabel('Time (ms)','FontSize',18)
 ylabel('Voltage (uV)','FontSize',18)
 title('Scrambled masker')
