@@ -63,9 +63,9 @@ end
 EEG = eeg_checkset( EEG );
 
 %downsampling to 256 Hz
-EEG = pop_resample( EEG, 256);
-[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
-EEG = eeg_checkset( EEG );
+%EEG = pop_resample( EEG, 256);
+%[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2, 'gui', 'off');
+%EEG = eeg_checkset( EEG );
 
 %bandpass filter (order of 1)
 fs = EEG.srate;
