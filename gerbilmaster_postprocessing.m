@@ -16,7 +16,7 @@ else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
-curr_subject_ID =  char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7023');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -25,7 +25,7 @@ nsubjects = size(curr_subject_ID,1);
 word_length = 0.3;
 num_tot_trials = 144; % look into this
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
-fs = 256;
+fs = 2048;
 
 %% For each subject.....
 for isubject = 1:size(curr_subject_ID,1)
@@ -114,20 +114,24 @@ for isubject = 1:size(curr_subject_ID,1)
         % Define time vector for extracting masker ERPs
         stimulus_length = 12; % seconds
         word_length = 0.3; % seconds
-        masker_time = 0:0.3*fs:(11.7*fs);
+        masker_time = 0:word_length*fs:(11.7*fs);
 
         %% For each trial...
         for itrial = 1:size(this_condition_EEG.data,3)% for each trial in this condition (should be 36)
             this_trial_target_onsets = this_condition_target_onsets(itrial).onsets; % find onsets of target words in this trial
             % Within Target Onsets
             for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
-                %resampled_search_time = floor((this_trial_target_onsets(ionset))*1000);
-                %[~,start_time] = min(abs(eeg_time - (resampled_search_time + erp_window_start_time)));
-                %[~,end_time] = min(abs(eeg_time - (resampled_search_time + erp_window_end_time)));
+                %resampled_search_time = 0;
+                resampled_search_time = floor(this_trial_target_onsets(ionset)*1000);
+                %[~,start_time] = min(abs(eeg_time - (resampled_search_time + erp_window_start_time))); % 
+                %[~,end_time] = min(abs(eeg_time - (resampled_search_time + erp_window_end_time)));% 
 
-                start_time = floor((this_trial_target_onsets(ionset)  + (erp_window_start_time/1000))*fs) + fs;
-                end_time = floor((this_trial_target_onsets(ionset) + (erp_window_end_time/1000))*fs) + fs;
-                if end_time - start_time == 218
+                start_time = resampled_search_time + ((erp_window_start_time/1000)*fs);
+                end_time = resampled_search_time + ((erp_window_end_time/1000)*fs);
+
+                %start_time = floor((this_trial_target_onsets(ionset)  + (erp_window_start_time/1000))*fs) + fs;
+                %end_time = floor((this_trial_target_onsets(ionset) + (erp_window_end_time/1000))*fs) + fs;
+                if end_time - start_time == 1741
                     end_time = end_time -1;
                 end
 
@@ -139,8 +143,12 @@ for isubject = 1:size(curr_subject_ID,1)
                 end
 
                 % Isolate ERP
-                this_erp = detrend(these_epochs(:,start_time:end_time,itrial));
+                
+                this_erp = these_epochs(:,start_time:end_time,itrial);
                 single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(this_erp,2));
+                [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
+                [~,baseline_end_index] = min(abs(single_onset_time - 0));
+                this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
 
                 % Put it into appropriate matrix
                 if this_condition_target_words(itrial).words(ionset) == 'red'
@@ -169,16 +177,19 @@ for isubject = 1:size(curr_subject_ID,1)
 
                 resampled_search_index = (masker_time(ionset) + (1*fs) - (0.1*fs));
                 start_time = round(resampled_search_index);
-                end_time = round(start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*256));
+                end_time = round(start_time + floor(((erp_window_end_time - erp_window_start_time)/1000)*fs));
 
                 % Reject epochs with amplitude above +/- 100 uV
                 if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > 100,'all')
                     continue
                     print('epoch rejected')
-                    add variance here
+                    %add variance here
                 end
 
                 this_erp = these_epochs(:,start_time:end_time,itrial);
+                [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
+                [~,baseline_end_index] = min(abs(single_onset_time - 0));
+                this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
                 data_by_masker_onset = cat(3, data_by_masker_onset,this_erp);
             end
             
@@ -221,8 +232,7 @@ for isubject = 1:size(curr_subject_ID,1)
     end
 
 
-    [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
-    [~,baseline_end_index] = min(abs(single_onset_time - 0));
+    
 
     % Concatenate and baseline
 
@@ -235,8 +245,8 @@ for isubject = 1:size(curr_subject_ID,1)
         unscrambled_st_by_masker_onset,unscrambled_dt_by_masker_onset); % include masker or no??
 
     for ichannel = 1:32
-        this_channel_target_baseline = mean(all_data_target_this_subject(ichannel,baseline_start_index:baseline_end_index,:),"all");
-        this_channel_masker_baseline = mean(all_data_masker_this_subject(ichannel,baseline_start_index:baseline_end_index,:),"all");
+%         this_channel_target_baseline = mean(all_data_target_this_subject(ichannel,baseline_start_index:baseline_end_index,:),"all");
+%         this_channel_masker_baseline = mean(all_data_masker_this_subject(ichannel,baseline_start_index:baseline_end_index,:),"all");
 %         all_scrambled_st_by_target_red_onset(isubject,ichannel,:) = squeeze(mean(scrambled_st_by_target_red_onset(ichannel,:,:) ,3));
 %         all_scrambled_st_by_target_green_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_green_onset(ichannel,:,:)  ,3));
 %         all_scrambled_st_by_target_blue_onset(isubject,ichannel,:) =  squeeze(mean(scrambled_st_by_target_blue_onset(ichannel,:,:)  ,3));
@@ -268,13 +278,13 @@ for isubject = 1:size(curr_subject_ID,1)
     
         % for plotting big averages ignoring same vs diff talker
         
-        all_scrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_target_color_onset(ichannel,:,:) - this_channel_target_baseline  ,scrambled_dt_by_target_color_onset(ichannel,:,:)  - this_channel_target_baseline),3));
-        all_scrambled_by_object_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,scrambled_st_by_target_object_onset(ichannel,:,:) - this_channel_target_baseline ,scrambled_dt_by_target_object_onset(ichannel,:,:) - this_channel_target_baseline),3));
-        all_scrambled_by_masker_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ,scrambled_dt_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ),3));
+        all_scrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_target_color_onset(ichannel,:,:),scrambled_dt_by_target_color_onset(ichannel,:,:)),3));
+        all_scrambled_by_object_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,scrambled_st_by_target_object_onset(ichannel,:,:),scrambled_dt_by_target_object_onset(ichannel,:,:)),3));
+        all_scrambled_by_masker_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_masker_onset(ichannel,:,:),scrambled_dt_by_masker_onset(ichannel,:,:)),3));
     
-        all_unscrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_color_onset(ichannel,:,:)- this_channel_target_baseline ,unscrambled_dt_by_target_color_onset(ichannel,:,:)- this_channel_target_baseline ),3));
-        all_unscrambled_by_object_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_object_onset(ichannel,:,:)- this_channel_target_baseline ,unscrambled_dt_by_target_object_onset(ichannel,:,:)- this_channel_target_baseline ),3));
-        all_unscrambled_by_masker_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,unscrambled_st_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ,unscrambled_dt_by_masker_onset(ichannel,:,:)- this_channel_masker_baseline ),3));
+        all_unscrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_color_onset(ichannel,:,:),unscrambled_dt_by_target_color_onset(ichannel,:,:) ),3));
+        all_unscrambled_by_object_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_object_onset(ichannel,:,:) ,unscrambled_dt_by_target_object_onset(ichannel,:,:) ),3));
+        all_unscrambled_by_masker_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,unscrambled_st_by_masker_onset(ichannel,:,:) ,unscrambled_dt_by_masker_onset(ichannel,:,:)),3));
     end
 
     all_data_target(isubject,:,:,:) = cat(4,all_scrambled_by_color_onset(isubject,:,:,:),all_scrambled_by_object_onset(isubject,:,:,:),all_unscrambled_by_color_onset(isubject,:,:,:),all_unscrambled_by_object_onset(isubject,:,:,:));
@@ -282,49 +292,36 @@ for isubject = 1:size(curr_subject_ID,1)
 
 
     % Plot for each subject
-%     figure;
-%    
-%     subplot(1,3,1)
-%     hold on
-%     plot(single_onset_time,squeeze(mean(all_scrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-r');
-%     plot(single_onset_time,squeeze(mean(all_unscrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-b');
-%     title('Target Color Word')
-%     legend({'Scrambled','Unscrambled'})
-% 
-%     subplot(1,3,2)
-%     hold on
-%     plot(single_onset_time,squeeze(mean(all_scrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-r');
-%     plot(single_onset_time,squeeze(mean(all_unscrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-b');
-%     title('Target Object Word')
-%     legend({'Scrambled','Unscrambled'})
-% 
-%     subplot(1,3,3)
-%     hold on
-%     plot(single_onset_time,squeeze(mean(all_scrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-r');
-%     plot(single_onset_time,squeeze(mean(all_unscrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-b');
-%     title('Masker Word')
-%     legend({'Scrambled','Unscrambled'})
-%     sgtitle(subID)
+    figure;
+   
+    subplot(1,3,1)
+    hold on
+    plot(single_onset_time,squeeze(mean(all_scrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-r');
+    plot(single_onset_time,squeeze(mean(all_unscrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-b');
+    title('Target Color Word')
+    legend({'Scrambled','Unscrambled'})
+    ylim([-1.5,1.5])
+
+    subplot(1,3,2)
+    hold on
+    plot(single_onset_time,squeeze(mean(all_scrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-r');
+    plot(single_onset_time,squeeze(mean(all_unscrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-b');
+    title('Target Object Word')
+    legend({'Scrambled','Unscrambled'})
+    ylim([-1.5,1.5])
+
+    subplot(1,3,3)
+    hold on
+    plot(single_onset_time,squeeze(mean(all_scrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-r');
+    plot(single_onset_time,squeeze(mean(all_unscrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-b');
+    title('Masker Word')
+    legend({'Scrambled','Unscrambled'})
+    ylim([-1.5,1.5])
+    sgtitle(subID)
 end
 
 
 
-%% MASTER BASELINING
-% for ichannel = 1:32
-%         [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
-%     [~,baseline_end_index] = min(abs(single_onset_time - 0));
-%     this_target_baseline_mean = mean(all_data_target(:,ichannel,baseline_start_index:baseline_end_index,:),"all");
-%     this_masker_baseline_mean = mean(all_data_masker(:,ichannel,baseline_start_index:baseline_end_index,:),"all");
-% 
-%     all_scrambled_by_color_onset(:,ichannel,:) = all_scrambled_by_color_onset(:,ichannel,:) - this_target_baseline_mean;
-%     all_scrambled_by_object_onset(:,ichannel,:) = all_scrambled_by_object_onset(:,ichannel,:) - this_target_baseline_mean;
-%     all_scrambled_by_masker_onset(:,ichannel,:) = all_scrambled_by_masker_onset(:,ichannel,:) - this_target_baseline_mean;
-% 
-%     all_unscrambled_by_color_onset(:,ichannel,:) = all_unscrambled_by_color_onset(:,ichannel,:) - this_target_baseline_mean;
-%     all_unscrambled_by_object_onset(:,ichannel,:) = all_unscrambled_by_object_onset(:,ichannel,:) - this_target_baseline_mean;
-%     all_unscrambled_by_masker_onset(:,ichannel,:) = all_unscrambled_by_masker_onset(:,ichannel,:) - this_target_baseline_mean;
-% 
-% end
 
 
 %% Going to build a 4 conditions x 6 word types x time array for this subject
