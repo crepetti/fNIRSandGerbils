@@ -240,11 +240,11 @@ while practicetrial <= numpracticetrials
     end
     
     %% Scramble masker sound if necessary
-    if (scramblingindex == 1)
-        newMaskerSound = scrambling(newMaskerSound, fs);
-    end
-    newMaskerSound = newMaskerSound'; % transpose the array
-    
+%     if (scramblingindex == 1)
+%         newMaskerSound = scrambling(newMaskerSound, fs);
+%     end
+     newMaskerSound = newMaskerSound'; % transpose the array
+%     
 
     %% Create target sound
     % STEPS: 1) Choose words, 2) Filter at the word level 3) Concatenate
@@ -484,11 +484,11 @@ while trial <= numtrials
     end
     
     %% Scramble masker sound if necessary
-    if (scramblingindex == 1)
-        newMaskerSound = scrambling(newMaskerSound, fs);
-    end
-    newMaskerSound = newMaskerSound'; % transpose the array
-    
+%     if (scramblingindex == 1)
+%         newMaskerSound = scrambling(newMaskerSound, fs);
+%     end
+     newMaskerSound = newMaskerSound'; % transpose the array
+%     
 
     %% Create target sound
     % STEPS: 1) Choose words, 2) Filter at the word level 3) Concatenate

@@ -136,7 +136,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
              % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                disp('epoch rejected')
                 continue
             end
 
@@ -172,7 +172,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                disp('epoch rejected')
                 continue
             end
 
@@ -223,7 +223,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                disp('epoch rejected')
                 continue
                 %add variance here
             end
@@ -300,6 +300,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
     all_data_target(isubject,:,:,:) = cat(4,all_scrambled_by_color_onset(isubject,:,:,:),all_scrambled_by_object_onset(isubject,:,:,:),all_unscrambled_by_color_onset(isubject,:,:,:),all_unscrambled_by_object_onset(isubject,:,:,:));
     all_data_masker(isubject,:,:,:) = cat(4,all_scrambled_by_masker_onset(isubject,:,:,:),all_unscrambled_by_masker_onset(isubject,:,:,:));
+    all_data_button_press(isubject,:,:,:) = all_data_button_this_subject;
 
 
 
@@ -339,31 +340,10 @@ for isubject = 1:size(curr_subject_ID,1)
     figure;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[1,2])),[1,3]))
     hold on;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[3,4])),[1,3]))
     legend({'Scrambled','Unscrambled'})
-     xlabel('Time (ms)','FontSize',18)
-    ylabel('Voltage (mV)','FontSize',18)
 
     % Plot button press
-    figure;plot(single_onset_time,squeeze(mean(all_data_button_this_subject(1,:,:),[1,3])))
+    figure;plot(single_onset_time,mean(all_data_button_press(isubject,frontocentral_channels,:,:),[1,2,4]))
     xlabel('Time (ms)','FontSize',18)
-    ylabel('Voltage (mV)','FontSize',18)
-    title('Button Press at Cz')
-
-    % button press topoplot
-    figure;
-    topoplot_indices = round(0:0.1*fs:(((erp_window_end_time - erp_window_start_time)/1000)*fs));
-topoplot_indices(1) = 1;
-topoplot_times = -100:50:750;
-
-iplot = 1;
-itime = 1;
-for itopo = topoplot_indices
-    subplot(1,length(topoplot_indices)+ 1,iplot);
-    this_data = squeeze(mean(all_data_button_this_subject(:,itopo,:),[2,3]));
-    topoplot(this_data,this_EEG.chanlocs,'maplimits',[-10, 5]);
-    title([num2str(topoplot_times(itime)),' ms'])
-    iplot = iplot + 1;
-    itime = itime + 1;
-end
-colorbar
+    ylabel('Voltage')
 
 end
