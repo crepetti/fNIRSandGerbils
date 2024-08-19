@@ -5,7 +5,7 @@
 
 % Create array of subject IDs that you would like to analyze now
 curr_subject_ID = char('7002','7004','7006','7007','7008','7010','7023','7024','7025','7030','7033','7035','7036','7038','7039','7040');
-user = 'Maa';
+user = 'Bon';
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
 if user == 'Ema'
@@ -17,9 +17,6 @@ elseif user == 'Bon'
 elseif user == 'Ben'
     fNIRSandGerbilsXL = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
     stim_file = '/home/ben/Documents/GitHub/fNIRSandGerbils/stim/s_';
-elseif user == 'Maa'
-    fNIRSandGerbilsXL = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
-    stim_file = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\stim\s_';
 end
 % names, and click times by trial
 all_click_info = readtable(fNIRSandGerbilsXL,'FileType','spreadsheet','Format','auto');
@@ -59,7 +56,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     n_trials = length(trials); % find number of trials
     threshold_window_start = 0.2; % time in seconds from onset of word for start of hit/FA windows
     threshold_window_end = 0.8; % time in seconds from onset of word for end of hit/FA windows
-    double_click_threshold = 0.5; % distance between clicks at which it would be decided that it is a double click
+    double_click_threshold = 0.1; % distance between clicks at which it would be decided that it is a double click
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct(); % create structure for nearest click distances
 
@@ -537,11 +534,12 @@ xlabel('Condition','FontSize',18)
 
 figure;
 hold on
-plot(all_dprimes_new','Color',[0.8, 0.8, 0.8], 'LineWidth',1);
-scatter(1:4,mean(all_dprimes_new,1),'ob','filled','LineWidth',1)
-errorbar(1:4,mean(all_dprimes_new,1),std(all_dprimes_new,[],1)./(sqrt(size(all_dprimes_new,1) - 1)),'b', 'LineWidth',2);
-%title('D-Primes vs Condition','FontSize',20)
+plot(all_dprimes_new','-ok', 'LineWidth',1);
+scatter(1:4,mean(all_dprimes_new,1),'or','LineWidth',1)
+errorbar(1:4,mean(all_dprimes_new,1),std(all_dprimes_new,[],1)./(sqrt(size(all_dprimes_new,1) - 1)),'r', 'LineWidth',2);
+title('D-Primes vs Condition','FontSize',20)
 %ylim([0,1])
-ylabel("d' Sensitivity",'FontSize',18) 
+ylabel('d-prime','FontSize',18) 
 xticks(1:4)
-xticklabels({'Scrambled Masker\newlineDifferent Talker','Scrambled Masker\newlineSame Talker','Unscrambled Masker\newlineDifferent Talker','Unscrambled Masker\newlineSame Talker'})
+xticklabels({'scrambled diff talker','scrambled same talker','unscrambled diff talker','unscrambled same talker'})
+xlabel('Condition','FontSize',18)

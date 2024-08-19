@@ -3,7 +3,7 @@
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 
 % Set directories
-whos_using = 'Maa';
+whos_using = 'Bon';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -12,9 +12,6 @@ elseif all(whos_using == 'Bon')
     addpath('C:\Users\benri\Documents\eeglab2023.1');
     dir = 'D:\GitHub\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'D:\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';   
-elseif all(whos_using == 'Maa')
-    dir = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\';
-    dir_fnirsandgerbils = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';   
 else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
@@ -124,10 +121,9 @@ for isubject = 1:size(curr_subject_ID,1)
             this_trial_target_onsets = this_condition_target_onsets(itrial).onsets; % find onsets of target words in this trial
             % Within Target Onsets
             for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
-                resampled_search_time = floor(this_trial_target_onsets(ionset)*1000);
-%                 resampled_search_time = 0;
-%                 [~,start_time] = min(abs(eeg_time - (resampled_search_time + erp_window_start_time)));
-%                 [~,end_time] = min(abs(eeg_time - (resampled_search_time + erp_window_end_time)));
+                %resampled_search_time = floor((this_trial_target_onsets(ionset))*1000);
+                %[~,start_time] = min(abs(eeg_time - (resampled_search_time + erp_window_start_time)));
+                %[~,end_time] = min(abs(eeg_time - (resampled_search_time + erp_window_end_time)));
 
                 start_time = floor((this_trial_target_onsets(ionset)  + (erp_window_start_time/1000))*fs) + fs;
                 end_time = floor((this_trial_target_onsets(ionset) + (erp_window_end_time/1000))*fs) + fs;
