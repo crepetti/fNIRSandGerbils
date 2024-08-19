@@ -1,7 +1,7 @@
 % Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 % EPOCHING
-subID = '7002'; % set current subject ID
+subID = '7024'; % set current subject ID
 
 % Set directories
 whos_using = 'Bon';
@@ -11,7 +11,7 @@ if whos_using == 'Ben'
     pre_pro_epoched_data_folder = '/home/ben/Documents/GitHub/fNIRSandGerbils/prepro_epoched_data/';
 elseif whos_using == 'Bon' % Ben Laptop
     addpath('\Users\benri\Documents\eeglab2023.0\')
-    pre_pro_epoched_data_folder = 'D:\GitHub\fNIRSandGerbils\prepro_epoched_data\';
+    pre_pro_epoched_data_folder = 'D:\prepro_epoched_data\';
 elseif whos_using == 'Ema'
     addpath('C:\Users\ema36\OneDrive\Documents\MATLAB\eeglab2023.0');
     pre_pro_epoched_data_folder = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\prepro_epoched_data\';
@@ -27,6 +27,26 @@ EEG = pop_loadset('filename', [subID, '_ICAdone.set'], 'filepath', pre_pro_epoch
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
 EEG = eeg_checkset( EEG );
 
+% shift latencies urevent
+% fs = EEG.srate;
+% tube_delay = fs/44100;
+% shifting_latencies = mat2cell( cell2mat({EEG.urevent.latency}') + (tube_delay * fs) , length(EEG.urevent),1);
+% shifting_latencies = shifting_latencies{:};
+% for i = 1:numel(shifting_latencies)
+%     EEG.urevent(i).latency = shifting_latencies(i);
+% end
+% EEG = eeg_checkset( EEG );
+
+% shift latencies event
+% fs = EEG.srate;
+% tube_delay = fs/44100;
+% shifting_latencies = mat2cell( cell2mat({EEG.event.latency}') + (tube_delay * fs) , length(EEG.event),1);
+% shifting_latencies = shifting_latencies{:};
+% for i = 1:numel(shifting_latencies)
+%     EEG.event(i).latency = shifting_latencies(i);
+% end
+% EEG = eeg_checkset( EEG );
+% 
 
 % remove extraneous triggers
 if double(string(subID)) >= 7023
@@ -45,7 +65,7 @@ end
 
 
 %check trigger latency distances, remove double triggers
-distance_threshold = 50;
+distance_threshold = 500;
 all_latencies = [EEG.urevent(:).latency];
 all_types = [EEG.urevent(:).type];
 
@@ -90,21 +110,12 @@ EEG.event(events_to_remove) = [];
 EEG.urevent(urevents_to_remove) = [];
 
 
-% shift latencies
-fs = EEG.srate;
-tube_delay = fs/44100;
-shifting_latencies = mat2cell( cell2mat({EEG.urevent.latency}') + (tube_delay * fs) , length(EEG.urevent),1);
-shifting_latencies = shifting_latencies{:};
-for i = 1:numel(shifting_latencies)
-    EEG.urevent(i).latency = shifting_latencies(i);
-end
-EEG = eeg_checkset( EEG );
 
 % if subID >= 7023, all trigger types will be 35071. Rename them to the
 % proper trigger types (sst = 18687, ust = 35327, sdt = 44031, udt = 11007)
 % Rename triggers to 4 distinct types (one for each condition)
 if double(string(subID)) >= 7023
-    fNIRSandGerbilsXL = '/home/ben/Documents/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
+    fNIRSandGerbilsXL = 'D:/GitHub/fNIRSandGerbils/data/fNIRSandGerbils.xlsx';
     all_click_info = readtable(fNIRSandGerbilsXL,'FileType','spreadsheet','Format','auto');
     which_rows_this_subject = find(all_click_info.S == string(subID)); % find the rows in the spreadsheet which belong to this subject
     conditions = all_click_info.Condition(which_rows_this_subject);
