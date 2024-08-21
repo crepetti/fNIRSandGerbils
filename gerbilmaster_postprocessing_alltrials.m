@@ -1,7 +1,7 @@
 %% gerbilmaster_postprocessing_alltrials.m
 
 % Set directories
-whos_using = 'Bon';
+whos_using = 'Maa';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -10,12 +10,15 @@ elseif all(whos_using == 'Bon')
     addpath('C:\Users\benri\Documents\eeglab2023.1');
     dir = 'D:\GitHub\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'D:\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+elseif all(whos_using == 'Maa')
+    dir = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\';
+    dir_fnirsandgerbils = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';   
 else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7023','7024');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7023','7024','7033');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -84,7 +87,7 @@ for isubject = 1:size(curr_subject_ID,1)
     all_data_button_this_subject = [];
 
     % Load EEG for this subject
-    epochs_filename = join(['D:/prepro_epoched_data/',strtrim(curr_subject_ID(isubject,:)),'all_epoch.mat'],'');
+    epochs_filename = join(['C:\Users\maana\Documents\GitHub\fNIRSandGerbils/prepro_epoched_data/',strtrim(curr_subject_ID(isubject,:)),'all_epoch.mat'],'');
     this_EEG = load(epochs_filename);
     eeg_struct_name = fieldnames(this_EEG);
     this_EEG = getfield(this_EEG,string(eeg_struct_name(1)));
@@ -349,21 +352,21 @@ for isubject = 1:size(curr_subject_ID,1)
     title('Button Press at Cz')
 
     % button press topoplot
-    figure;
-    topoplot_indices = round(0:0.1*fs:(((erp_window_end_time - erp_window_start_time)/1000)*fs));
-topoplot_indices(1) = 1;
-topoplot_times = -100:50:750;
-
-iplot = 1;
-itime = 1;
-for itopo = topoplot_indices
-    subplot(1,length(topoplot_indices)+ 1,iplot);
-    this_data = squeeze(mean(all_data_button_this_subject(:,itopo,:),[2,3]));
-    topoplot(this_data,this_EEG.chanlocs,'maplimits',[-10, 5]);
-    title([num2str(topoplot_times(itime)),' ms'])
-    iplot = iplot + 1;
-    itime = itime + 1;
-end
-colorbar
+%     figure;
+%     topoplot_indices = round(0:0.1*fs:(((erp_window_end_time - erp_window_start_time)/1000)*fs));
+% topoplot_indices(1) = 1;
+% topoplot_times = -100:50:750;
+% 
+% iplot = 1;
+% itime = 1;
+% for itopo = topoplot_indices
+%     subplot(1,length(topoplot_indices)+ 1,iplot);
+%     this_data = squeeze(mean(all_data_button_this_subject(:,itopo,:),[2,3]));
+%     topoplot(this_data,this_EEG.chanlocs,'maplimits',[-10, 5]);
+%     title([num2str(topoplot_times(itime)),' ms'])
+%     iplot = iplot + 1;
+%     itime = itime + 1;
+% end
+% colorbar
 
 end
