@@ -20,8 +20,8 @@ else
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7023','7024');%,'7033','7035','7036','7038','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
-
+curr_subject_ID =  char('7036','7038','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+% '7023',
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
 erp_window_end_time = 750; % 750 ms after onset of word
@@ -82,11 +82,28 @@ for isubject = 1:size(curr_subject_ID,1)
     noise_thresh = 10000000000; % 80;
 
     for itrial = 1:size(this_EEG.data,3)% for each trial (should be 144)
-
+        disp(itrial)
         icondition = conditions(itrial);
-        this_trial_target_onsets = all_target_onsets(itrial).onsets;
+        
+        %this_trial_target_onsets = all_target_onsets(itrial).onsets;
+        % actually this_trial_target_onsets should be the one that matches
+        % the SOUNDFILE, not the trial number. They were not played in that
+        % order
+        which_soundfile_this_trial = this_subject_table.Soundfile(itrial);
+        which_soundfile_this_trial = cell2mat(which_soundfile_this_trial);
+        slash_indices = find(which_soundfile_this_trial == '\');
+        slash_index = max(slash_indices);
+        which_soundfile_this_trial = which_soundfile_this_trial(slash_index + 1:slash_index + 3);
+        if contains(which_soundfile_this_trial, '_s') || contains(which_soundfile_this_trial,'_u')
+            which_soundfile_this_trial = str2num(which_soundfile_this_trial(1));
+        elseif contains(which_soundfile_this_trial,'_')
+            which_soundfile_this_trial = str2num(which_soundfile_this_trial(1:2));
+        else
+            which_soundfile_this_trial = str2num(which_soundfile_this_trial);
+        end
+        this_trial_target_onsets = all_target_onsets(which_soundfile_this_trial).onsets;
 
-        if length(all_target_onsets(itrial).onsets) ~=length(all_target_words(itrial).words)
+        if length(all_target_onsets(which_soundfile_this_trial).onsets) ~=length(all_target_words(which_soundfile_this_trial).words)
             pause()
         end
 
@@ -165,12 +182,12 @@ for isubject = 1:size(curr_subject_ID,1)
             if ~isempty(ERP_info_target)
                 ERP_info_target.SubID = [ERP_info_target.SubID; curr_subject_ID(isubject,:)];
                 ERP_info_target.Trial = [ERP_info_target.Trial, itrial];
-                ERP_info_target.Word = [ERP_info_target.Word; all_target_words(itrial).words(ionset)];
+                ERP_info_target.Word = [ERP_info_target.Word; all_target_words(which_soundfile_this_trial).words(ionset)];
                 ERP_info_target.Condition = [ERP_info_target.Condition, conditions(itrial)];
             else
                 ERP_info_target(1).SubID = curr_subject_ID(isubject,:);
                 ERP_info_target(1).Trial = itrial;
-                ERP_info_target(1).Word = all_target_words(itrial).words(ionset);
+                ERP_info_target(1).Word = all_target_words(which_soundfile_this_trial).words(ionset);
                 ERP_info_target(1).Condition = conditions(itrial);
             end
           
@@ -243,9 +260,13 @@ for isubject = 1:size(curr_subject_ID,1)
     % condition 3 = unscrambled diff talker
     % condition 4 = unscrambled same talker
 
-    all_data_button_press(isubject,:,:,:) = data_by_button_press_baselined;
-    all_data_target(isubject,:,:,:) = data_by_target_onset_baselined;
-    all_data_masker(isubject,:,:,:) = data_by_masker_onset_baselined;
+    all_data_button_press(isubject,:,:) = squeeze(mean(data_by_button_press_baselined,3));
+    all_data_target(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined,3));
+    all_data_masker(isubject,:,:) = squeeze(mean(data_by_masker_onset_baselined,3));
+
+    %all_info_button_press(isubject).info = ERP_info_button_press;
+    %all_info_target(isubject).info = ERP_info_target;
+    %all_info_masker(isubject).info = ERP_info_masker;
 
     color_words = {'red','green','blue','white'};
     all_scrambled_by_color_onset(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined(:,:,logical(ismember(ERP_info_target(:).Word,color_words)'.*ismember(ERP_info_target(:).Condition,[1,2]))),3));
@@ -257,9 +278,9 @@ for isubject = 1:size(curr_subject_ID,1)
     all_unscrambled_by_masker_onset(isubject,:,:) = squeeze(mean(data_by_masker_onset_baselined(:,:,logical(ismember(ERP_info_masker(:).Condition,[3,4]))),3));
 
     % Plot for each subject
-    figure(1)
+    figure;
     subplot_counter = subplot_counter + 1;
-    subplot(size(curr_subject_ID,1),3,subplot_counter)
+    subplot(1,3,1)
     hold on
     plot(single_onset_time,squeeze(mean(all_scrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-r');
     plot(single_onset_time,squeeze(mean(all_unscrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-b');
@@ -267,10 +288,10 @@ for isubject = 1:size(curr_subject_ID,1)
         title('Target Color Word')
     end
     %legend({'Scrambled','Unscrambled'})
-    ylim([-3,10])
+    ylim([-8,8])
 
     subplot_counter = subplot_counter + 1;
-    subplot(size(curr_subject_ID,1),3,subplot_counter)
+    subplot(1,3,2)
     hold on
     plot(single_onset_time,squeeze(mean(all_scrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-r');
     plot(single_onset_time,squeeze(mean(all_unscrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-b');
@@ -278,10 +299,10 @@ for isubject = 1:size(curr_subject_ID,1)
         title('Target Object Word')
     end
     %legend({'Scrambled','Unscrambled'})
-    ylim([-3,10])
+    ylim([-8,8])
 
     subplot_counter = subplot_counter + 1;
-    subplot(size(curr_subject_ID,1),3,subplot_counter)
+    subplot(1,3,3)
     hold on
     plot(single_onset_time,squeeze(mean(all_scrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-r');
     plot(single_onset_time,squeeze(mean(all_unscrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-b');
@@ -289,31 +310,31 @@ for isubject = 1:size(curr_subject_ID,1)
         title('Masker Word')
     end
     %legend({'Scrambled','Unscrambled'})
-    ylim([-3,10])
+    ylim([-8,8])
     sgtitle(subID)
 
-    % Plot whole trial EEG
-    figure(2);
-    subplot(size(curr_subject_ID,1),1,isubject)
-    plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[1,2])),[1,3]))
-    hold on;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[3,4])),[1,3]))
-    %legend({'Scrambled','Unscrambled'})
-    if isubject == size(curr_subject_ID,1)
-        xlabel('Time (ms)','FontSize',18)
-    elseif isubject == round(size(curr_subject_ID,1)/2)
-        ylabel('Voltage (mV)','FontSize',18)
-    end
-
-    % Plot button press
-    figure(3);
-    subplot(size(curr_subject_ID,1),1,isubject)
-    plot(single_onset_time,squeeze(mean(all_data_button_press(isubject,1,:,:),[1,3])))
-    if isubject == size(curr_subject_ID,1)
-        xlabel('Time (ms)','FontSize',18)
-    elseif isubject == round(size(curr_subject_ID,1)/2)
-        ylabel('Voltage (mV)','FontSize',18)
-    end
-    title('Button Press at Cz')
+%    % Plot whole trial EEG
+%     figure(2);
+%     subplot(size(curr_subject_ID,1),1,isubject)
+%     plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[1,2])),[1,3]))
+%     hold on;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[3,4])),[1,3]))
+%     %legend({'Scrambled','Unscrambled'})
+%     if isubject == size(curr_subject_ID,1)
+%         xlabel('Time (ms)','FontSize',18)
+%     elseif isubject == round(size(curr_subject_ID,1)/2)
+%         ylabel('Voltage (mV)','FontSize',18)
+%     end
+% 
+%     % Plot button press
+%     figure(3);
+%     subplot(size(curr_subject_ID,1),1,isubject)
+%     plot(single_onset_time,squeeze(mean(all_data_button_press(isubject,1,:,:),[2,4])))
+%     if isubject == size(curr_subject_ID,1)
+%         xlabel('Time (ms)','FontSize',18)
+%     elseif isubject == round(size(curr_subject_ID,1)/2)
+%         ylabel('Voltage (mV)','FontSize',18)
+%     end
+%     title('Button Press at Cz')
 
     % button press topoplot
 %     figure;
@@ -332,5 +353,9 @@ for isubject = 1:size(curr_subject_ID,1)
 %     itime = itime + 1;
 % end
 % colorbar
+
+
+%% SAVE INFO FOR THIS SUBBY
+save(append('Results_Subject_',string(curr_subject_ID(isubject,:)),'.mat'),'data_by_masker_onset_baselined','data_by_target_onset_baselined','data_by_button_press_baselined','ERP_info_button_press','ERP_info_masker','ERP_info_target','-v7.3')
 
 end
