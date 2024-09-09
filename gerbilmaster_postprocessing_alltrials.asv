@@ -1,7 +1,7 @@
 %% gerbilmaster_postprocessing_alltrials.m
 
 % Set directories
-whos_using = 'Maa';
+whos_using = 'Bon';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -10,15 +10,17 @@ elseif all(whos_using == 'Bon')
     addpath('C:\Users\benri\Documents\eeglab2023.1');
     dir = 'D:\GitHub\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'D:\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+    prepro_folder = 'D:\prepro_epoched_data\';
 elseif all(whos_using == 'Maa')
     dir = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\';
-    dir_fnirsandgerbils = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';   
+    dir_fnirsandgerbils = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+    prepro_folder = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils/prepro_epoched_data/';
 else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7023','7024','7033','7035','7036','7038','7039','7040','7041','7043','7044','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7023','7024');%,'7033','7035','7036','7038','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -29,6 +31,7 @@ num_tot_trials = 144; % look into this
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
 fs = 2048;
 target_info={};
+subplot_counter = 0;
 %% For each subject.....
 for isubject = 1:size(curr_subject_ID,1)
     subID = curr_subject_ID(isubject,:); % set subject ID
@@ -46,48 +49,18 @@ for isubject = 1:size(curr_subject_ID,1)
     this_subject_table = all_click_info(which_rows_this_subject,:);
 
     % Create empty arrays for ERPs
-    % Scrambled Same Talker
-    scrambled_st_by_target_red_onset = [];
-    scrambled_st_by_target_green_onset = [];
-    scrambled_st_by_target_blue_onset = [];
-    scrambled_st_by_target_white_onset = [];
-    scrambled_st_by_target_color_onset = [];
-    scrambled_st_by_target_object_onset = [];
-    scrambled_st_by_masker_onset = [];
+    data_by_masker_onset = [];
+    data_by_target_onset = [];
+    data_by_button_press = [];
 
-    % Unscrambled Same Talker
-    unscrambled_st_by_target_red_onset = [];
-    unscrambled_st_by_target_green_onset = [];
-    unscrambled_st_by_target_blue_onset = [];
-    unscrambled_st_by_target_white_onset =[];
-    unscrambled_st_by_target_color_onset = [];
-    unscrambled_st_by_target_object_onset = [];
-    unscrambled_st_by_masker_onset = [];
-
-    % Scrambled Different Talker
-    scrambled_dt_by_target_red_onset = [];
-    scrambled_dt_by_target_green_onset = [];
-    scrambled_dt_by_target_blue_onset = [];
-    scrambled_dt_by_target_white_onset = [];
-    scrambled_dt_by_target_color_onset = [];
-    scrambled_dt_by_target_object_onset = [];
-    scrambled_dt_by_masker_onset = [];
-
-    % Unscrambled Different Talker
-    unscrambled_dt_by_target_red_onset = [];
-    unscrambled_dt_by_target_green_onset = [];
-    unscrambled_dt_by_target_blue_onset = [];
-    unscrambled_dt_by_target_white_onset = [];
-    unscrambled_dt_by_target_color_onset = [];
-    unscrambled_dt_by_target_object_onset = [];
-    unscrambled_dt_by_masker_onset = [];
-
-    all_data_target = [];
-    all_data_masker = [];
-    all_data_button_this_subject = [];
+    % Create empty arrays for info for each ERP
+    % Will contain subID, trial, and word (if target)
+    ERP_info_masker = struct('SubID',{},'Trial',{});
+    ERP_info_target = struct('SubID',{},'Trial',{},'Word',{});
+    ERP_info_button_press = struct('SubID',{},'Trial',{});
 
     % Load EEG for this subject
-    epochs_filename = join(['C:\Users\maana\Documents\GitHub\fNIRSandGerbils/prepro_epoched_data/',strtrim(curr_subject_ID(isubject,:)),'all_epoch.mat'],'');
+    epochs_filename = join([prepro_folder,strtrim(curr_subject_ID(isubject,:)),'all_epoch.mat'],'');
     this_EEG = load(epochs_filename);
     eeg_struct_name = fieldnames(this_EEG);
     this_EEG = getfield(this_EEG,string(eeg_struct_name(1)));
@@ -106,18 +79,9 @@ for isubject = 1:size(curr_subject_ID,1)
     word_length = 0.3; % seconds
     masker_time = 0:word_length:11.7;
 
-    noise_thresh = 80;
+    noise_thresh = 10000000000; % 80;
 
     for itrial = 1:size(this_EEG.data,3)% for each trial (should be 144)
-
-        data_by_masker_onset = [];
-        data_by_red_onset = [];
-        data_by_green_onset = [];
-        data_by_blue_onset = [];
-        data_by_white_onset  = [];
-        data_by_color_onset = [];
-        data_by_object_onset = [];
-        data_by_button_press = [];
 
         icondition = conditions(itrial);
         this_trial_target_onsets = all_target_onsets(itrial).onsets;
@@ -126,7 +90,7 @@ for isubject = 1:size(curr_subject_ID,1)
             pause()
         end
 
-        % BUTTON PRESSES
+        %% ISOLATE BUTTON PRESSES
         % Find this trial button presses
         this_trial_click_times = table2array(this_subject_table(itrial,9:end));
         this_trial_click_times(isnan(this_trial_click_times)) = [];
@@ -147,20 +111,23 @@ for isubject = 1:size(curr_subject_ID,1)
             end
 
             % Isolate ERP
-
             this_erp = these_epochs(:,start_time:end_time,itrial);
-
-            single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(this_erp,2));
-            [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
-            [~,baseline_end_index] = min(abs(single_onset_time - 0));
-            this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
-
             data_by_button_press = cat(3, data_by_button_press,this_erp);
+
+            % Append Info
+            if ~isempty(ERP_info_button_press)
+                ERP_info_button_press.SubID = [ERP_info_button_press.SubID; curr_subject_ID(isubject,:)];
+                ERP_info_button_press.Trial = [ERP_info_button_press.Trial, itrial];
+            else
+                ERP_info_button_press(1).SubID = curr_subject_ID(isubject,:);
+                ERP_info_button_press(1).Trial = itrial;
+            end
+
 
 
         end
 
-        % TARGET WORD ONSETS 
+        %% ISOLATE TARGET WORD ONSETS 
         % Within Target Onsets
         
         for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
@@ -192,38 +159,24 @@ for isubject = 1:size(curr_subject_ID,1)
             % Isolate ERP
 
             this_erp = these_epochs(:,start_time:end_time,itrial);
-            single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(this_erp,2));
-            [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
-            [~,baseline_end_index] = min(abs(single_onset_time - 0));
-            this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
+            data_by_target_onset = cat(3,data_by_target_onset,this_erp);
 
-            %Add info in to target matrix
-            target_info = [target_info; {subID, this_trial_target_onsets(ionset), resampled_audio_time(start_time), resampled_audio_time(end_time)}];
-          
-
-            % Put it into appropriate matrix
-            if all_target_words(itrial).words(ionset) == 'red'
-                data_by_red_onset = cat(3, data_by_red_onset,this_erp);
-                data_by_color_onset = cat(3, data_by_color_onset ,this_erp);
-
-            elseif all_target_words(itrial).words(ionset) == 'green'
-                data_by_green_onset = cat(3, data_by_green_onset,this_erp);
-                data_by_color_onset= cat(3, data_by_color_onset ,this_erp);
-
-            elseif all_target_words(itrial).words(ionset) == 'white'
-                data_by_white_onset = cat(3, data_by_white_onset,this_erp);
-                data_by_color_onset= cat(3, data_by_color_onset ,this_erp);
-
-            elseif all_target_words(itrial).words(ionset) == 'blue'
-                data_by_blue_onset= cat(3, data_by_blue_onset,this_erp);
-                data_by_color_onset= cat(3, data_by_color_onset,this_erp);
-
+            % Append Info
+            if ~isempty(ERP_info_target)
+                ERP_info_target.SubID = [ERP_info_target.SubID; curr_subject_ID(isubject,:)];
+                ERP_info_target.Trial = [ERP_info_target.Trial, itrial];
+                ERP_info_target.Word = [ERP_info_target.Word; all_target_words(itrial).words(ionset)];
+                ERP_info_target.Condition = [ERP_info_target.Condition, conditions(itrial)];
             else
-                data_by_object_onset = cat(3, data_by_object_onset,this_erp);
+                ERP_info_target(1).SubID = curr_subject_ID(isubject,:);
+                ERP_info_target(1).Trial = itrial;
+                ERP_info_target(1).Word = all_target_words(itrial).words(ionset);
+                ERP_info_target(1).Condition = conditions(itrial);
             end
+          
         end
 
-        % MASKER WORD ONSETS
+        %% ISOLATE MASKER WORD ONSETS
         % Background Onsets (masker onsets)
         for ionset = 1:length(masker_time)
 
@@ -246,129 +199,120 @@ for isubject = 1:size(curr_subject_ID,1)
             end
 
             this_erp = these_epochs(:,start_time:end_time,itrial);
-            [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
-            [~,baseline_end_index] = min(abs(single_onset_time - 0));
-            this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
             data_by_masker_onset = cat(3, data_by_masker_onset,this_erp);
-        end
 
+            % Append Info
+            if ~isempty(ERP_info_masker)
+                ERP_info_masker.SubID = [ERP_info_masker.SubID; curr_subject_ID(isubject,:)];
+                ERP_info_masker.Trial = [ERP_info_masker.Trial, itrial];
+                ERP_info_masker.Condition = [ERP_info_masker.Condition, conditions(itrial)];
+            else
+                ERP_info_masker(1).SubID = curr_subject_ID(isubject,:);
+                ERP_info_masker(1).Trial = itrial;
+                ERP_info_masker(1).Condition = conditions(itrial);
+            end
 
-        % save to appropriate array
-
-        if isempty(data_by_color_onset) || isempty(data_by_masker_onset) || isempty(data_by_object_onset)
-            disp('UH OH!!!')
-            disp(itrial)
-        elseif icondition == 1
-            %scrambled_dt_by_target_red_onset = cat(3,scrambled_dt_by_target_red_onset, data_by_red_onset);
-            %scrambled_dt_by_target_green_onset = cat(3,scrambled_dt_by_target_green_onset,data_by_green_onset);
-            %scrambled_dt_by_target_blue_onset = cat(3,scrambled_dt_by_target_blue_onset,data_by_blue_onset);
-            %scrambled_dt_by_target_white_onset = cat(3,scrambled_dt_by_target_white_onset,data_by_white_onset);
-            scrambled_dt_by_target_color_onset = cat(3,scrambled_dt_by_target_color_onset,data_by_color_onset);
-            scrambled_dt_by_target_object_onset = cat(3,scrambled_dt_by_target_object_onset,data_by_object_onset);
-            scrambled_dt_by_masker_onset = cat(3,scrambled_dt_by_masker_onset,data_by_masker_onset);
-        elseif icondition == 2
-            %scrambled_st_by_target_red_onset = cat(3,scrambled_st_by_target_red_onset, data_by_red_onset);
-            %scrambled_st_by_target_green_onset = cat(3,scrambled_st_by_target_green_onset,data_by_green_onset);
-            %scrambled_st_by_target_blue_onset = cat(3,scrambled_st_by_target_blue_onset,data_by_blue_onset);
-            %scrambled_st_by_target_white_onset = cat(3,scrambled_st_by_target_white_onset,data_by_white_onset);
-            scrambled_st_by_target_color_onset = cat(3,scrambled_st_by_target_color_onset,data_by_color_onset);
-            scrambled_st_by_target_object_onset = cat(3,scrambled_st_by_target_object_onset,data_by_object_onset);
-            scrambled_st_by_masker_onset = cat(3,scrambled_st_by_masker_onset,data_by_masker_onset);
-        elseif icondition == 3
-            %unscrambled_dt_by_target_red_onset = cat(3,unscrambled_dt_by_target_red_onset, data_by_red_onset);
-            %unscrambled_dt_by_target_green_onset = cat(3,unscrambled_dt_by_target_green_onset,data_by_green_onset);
-            %unscrambled_dt_by_target_blue_onset = cat(3,unscrambled_dt_by_target_blue_onset,data_by_blue_onset);
-            %unscrambled_dt_by_target_white_onset = cat(3,unscrambled_dt_by_target_white_onset,data_by_white_onset);
-            unscrambled_dt_by_target_color_onset = cat(3,unscrambled_dt_by_target_color_onset,data_by_color_onset);
-            unscrambled_dt_by_target_object_onset = cat(3,unscrambled_dt_by_target_object_onset,data_by_object_onset);
-            unscrambled_dt_by_masker_onset = cat(3,unscrambled_dt_by_masker_onset,data_by_masker_onset);
-        elseif icondition == 4
-            %unscrambled_st_by_target_red_onset = cat(3,unscrambled_st_by_target_red_onset,data_by_red_onset);
-            %unscrambled_st_by_target_green_onset = cat(3,unscrambled_st_by_target_green_onset,data_by_green_onset);
-            %unscrambled_st_by_target_blue_onset = cat(3,unscrambled_st_by_target_blue_onset,data_by_blue_onset);
-            %unscrambled_st_by_target_white_onset = cat(3,unscrambled_st_by_target_white_onset,data_by_white_onset);
-            unscrambled_st_by_target_color_onset = cat(3,unscrambled_st_by_target_color_onset,data_by_color_onset);
-            unscrambled_st_by_target_object_onset = cat(3,unscrambled_st_by_target_object_onset,data_by_object_onset);
-            unscrambled_st_by_masker_onset = cat(3,unscrambled_st_by_masker_onset,data_by_masker_onset);
-        end
-
-        if ~isempty(data_by_button_press)
-            all_data_button_this_subject = cat(3,all_data_button_this_subject,data_by_button_press);
         end
 
     end
 
-    % Concatenate and baseline
+    %% Concatenate and baseline within each channel for this subject
+    % Baseline to the mean voltage during the baseline period over ALL
+    % trials
 
-    all_data_target_this_subject = cat(3,scrambled_st_by_target_color_onset,scrambled_dt_by_target_color_onset,...
-        scrambled_st_by_target_object_onset,scrambled_dt_by_target_object_onset,...
-        unscrambled_st_by_target_color_onset,unscrambled_dt_by_target_color_onset,...
-        unscrambled_st_by_target_object_onset,unscrambled_dt_by_target_object_onset); % include masker or no??
-
-    all_data_masker_this_subject = cat(3,scrambled_st_by_masker_onset,scrambled_dt_by_masker_onset,...
-        unscrambled_st_by_masker_onset,unscrambled_dt_by_masker_onset); % include masker or no??
+    % Masker and target will be baselined separately
 
 
+    single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(data_by_target_onset,2));
+    [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
+    [~,baseline_end_index] = min(abs(single_onset_time - 0));
+
+    data_by_button_press_baselined = nan(size(data_by_button_press));
+    data_by_target_onset_baselined = nan(size(data_by_target_onset));
+    data_by_masker_onset_baselined = nan(size(data_by_masker_onset));
     for ichannel = 1:32
-
-        all_scrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_target_color_onset(ichannel,:,:),scrambled_dt_by_target_color_onset(ichannel,:,:)),3));
-        all_scrambled_by_object_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,scrambled_st_by_target_object_onset(ichannel,:,:),scrambled_dt_by_target_object_onset(ichannel,:,:)),3));
-        all_scrambled_by_masker_onset(isubject,ichannel,:) = squeeze(mean(cat(3,scrambled_st_by_masker_onset(ichannel,:,:),scrambled_dt_by_masker_onset(ichannel,:,:)),3));
-
-        all_unscrambled_by_color_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_color_onset(ichannel,:,:),unscrambled_dt_by_target_color_onset(ichannel,:,:) ),3));
-        all_unscrambled_by_object_onset(isubject,ichannel,:) = squeeze(mean(cat(3,unscrambled_st_by_target_object_onset(ichannel,:,:) ,unscrambled_dt_by_target_object_onset(ichannel,:,:) ),3));
-        all_unscrambled_by_masker_onset(isubject,ichannel,:)  = squeeze(mean(cat(3,unscrambled_st_by_masker_onset(ichannel,:,:) ,unscrambled_dt_by_masker_onset(ichannel,:,:)),3));
+        data_by_button_press_baselined(ichannel,:,:) = data_by_button_press(ichannel,:,:) - mean(data_by_button_press(ichannel,baseline_start_index:baseline_end_index,:),'all');
+        data_by_target_onset_baselined(ichannel,:,:) = data_by_target_onset(ichannel,:,:) - mean(data_by_target_onset(ichannel,baseline_start_index:baseline_end_index,:),'all');
+        data_by_masker_onset_baselined(ichannel,:,:) = data_by_masker_onset(ichannel,:,:) - mean(data_by_masker_onset(ichannel,baseline_start_index:baseline_end_index,:),'all');
+        
     end
 
+    % Save to larget array with all subjects in it
+    % condition 1 = scrambled diff talker
+    % condition 2 = scrambled same talker
+    % condition 3 = unscrambled diff talker
+    % condition 4 = unscrambled same talker
 
-    all_data_target(isubject,:,:,:) = cat(4,all_scrambled_by_color_onset(isubject,:,:,:),all_scrambled_by_object_onset(isubject,:,:,:),all_unscrambled_by_color_onset(isubject,:,:,:),all_unscrambled_by_object_onset(isubject,:,:,:));
-    all_data_masker(isubject,:,:,:) = cat(4,all_scrambled_by_masker_onset(isubject,:,:,:),all_unscrambled_by_masker_onset(isubject,:,:,:));
+    all_data_button_press(isubject,:,:,:) = data_by_button_press_baselined;
+    all_data_target(isubject,:,:,:) = data_by_target_onset_baselined;
+    all_data_masker(isubject,:,:,:) = data_by_masker_onset_baselined;
 
-
-
-
-
-
+    color_words = {'red','green','blue','white'};
+    all_scrambled_by_color_onset(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined(:,:,logical(ismember(ERP_info_target(:).Word,color_words)'.*ismember(ERP_info_target(:).Condition,[1,2]))),3));
+    all_scrambled_by_object_onset(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined(:,:,logical(~ismember(ERP_info_target(:).Word,color_words)'.*ismember(ERP_info_target(:).Condition,[1,2]))),3));
+    all_scrambled_by_masker_onset(isubject,:,:) = squeeze(mean(data_by_masker_onset_baselined(:,:,logical(ismember(ERP_info_masker(:).Condition,[1,2]))),3));
+    
+    all_unscrambled_by_color_onset(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined(:,:,logical(ismember(ERP_info_target(:).Word,color_words)'.*ismember(ERP_info_target(:).Condition,[3,4]))),3));
+    all_unscrambled_by_object_onset(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined(:,:,logical(~ismember(ERP_info_target(:).Word,color_words)'.*ismember(ERP_info_target(:).Condition,[3,4]))),3));
+    all_unscrambled_by_masker_onset(isubject,:,:) = squeeze(mean(data_by_masker_onset_baselined(:,:,logical(ismember(ERP_info_masker(:).Condition,[3,4]))),3));
 
     % Plot for each subject
-    figure;
-
-    subplot(1,3,1)
+    figure(1)
+    subplot_counter = subplot_counter + 1;
+    subplot(size(curr_subject_ID,1),3,subplot_counter)
     hold on
     plot(single_onset_time,squeeze(mean(all_scrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-r');
     plot(single_onset_time,squeeze(mean(all_unscrambled_by_color_onset(isubject,frontocentral_channels,:),2)),'-b');
-    title('Target Color Word')
-    legend({'Scrambled','Unscrambled'})
+    if isubject == 1
+        title('Target Color Word')
+    end
+    %legend({'Scrambled','Unscrambled'})
     ylim([-3,10])
 
-    subplot(1,3,2)
+    subplot_counter = subplot_counter + 1;
+    subplot(size(curr_subject_ID,1),3,subplot_counter)
     hold on
     plot(single_onset_time,squeeze(mean(all_scrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-r');
     plot(single_onset_time,squeeze(mean(all_unscrambled_by_object_onset(isubject,frontocentral_channels,:),2)),'-b');
-    title('Target Object Word')
-    legend({'Scrambled','Unscrambled'})
+    if isubject == 1
+        title('Target Object Word')
+    end
+    %legend({'Scrambled','Unscrambled'})
     ylim([-3,10])
 
-    subplot(1,3,3)
+    subplot_counter = subplot_counter + 1;
+    subplot(size(curr_subject_ID,1),3,subplot_counter)
     hold on
     plot(single_onset_time,squeeze(mean(all_scrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-r');
     plot(single_onset_time,squeeze(mean(all_unscrambled_by_masker_onset(isubject,frontocentral_channels,:),2)),'-b');
-    title('Masker Word')
-    legend({'Scrambled','Unscrambled'})
+    if isubject == 1
+        title('Masker Word')
+    end
+    %legend({'Scrambled','Unscrambled'})
     ylim([-3,10])
     sgtitle(subID)
 
     % Plot whole trial EEG
-    figure;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[1,2])),[1,3]))
+    figure(2);
+    subplot(size(curr_subject_ID,1),1,isubject)
+    plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[1,2])),[1,3]))
     hold on;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[3,4])),[1,3]))
-    legend({'Scrambled','Unscrambled'})
-     xlabel('Time (ms)','FontSize',18)
-    ylabel('Voltage (mV)','FontSize',18)
+    %legend({'Scrambled','Unscrambled'})
+    if isubject == size(curr_subject_ID,1)
+        xlabel('Time (ms)','FontSize',18)
+    elseif isubject == round(size(curr_subject_ID,1)/2)
+        ylabel('Voltage (mV)','FontSize',18)
+    end
 
     % Plot button press
-    figure;plot(single_onset_time,squeeze(mean(all_data_button_this_subject(1,:,:),[1,3])))
-    xlabel('Time (ms)','FontSize',18)
-    ylabel('Voltage (mV)','FontSize',18)
+    figure(3);
+    subplot(size(curr_subject_ID,1),1,isubject)
+    plot(single_onset_time,squeeze(mean(all_data_button_press(isubject,1,:,:),[1,3])))
+    if isubject == size(curr_subject_ID,1)
+        xlabel('Time (ms)','FontSize',18)
+    elseif isubject == round(size(curr_subject_ID,1)/2)
+        ylabel('Voltage (mV)','FontSize',18)
+    end
     title('Button Press at Cz')
 
     % button press topoplot
