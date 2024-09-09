@@ -1,7 +1,7 @@
 % Primary Authors: Victoria Figarola, Benjamin Richardson 7/21/23
 % Secondary Authors: Emaya Anand, Maanasa Guru Adimurthy
 % EPOCHING
-subID = ['7040']; % set current subject ID
+subID = ['7045']; % set current subject ID
 
 % Set directories
 whos_using = 'Maa';

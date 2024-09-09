@@ -1,7 +1,7 @@
 %% gerbilmaster_postprocessing_alltrials.m
 
 % Set directories
-whos_using = 'Bon';
+whos_using = 'Maa';
 if all(whos_using == 'Ben')
     addpath('/home/ben/Documents/MATLAB/eeglab2023.1');
     dir = '/home/ben/Documents/GitHub/fNIRSandGerbils/';
@@ -10,12 +10,15 @@ elseif all(whos_using == 'Bon')
     addpath('C:\Users\benri\Documents\eeglab2023.1');
     dir = 'D:\GitHub\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'D:\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
+elseif all(whos_using == 'Maa')
+    dir = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\';
+    dir_fnirsandgerbils = 'C:\Users\maana\Documents\GitHub\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';   
 else
     dir = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\';
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7023','7024');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7023','7024','7033','7035','7036','7038','7039','7040','7041','7043','7044','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -25,7 +28,7 @@ word_length = 0.3;
 num_tot_trials = 144; % look into this
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
 fs = 2048;
-
+target_info={};
 %% For each subject.....
 for isubject = 1:size(curr_subject_ID,1)
     subID = curr_subject_ID(isubject,:); % set subject ID
@@ -84,7 +87,7 @@ for isubject = 1:size(curr_subject_ID,1)
     all_data_button_this_subject = [];
 
     % Load EEG for this subject
-    epochs_filename = join(['D:/prepro_epoched_data/',strtrim(curr_subject_ID(isubject,:)),'all_epoch.mat'],'');
+    epochs_filename = join(['C:\Users\maana\Documents\GitHub\fNIRSandGerbils/prepro_epoched_data/',strtrim(curr_subject_ID(isubject,:)),'all_epoch.mat'],'');
     this_EEG = load(epochs_filename);
     eeg_struct_name = fieldnames(this_EEG);
     this_EEG = getfield(this_EEG,string(eeg_struct_name(1)));
@@ -93,8 +96,10 @@ for isubject = 1:size(curr_subject_ID,1)
 
     % Define time vector for extracting target ERPs
     eeg_time = this_EEG.times; % in milliseconds
-    audio_time = linspace(eeg_time(1),eeg_time(end),((eeg_time(end) - eeg_time(1))/1000)*44100);
-    resampled_audio_time = resample(audio_time,this_EEG.srate,44100);
+    audio_time = 0:1/44100:12;
+    %resampled_audio_time = resample(audio_time,this_EEG.srate,44100);
+    resampled_audio_time = -1:1/fs:16;
+    resampled_audio_time = resampled_audio_time.*1000;
 
     % Define time vector for extracting masker ERPs
     stimulus_length = 12; % seconds
@@ -130,19 +135,21 @@ for isubject = 1:size(curr_subject_ID,1)
             [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time))); %
             [~,end_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_end_time)));%
 
+
              if end_time - start_time == 1741
                 end_time = end_time -1;
             end
 
              % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('epoch rejected')
+                disp('ERP rejected')
                 continue
             end
 
             % Isolate ERP
 
             this_erp = these_epochs(:,start_time:end_time,itrial);
+
             single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(this_erp,2));
             [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
             [~,baseline_end_index] = min(abs(single_onset_time - 0));
@@ -153,8 +160,9 @@ for isubject = 1:size(curr_subject_ID,1)
 
         end
 
-        % TARGET WORD ONSETS
+        % TARGET WORD ONSETS 
         % Within Target Onsets
+        
         for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
             resampled_search_time = floor(this_trial_target_onsets(ionset)*1000);
             [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time))); %
@@ -172,9 +180,14 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('epoch rejected')
+                disp('ERP rejected')
                 continue
             end
+             % Store target information in the cell array
+            target_info{end+1,1} = subID; % Subject ID
+            target_info{end,2} = this_trial_target_onsets(ionset); % Target Onset
+            target_info{end,3} = resampled_audio_time(start_time); % Start Time
+            target_info{end,4} = resampled_audio_time(end_time); % End Time
 
             % Isolate ERP
 
@@ -183,6 +196,10 @@ for isubject = 1:size(curr_subject_ID,1)
             [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
             [~,baseline_end_index] = min(abs(single_onset_time - 0));
             this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
+
+            %Add info in to target matrix
+            target_info = [target_info; {subID, this_trial_target_onsets(ionset), resampled_audio_time(start_time), resampled_audio_time(end_time)}];
+          
 
             % Put it into appropriate matrix
             if all_target_words(itrial).words(ionset) == 'red'
@@ -223,7 +240,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('epoch rejected')
+                disp('ERP rejected')
                 continue
                 %add variance here
             end
@@ -237,7 +254,11 @@ for isubject = 1:size(curr_subject_ID,1)
 
 
         % save to appropriate array
-        if icondition == 1
+
+        if isempty(data_by_color_onset) || isempty(data_by_masker_onset) || isempty(data_by_object_onset)
+            disp('UH OH!!!')
+            disp(itrial)
+        elseif icondition == 1
             %scrambled_dt_by_target_red_onset = cat(3,scrambled_dt_by_target_red_onset, data_by_red_onset);
             %scrambled_dt_by_target_green_onset = cat(3,scrambled_dt_by_target_green_onset,data_by_green_onset);
             %scrambled_dt_by_target_blue_onset = cat(3,scrambled_dt_by_target_blue_onset,data_by_blue_onset);
@@ -271,7 +292,9 @@ for isubject = 1:size(curr_subject_ID,1)
             unscrambled_st_by_masker_onset = cat(3,unscrambled_st_by_masker_onset,data_by_masker_onset);
         end
 
-        all_data_button_this_subject = cat(3,all_data_button_this_subject,data_by_button_press);
+        if ~isempty(data_by_button_press)
+            all_data_button_this_subject = cat(3,all_data_button_this_subject,data_by_button_press);
+        end
 
     end
 
@@ -300,7 +323,6 @@ for isubject = 1:size(curr_subject_ID,1)
 
     all_data_target(isubject,:,:,:) = cat(4,all_scrambled_by_color_onset(isubject,:,:,:),all_scrambled_by_object_onset(isubject,:,:,:),all_unscrambled_by_color_onset(isubject,:,:,:),all_unscrambled_by_object_onset(isubject,:,:,:));
     all_data_masker(isubject,:,:,:) = cat(4,all_scrambled_by_masker_onset(isubject,:,:,:),all_unscrambled_by_masker_onset(isubject,:,:,:));
-    all_data_button_press(isubject,:,:,:) = all_data_button_this_subject;
 
 
 
@@ -340,10 +362,31 @@ for isubject = 1:size(curr_subject_ID,1)
     figure;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[1,2])),[1,3]))
     hold on;plot(eeg_time,mean(these_epochs(frontocentral_channels,:,ismember(conditions,[3,4])),[1,3]))
     legend({'Scrambled','Unscrambled'})
+     xlabel('Time (ms)','FontSize',18)
+    ylabel('Voltage (mV)','FontSize',18)
 
     % Plot button press
-    figure;plot(single_onset_time,mean(all_data_button_press(isubject,frontocentral_channels,:,:),[1,2,4]))
+    figure;plot(single_onset_time,squeeze(mean(all_data_button_this_subject(1,:,:),[1,3])))
     xlabel('Time (ms)','FontSize',18)
-    ylabel('Voltage')
+    ylabel('Voltage (mV)','FontSize',18)
+    title('Button Press at Cz')
+
+    % button press topoplot
+%     figure;
+%     topoplot_indices = round(0:0.1*fs:(((erp_window_end_time - erp_window_start_time)/1000)*fs));
+% topoplot_indices(1) = 1;
+% topoplot_times = -100:50:750;
+% 
+% iplot = 1;
+% itime = 1;
+% for itopo = topoplot_indices
+%     subplot(1,length(topoplot_indices)+ 1,iplot);
+%     this_data = squeeze(mean(all_data_button_this_subject(:,itopo,:),[2,3]));
+%     topoplot(this_data,this_EEG.chanlocs,'maplimits',[-10, 5]);
+%     title([num2str(topoplot_times(itime)),' ms'])
+%     iplot = iplot + 1;
+%     itime = itime + 1;
+% end
+% colorbar
 
 end

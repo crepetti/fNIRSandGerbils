@@ -18,7 +18,7 @@ else
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7023','7024','7033');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7023','7024','7033','7035','7036','7038','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
@@ -28,7 +28,7 @@ word_length = 0.3;
 num_tot_trials = 144; % look into this
 frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
 fs = 2048;
-
+target_info={};
 %% For each subject.....
 for isubject = 1:size(curr_subject_ID,1)
     subID = curr_subject_ID(isubject,:); % set subject ID
@@ -96,8 +96,10 @@ for isubject = 1:size(curr_subject_ID,1)
 
     % Define time vector for extracting target ERPs
     eeg_time = this_EEG.times; % in milliseconds
-    audio_time = linspace(eeg_time(1),eeg_time(end),((eeg_time(end) - eeg_time(1))/1000)*44100);
-    resampled_audio_time = resample(audio_time,this_EEG.srate,44100);
+    audio_time = 0:1/44100:12;
+    %resampled_audio_time = resample(audio_time,this_EEG.srate,44100);
+    resampled_audio_time = -1:1/fs:16;
+    resampled_audio_time = resampled_audio_time.*1000;
 
     % Define time vector for extracting masker ERPs
     stimulus_length = 12; % seconds
@@ -133,6 +135,7 @@ for isubject = 1:size(curr_subject_ID,1)
             [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time))); %
             [~,end_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_end_time)));%
 
+
              if end_time - start_time == 1741
                 end_time = end_time -1;
             end
@@ -146,6 +149,7 @@ for isubject = 1:size(curr_subject_ID,1)
             % Isolate ERP
 
             this_erp = these_epochs(:,start_time:end_time,itrial);
+
             single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(this_erp,2));
             [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
             [~,baseline_end_index] = min(abs(single_onset_time - 0));
@@ -156,8 +160,9 @@ for isubject = 1:size(curr_subject_ID,1)
 
         end
 
-        % TARGET WORD ONSETS
+        % TARGET WORD ONSETS 
         % Within Target Onsets
+        
         for ionset = 1:length(this_trial_target_onsets) % for each target word onset...
             resampled_search_time = floor(this_trial_target_onsets(ionset)*1000);
             [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time))); %
@@ -178,6 +183,11 @@ for isubject = 1:size(curr_subject_ID,1)
                 disp('ERP rejected')
                 continue
             end
+             % Store target information in the cell array
+            target_info{end+1,1} = subID; % Subject ID
+            target_info{end,2} = this_trial_target_onsets(ionset); % Target Onset
+            target_info{end,3} = resampled_audio_time(start_time); % Start Time
+            target_info{end,4} = resampled_audio_time(end_time); % End Time
 
             % Isolate ERP
 
@@ -186,6 +196,10 @@ for isubject = 1:size(curr_subject_ID,1)
             [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
             [~,baseline_end_index] = min(abs(single_onset_time - 0));
             this_erp = this_erp - mean(this_erp(:,baseline_start_index:baseline_end_index),2);
+
+            %Add info in to target matrix
+            %target_info = [target_info; {subID, this_trial_target_onsets(ionset), resampled_audio_time(start_time), resampled_audio_time(end_time)}];
+          
 
             % Put it into appropriate matrix
             if all_target_words(itrial).words(ionset) == 'red'
@@ -240,7 +254,11 @@ for isubject = 1:size(curr_subject_ID,1)
 
 
         % save to appropriate array
-        if icondition == 1
+
+        if isempty(data_by_color_onset) || isempty(data_by_masker_onset) || isempty(data_by_object_onset)
+            disp('UH OH!!!')
+            disp(itrial)
+        elseif icondition == 1
             %scrambled_dt_by_target_red_onset = cat(3,scrambled_dt_by_target_red_onset, data_by_red_onset);
             %scrambled_dt_by_target_green_onset = cat(3,scrambled_dt_by_target_green_onset,data_by_green_onset);
             %scrambled_dt_by_target_blue_onset = cat(3,scrambled_dt_by_target_blue_onset,data_by_blue_onset);
@@ -274,7 +292,9 @@ for isubject = 1:size(curr_subject_ID,1)
             unscrambled_st_by_masker_onset = cat(3,unscrambled_st_by_masker_onset,data_by_masker_onset);
         end
 
-        all_data_button_this_subject = cat(3,all_data_button_this_subject,data_by_button_press);
+        if ~isempty(data_by_button_press)
+            all_data_button_this_subject = cat(3,all_data_button_this_subject,data_by_button_press);
+        end
 
     end
 
