@@ -4,7 +4,7 @@
 % Create array of all subjects that have been run
 
 % Create array of subject IDs that you would like to analyze now
-curr_subject_ID = char('7002','7004','7006','7007','7008','7010','7023','7024','7025','7030','7033','7035','7036','7038','7039','7040');
+curr_subject_ID =  char('7023','7024','7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
 user = 'Bon';
 %% Load in Relevant files
 % Spreadsheet which contains all subjects' condition, soundfile
@@ -34,6 +34,7 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     load(stim_info_filename) % loads all_word_order (array of all words) and tOnset (the onset times within each trial)
 
     this_subject_ID = strtrim(string(curr_subject_ID(isubject,:))); % define this subject ID
+    disp(this_subject_ID)
     by_subject_behavior_info(isubject).subject_ID = strtrim(curr_subject_ID(isubject,:)); % save subject ID in behavior struct
 
     numtotalwords = 40;
@@ -54,9 +55,9 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
     %% Loop through each trial, and calculate hits and false alarms
 
     n_trials = length(trials); % find number of trials
-    threshold_window_start = 0.2; % time in seconds from onset of word for start of hit/FA windows
-    threshold_window_end = 0.8; % time in seconds from onset of word for end of hit/FA windows
-    double_click_threshold = 0.1; % distance between clicks at which it would be decided that it is a double click
+    threshold_window_start = 0.25; % time in seconds from onset of word for start of hit/FA windows
+    threshold_window_end = 1; % time in seconds from onset of word for end of hit/FA windows
+    double_click_threshold = 0.2; % distance between clicks at which it would be decided that it is a double click
 
     by_subject_behavior_info(isubject).nearest_click_distances = struct(); % create structure for nearest click distances
 
@@ -112,6 +113,9 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
         end
         current_click_times = table2array(click_times(itrial,:));
         current_click_times = current_click_times(~isnan(current_click_times));
+        curr_distances = diff(current_click_times);
+        clicks_to_reject = find(curr_distances < double_click_threshold);
+        current_click_times(clicks_to_reject + 1) = [];
 
         all_subjects_click_times = [all_subjects_click_times,current_click_times];
 
@@ -160,9 +164,6 @@ for isubject = 1:size(curr_subject_ID,1) % For each subject....
 
         for iclick = 1:length(current_click_times) % for each click in this trial...
             [~,current_click_index] = min(abs(tVec - current_click_times(iclick))); % ...find the time index of that click...
-            if iclick > 1 && (current_click_times(iclick) - current_click_times(iclick - 1)) < double_click_threshold
-                continue
-            end
             if hit_windows(current_click_index) == 1 % ...if that click falls within a hit window...
                 by_subject_behavior_info(isubject).num_hits(itrial).value = by_subject_behavior_info(isubject).num_hits(itrial).value + 1; % ...add 1 to the number of hits
             elseif FA_windows(current_click_index) == 1 %...otherwise if that click falls within a false alarm window...
