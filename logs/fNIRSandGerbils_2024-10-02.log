@@ -582,3 +582,11 @@ Experiment fNIRSandGerbils running subject 7051 started at 09:04:10 on 2024-10-0
   Block 144 of 144 ended at 09:53:33; Condition: 2 ; masker = scrambled_same_talker
 
 Experiment fNIRSandGerbils running subject 7051 ended at 09:53:33 on 2024-10-02
+
+Experiment fNIRSandGerbils running subject triggertest started at 15:40:45 on 2024-10-02
+
+  Block 1 of 144 started at 15:40:50; Condition: 1 ; masker = scrambled_diff_talker
+    Trial 1, target stimulus: , KWs correct:  / possible: 0 (0 / 0: 0.0 %)
+  Block 1 of 144 ended at 15:41:11; Condition: 1 ; masker = scrambled_diff_talker
+
+  Block 2 of 144 started at 15:41:11; Condition: 2 ; masker = scrambled_same_talker

@@ -10967,3 +10967,4 @@ triggertest228part7,8,2024-02-28,8,1,scrambled_diff_talker,D:\Experiments\fNIRSa
 7051,142,2024-10-02,142,1,scrambled_diff_talker,D:\Experiments\fNIRSandGerbils\stim\s_7051\scrambled_diff_talker\99_scrambled_dt.wav,b,2.091,3.872
 7051,143,2024-10-02,143,4,unscrambled_same_talker,D:\Experiments\fNIRSandGerbils\stim\s_7051\unscrambled_same_talker\9_unscrambled_st.wav,b,3.341,3.967,9.262
 7051,144,2024-10-02,144,2,scrambled_same_talker,D:\Experiments\fNIRSandGerbils\stim\s_7051\scrambled_same_talker\98_scrambled_st.wav,b,0.06,2.383,3.305,5.717,7.028,8.196,10.518,11.596
+triggertest,1,2024-10-02,1,1,scrambled_diff_talker,D:\Experiments\fNIRSandGerbils\stim\s_triggertest\scrambled_diff_talker\2_scrambled_dt.wav,b,2.63,2.946,3.164

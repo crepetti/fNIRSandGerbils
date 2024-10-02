@@ -597,7 +597,7 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs)= 1;
+        trigger_channel_3(1)= 1;
         %trigger_channel_4(1:0.01*fs)= 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
         audiowrite(audiofilename, output, fs);
@@ -612,7 +612,7 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs) = 1;
+        trigger_channel_3(1) = 1;
         %trigger_channel_6(1:0.01*fs) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
         audiowrite(audiofilename, output, fs);
@@ -627,7 +627,7 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs) = 1;
+        trigger_channel_3(1) = 1;
         %trigger_channel_5(1:0.01*fs) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
         audiowrite(audiofilename, output, fs);
@@ -642,7 +642,7 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_6 = zeros(size(output(:,1)));
-        trigger_channel_3(1:0.01*fs) = 1;
+        trigger_channel_3(1) = 1;
         %trigger_channel_6(1:0.01*fs) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5,trigger_channel_6);
         audiowrite(audiofilename, output, fs);
