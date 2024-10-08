@@ -20,8 +20,8 @@ else
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7002','7004','7023','7024','7033','7035','7036','7038','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
-% 
+curr_subject_ID =  char('7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+% '7023','7024',
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
 erp_window_end_time = 750; % 750 ms after onset of word
@@ -79,10 +79,12 @@ for isubject = 1:size(curr_subject_ID,1)
     word_length = 0.3; % seconds
     masker_time = 0:word_length:11.7;
 
-    noise_thresh = 10000000000; % 80;
+    noise_thresh = 100; % 80;
 
     for itrial = 1:size(this_EEG.data,3)% for each trial (should be 144)
-        disp(itrial)
+        if mod(40,itrial) == 0 
+            disp(itrial)
+        end
         icondition = conditions(itrial);
         
         %this_trial_target_onsets = all_target_onsets(itrial).onsets;
@@ -113,17 +115,18 @@ for isubject = 1:size(curr_subject_ID,1)
         this_trial_click_times(isnan(this_trial_click_times)) = [];
         for iclick = 1:length(this_trial_click_times) % for each target word onset...
             resampled_search_time = floor(this_trial_click_times(iclick)*1000);
-            [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time))); %
+            button_press_delay = 0; % ms 
+            [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time + button_press_delay))); %
             [~,end_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_end_time)));%
 
 
              if end_time - start_time == 1741
-                end_time = end_time -1;
+                end_time = end_time - 1;
             end
 
              % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                %disp('ERP rejected')
                 continue
             end
 
@@ -164,7 +167,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                %disp('ERP rejected')
                 continue
             end
              % Store target information in the cell array
@@ -210,7 +213,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                %disp('ERP rejected')
                 continue
                 %add variance here
             end
@@ -244,11 +247,15 @@ for isubject = 1:size(curr_subject_ID,1)
     [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
     [~,baseline_end_index] = min(abs(single_onset_time - 0));
 
+    single_onset_time_buttonpress = linspace(erp_window_start_time + button_press_delay,erp_window_end_time,size(data_by_target_onset,2));
+    [~,baseline_start_index_buttonpress] = min(abs(single_onset_time_buttonpress - erp_window_start_time));
+    [~,baseline_end_index_buttonpress] = min(abs(single_onset_time_buttonpress - 0));
+
     data_by_button_press_baselined = nan(size(data_by_button_press));
     data_by_target_onset_baselined = nan(size(data_by_target_onset));
     data_by_masker_onset_baselined = nan(size(data_by_masker_onset));
     for ichannel = 1:32
-        data_by_button_press_baselined(ichannel,:,:) = data_by_button_press(ichannel,:,:) - mean(data_by_button_press(ichannel,baseline_start_index:baseline_end_index,:),'all');
+        data_by_button_press_baselined(ichannel,:,:) = data_by_button_press(ichannel,:,:) - mean(data_by_button_press(ichannel,baseline_start_index_buttonpress:baseline_end_index_buttonpress,:),'all');
         data_by_target_onset_baselined(ichannel,:,:) = data_by_target_onset(ichannel,:,:) - mean(data_by_target_onset(ichannel,baseline_start_index:baseline_end_index,:),'all');
         data_by_masker_onset_baselined(ichannel,:,:) = data_by_masker_onset(ichannel,:,:) - mean(data_by_masker_onset(ichannel,baseline_start_index:baseline_end_index,:),'all');
         

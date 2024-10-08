@@ -3,8 +3,8 @@
 % Author: Benjamin Richards
 % 09/16/2024
 
-curr_subject_ID =  char('7023','7024','7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
-
+curr_subject_ID =  char('7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+% '7023','7024',
 all_scrambled_by_color_onset = [];
 all_scrambled_by_object_onset = [];
 all_scrambled_by_masker_onset = [];
@@ -14,6 +14,11 @@ all_unscrambled_by_masker_onset = [];
 num_erps_removed = zeros(size(curr_subject_ID,1));
 
 noise_thresh = 100;
+
+EEG_struct_for_topographies = load('7002all_epoch.mat');
+EEG_struct_for_topographies = EEG_struct_for_topographies.EEG;
+
+
 
 for isubject = 1:size(curr_subject_ID,1)
     subID = string(curr_subject_ID(isubject,:));
@@ -52,8 +57,10 @@ for isubject = 1:size(curr_subject_ID,1)
     % Plotting parameters
     erp_window_start_time =-100;
     erp_window_end_time = 750;
+    button_press_delay = -500;
     single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(data_by_target_onset_baselined,2));
-    frontocentral_channels = [1,2,4,5,6,8,9,23,25,26,27,29,31,32];
+    single_onset_time_buttonpress = linspace(erp_window_start_time + button_press_delay,erp_window_end_time,size(data_by_button_press_baselined,2));
+    frontocentral_channels = [31,32];%[1,2,4,5,6,8,9,23,25,26,27,29,31,32];
     
     % Plot all individual word ERPs for this subject
 %     figure;
@@ -105,7 +112,34 @@ for isubject = 1:size(curr_subject_ID,1)
 %     ylim([-8,8])
 %     sgtitle(subID)
 
+% Plot individual button press topographies
+figure;
+hold on
+cmin = -4;
+cmax = 5;
+fs = 2048;
 
+
+topoplot_indices = round(0:0.05*fs:(((erp_window_end_time - (erp_window_start_time + button_press_delay))/1000)*fs));
+topoplot_indices(1) = 1;
+topoplot_times = -600:100:750;
+
+iplot = 1;
+axis off
+
+itime = 1;
+for itopo = topoplot_indices(1:2:end)
+    subplot(1,length(topoplot_indices(1:2:end))+ 1,iplot);
+    this_data = mean(data_by_button_press_baselined(:,itopo,:), [2,3]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
+    title([num2str(topoplot_times(itime)),' ms'])
+    iplot = iplot + 1;
+    itime = itime + 1;
+    if itopo == topoplot_indices(end-1)
+        colorbar
+    end
+end
+sgtitle(curr_subject_ID(isubject,:))
 
 end
 
@@ -149,10 +183,10 @@ ylim([-3.5,3.5])
 xlim([erp_window_start_time,erp_window_end_time])
 title('Masker Words','FontSize',18)
 
-subplot(1,4,4)
+subplot(1,4,4) % button presses
 hold on
 this_data = mean(all_button_press_onset(:,frontocentral_channels,:),2);
-shadedErrorBar(single_onset_time,mean(this_data,1),std(this_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-k'} )
+shadedErrorBar(single_onset_time_buttonpress,mean(this_data,1),std(this_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-k'} )
 title('Button Press','FontSize',18)
 
 %% Color vs. object within each condition
@@ -184,8 +218,7 @@ cmin = -3.5;
 cmax = 2;
 fs = 2048;
 
-this_condition_EEG = load('7002all_epoch.mat');
-this_condition_EEG = this_condition_EEG.EEG;
+EEG_struct_for_topographies = EEG_struct_for_topographies.EEG;
 
 topoplot_indices = round(0:0.05*fs:(((erp_window_end_time - erp_window_start_time)/1000)*fs));
 topoplot_indices(1) = 1;
@@ -204,7 +237,7 @@ itime = 1;
 for itopo = topoplot_indices
     subplot(6,length(topoplot_indices)+ 1,iplot);
     this_data = mean(all_scrambled_by_color_onset(:,:,itopo), [1,3]);
-    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
     title([num2str(topoplot_times(itime)),' ms'])
     iplot = iplot + 1;
     itime = itime + 1;
@@ -219,7 +252,7 @@ iplot = iplot+1;
 for itopo = topoplot_indices
     subplot(6,length(topoplot_indices)+ 1,iplot);
     this_data = mean(all_unscrambled_by_color_onset(:,:,itopo), [1,3]);
-    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
     iplot = iplot + 1;
 end
 
@@ -232,7 +265,7 @@ iplot = iplot+1;
 for itopo = topoplot_indices
     subplot(6,length(topoplot_indices)+ 1,iplot);
     this_data = mean(all_scrambled_by_object_onset(:,:,itopo), [1,3]);
-    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
     iplot = iplot + 1;
 end
 
@@ -245,7 +278,7 @@ iplot = iplot+1;
 for itopo = topoplot_indices
     subplot(6,length(topoplot_indices)+ 1,iplot);
     this_data = mean(all_unscrambled_by_object_onset(:,:,itopo), [1,3]);
-    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
     iplot = iplot + 1;
 end
 
@@ -258,7 +291,7 @@ iplot = iplot+1;
 for itopo = topoplot_indices
     subplot(6,length(topoplot_indices)+ 1,iplot);
     this_data = mean(all_scrambled_by_masker_onset(:,:,itopo), [1,3]);
-    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
     iplot = iplot + 1;
 end
 
@@ -272,7 +305,25 @@ iplot = iplot+1;
 for itopo = topoplot_indices
     subplot(6,length(topoplot_indices)+ 1,iplot);
     this_data = mean(all_unscrambled_by_masker_onset(:,:,itopo), [1,3]);
-    topoplot(this_data,this_condition_EEG.chanlocs,'maplimits',[cmin, cmax]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
+    iplot = iplot + 1;
+    if itopo == topoplot_indices(end)
+        colorbar
+    end
+end
+
+%% Button press topography
+cmin = -3.5;
+cmax = 2;
+topoplot_indices = round(0:0.05*fs:(((erp_window_end_time - (erp_window_start_time + button_press_delay))/1000)*fs));
+topoplot_indices(1) = 1;
+topoplot_times = -600:50:750;
+figure;
+iplot=1;
+for itopo = topoplot_indices
+    subplot(1,length(topoplot_indices) + 1,iplot)
+    this_data = mean(all_button_press_onset(:,:,itopo), [1,3]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
     iplot = iplot + 1;
     if itopo == topoplot_indices(end)
         colorbar
