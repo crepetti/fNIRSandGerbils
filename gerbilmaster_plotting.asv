@@ -3,8 +3,8 @@
 % Author: Benjamin Richards
 % 09/16/2024
 
-curr_subject_ID =  char('7023','7024','7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
-% 
+curr_subject_ID =  char('7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+% '7023','7024',
 all_scrambled_by_color_onset = [];
 all_scrambled_by_object_onset = [];
 all_scrambled_by_masker_onset = [];
@@ -57,7 +57,7 @@ for isubject = 1:size(curr_subject_ID,1)
     % Plotting parameters
     erp_window_start_time =-100;
     erp_window_end_time = 750;
-    button_press_delay = 0;
+    button_press_delay = -500;
     single_onset_time = linspace(erp_window_start_time,erp_window_end_time,size(data_by_target_onset_baselined,2));
     single_onset_time_buttonpress = linspace(erp_window_start_time + button_press_delay,erp_window_end_time,size(data_by_button_press_baselined,2));
     frontocentral_channels = [31,32];%[1,2,4,5,6,8,9,23,25,26,27,29,31,32];
@@ -116,33 +116,33 @@ for isubject = 1:size(curr_subject_ID,1)
 %     sgtitle(subID)
 
 % Plot individual button press topographies
-% figure;
-% hold on
-% cmin = -4;
-% cmax = 5;
-% fs = 2048;
-% 
-% 
-% topoplot_indices = round(0:0.05*fs:(((erp_window_end_time - (erp_window_start_time + button_press_delay))/1000)*fs));
-% topoplot_indices(1) = 1;
-% topoplot_times = -100:100:750;
-% 
-% iplot = 1;
-% axis off
-% 
-% itime = 1;
-% for itopo = topoplot_indices(1:2:end)
-%     subplot(1,length(topoplot_indices(1:2:end))+ 1,iplot);
-%     this_data = mean(data_by_button_press_baselined(:,itopo,:), [2,3]);
-%     topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
-%     title([num2str(topoplot_times(itime)),' ms'])
-%     iplot = iplot + 1;
-%     itime = itime + 1;
-%     if itopo == topoplot_indices(end-1)
-%         colorbar
-%     end
-% end
-% sgtitle(curr_subject_ID(isubject,:))
+figure;
+hold on
+cmin = -4;
+cmax = 5;
+fs = 2048;
+
+
+topoplot_indices = round(0:0.05*fs:(((erp_window_end_time - (erp_window_start_time + button_press_delay))/1000)*fs));
+topoplot_indices(1) = 1;
+topoplot_times = -600:100:750;
+
+iplot = 1;
+axis off
+
+itime = 1;
+for itopo = topoplot_indices(1:2:end)
+    subplot(1,length(topoplot_indices(1:2:end))+ 1,iplot);
+    this_data = mean(data_by_button_press_baselined(:,itopo,:), [2,3]);
+    topoplot(this_data,EEG_struct_for_topographies.chanlocs,'maplimits',[cmin, cmax]);
+    title([num2str(topoplot_times(itime)),' ms'])
+    iplot = iplot + 1;
+    itime = itime + 1;
+    if itopo == topoplot_indices(end-1)
+        colorbar
+    end
+end
+sgtitle(curr_subject_ID(isubject,:))
 
 end
 
@@ -335,22 +335,22 @@ end
 
 %% Button presses nearby vs. button presses far away
 figure;
-subplot(1,2,1)
+subplot(2,1,1)
 hold on
-button_press_near_data = squeeze(mean(all_button_press_near(:,32,:),2));
-button_press_far_data = squeeze(mean(all_button_press_far(:,32,:),2));
-shadedErrorBar(single_onset_time,mean(button_press_near_data,1),std(button_press_near_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-m'})
-shadedErrorBar(single_onset_time,mean(button_press_far_data,1),std(button_press_far_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-g'})
+button_press_near_data = squeeze(mean(all_button_press_near(:,frontocentral_channels,:),2));
+button_press_far_data = squeeze(mean(all_button_press_far(:,frontocentral_channels,:),2));
+shadedErrorBar(single_onset_time,mean(this_scrambled_data,1),std(this_scrambled_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-g'})
+shadedErrorBar(single_onset_time,mean(this_unscrambled_data,1),std(this_unscrambled_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-m'})
 ylim([-3.5,3.5])
 title('At Cz','FontSize',18)
-legend({'Button Press Nearby','No Button Press Nearby'})
+legend({'Color','Object'})
 
-subplot(1,2,2)
+subplot(2,1,2)
 hold on
-button_press_near_data = squeeze(mean(all_button_press_near(:,13,:),2));
-button_press_far_data = squeeze(mean(all_button_press_far(:,13,:),2));
-shadedErrorBar(single_onset_time,mean(button_press_near_data,1),std(button_press_near_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-m'})
-shadedErrorBar(single_onset_time,mean(button_press_far_data,1),std(button_press_far_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-g'})
+button_press_near_data = squeeze(mean(all_button_press_near(:,frontocentral_channels,:),2));
+button_press_far_data = squeeze(mean(all_button_press_far(:,frontocentral_channels,:),2));
+shadedErrorBar(single_onset_time,mean(this_scrambled_data,1),std(this_scrambled_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-g'})
+shadedErrorBar(single_onset_time,mean(this_unscrambled_data,1),std(this_unscrambled_data,[],1)./(sqrt(num_subjects) - 1),'lineProps',{'-m'})
 ylim([-3.5,3.5])
 title('At Pz','FontSize',18)
-legend({'Button Press Nearby','No Button Press Nearby'})
+legend({'Color','Object'})
