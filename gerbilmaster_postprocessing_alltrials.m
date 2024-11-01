@@ -20,8 +20,8 @@ else
     dir_fnirsandgerbils = 'C:\Users\ema36\OneDrive\Documents\LiMN Things\fNIRSandGerbils\data\fNIRSandGerbils.xlsx';
 end
 
-curr_subject_ID =  char('7002','7004','7023','7024','7033','7035','7036','7038','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
-% 
+curr_subject_ID = char('7023','7024');% char('7033','7035','7036','7039','7040','7041','7043','7044','7045','7047','7048','7049','7050');%char('7002','7004','7007','7008','7010','7023','7024','7033','7035','7036','7038','7039','7040');
+% ,
 % Set analysis parameters
 erp_window_start_time = -100; % 100 ms before onset of word
 erp_window_end_time = 750; % 750 ms after onset of word
@@ -53,6 +53,9 @@ for isubject = 1:size(curr_subject_ID,1)
     data_by_target_onset = [];
     data_by_button_press = [];
 
+    data_by_button_press_near = [];
+    data_by_button_press_far = [];
+
     % Create empty arrays for info for each ERP
     % Will contain subID, trial, and word (if target)
     ERP_info_masker = struct('SubID',{},'Trial',{});
@@ -79,10 +82,12 @@ for isubject = 1:size(curr_subject_ID,1)
     word_length = 0.3; % seconds
     masker_time = 0:word_length:11.7;
 
-    noise_thresh = 10000000000; % 80;
+    noise_thresh = 100; % 80;
 
     for itrial = 1:size(this_EEG.data,3)% for each trial (should be 144)
-        disp(itrial)
+        if mod(40,itrial) == 0 
+            disp(itrial)
+        end
         icondition = conditions(itrial);
         
         %this_trial_target_onsets = all_target_onsets(itrial).onsets;
@@ -113,17 +118,18 @@ for isubject = 1:size(curr_subject_ID,1)
         this_trial_click_times(isnan(this_trial_click_times)) = [];
         for iclick = 1:length(this_trial_click_times) % for each target word onset...
             resampled_search_time = floor(this_trial_click_times(iclick)*1000);
-            [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time))); %
+            button_press_delay = 0; % ms 
+            [~,start_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_start_time + button_press_delay))); %
             [~,end_time] = min(abs(resampled_audio_time - (resampled_search_time + erp_window_end_time)));%
 
 
              if end_time - start_time == 1741
-                end_time = end_time -1;
+                end_time = end_time - 1;
             end
 
              % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                %disp('ERP rejected')
                 continue
             end
 
@@ -164,7 +170,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                %disp('ERP rejected')
                 continue
             end
              % Store target information in the cell array
@@ -190,6 +196,15 @@ for isubject = 1:size(curr_subject_ID,1)
                 ERP_info_target(1).Word = all_target_words(which_soundfile_this_trial).words(ionset);
                 ERP_info_target(1).Condition = conditions(itrial);
             end
+
+
+            % Append to button press nearby or not
+            [minValue,closestIndex] = min(abs(this_trial_click_times - this_trial_target_onsets(ionset)));
+            if minValue < 0.5
+                data_by_button_press_near = cat(3,data_by_button_press_near,this_erp);
+            else
+                data_by_button_press_far = cat(3,data_by_button_press_far,this_erp);
+            end
           
         end
 
@@ -210,7 +225,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
             % Reject epochs with amplitude above +/- 100 uV
             if any(abs(detrend(these_epochs(:,start_time:end_time,itrial))) > noise_thresh,'all')
-                disp('ERP rejected')
+                %disp('ERP rejected')
                 continue
                 %add variance here
             end
@@ -244,14 +259,24 @@ for isubject = 1:size(curr_subject_ID,1)
     [~,baseline_start_index] = min(abs(single_onset_time - erp_window_start_time));
     [~,baseline_end_index] = min(abs(single_onset_time - 0));
 
+    single_onset_time_buttonpress = linspace(erp_window_start_time + button_press_delay,erp_window_end_time,size(data_by_target_onset,2));
+    [~,baseline_start_index_buttonpress] = min(abs(single_onset_time_buttonpress - erp_window_start_time));
+    [~,baseline_end_index_buttonpress] = min(abs(single_onset_time_buttonpress - 0));
+
     data_by_button_press_baselined = nan(size(data_by_button_press));
     data_by_target_onset_baselined = nan(size(data_by_target_onset));
     data_by_masker_onset_baselined = nan(size(data_by_masker_onset));
+
+    data_by_button_press_near_baselined = nan(size(data_by_button_press_near));
+    data_by_button_press_far_baselined = nan(size(data_by_button_press_far));
     for ichannel = 1:32
-        data_by_button_press_baselined(ichannel,:,:) = data_by_button_press(ichannel,:,:) - mean(data_by_button_press(ichannel,baseline_start_index:baseline_end_index,:),'all');
+        data_by_button_press_baselined(ichannel,:,:) = data_by_button_press(ichannel,:,:) - mean(data_by_button_press(ichannel,baseline_start_index_buttonpress:baseline_end_index_buttonpress,:),'all');
         data_by_target_onset_baselined(ichannel,:,:) = data_by_target_onset(ichannel,:,:) - mean(data_by_target_onset(ichannel,baseline_start_index:baseline_end_index,:),'all');
         data_by_masker_onset_baselined(ichannel,:,:) = data_by_masker_onset(ichannel,:,:) - mean(data_by_masker_onset(ichannel,baseline_start_index:baseline_end_index,:),'all');
         
+        data_by_button_press_near_baselined(ichannel,:,:) = data_by_button_press_near(ichannel,:,:) - mean(data_by_button_press_near(ichannel,baseline_start_index:baseline_end_index,:),'all');
+        data_by_button_press_far_baselined(ichannel,:,:) = data_by_button_press_far(ichannel,:,:) - mean(data_by_button_press_far(ichannel,baseline_start_index:baseline_end_index,:),'all');
+
     end
 
     % Save to larget array with all subjects in it
@@ -263,6 +288,9 @@ for isubject = 1:size(curr_subject_ID,1)
     all_data_button_press(isubject,:,:) = squeeze(mean(data_by_button_press_baselined,3));
     all_data_target(isubject,:,:) = squeeze(mean(data_by_target_onset_baselined,3));
     all_data_masker(isubject,:,:) = squeeze(mean(data_by_masker_onset_baselined,3));
+
+    all_data_button_press_near(isubject,:,:) = squeeze(mean(data_by_button_press_near,3));
+    all_data_button_press_far(isubject,:,:) = squeeze(mean(data_by_button_press_far,3));
 
     %all_info_button_press(isubject).info = ERP_info_button_press;
     %all_info_target(isubject).info = ERP_info_target;
@@ -356,7 +384,7 @@ for isubject = 1:size(curr_subject_ID,1)
 
 
 %% SAVE INFO FOR THIS SUBBY
-save(append('Results_Subject_',string(curr_subject_ID(isubject,:)),'.mat'),'data_by_masker_onset_baselined','data_by_target_onset_baselined','data_by_button_press_baselined','ERP_info_button_press','ERP_info_masker','ERP_info_target','-v7.3')
+save(append('Results_Subject_',string(curr_subject_ID(isubject,:)),'.mat'),'data_by_masker_onset_baselined','data_by_target_onset_baselined','data_by_button_press_baselined','data_by_button_press_near_baselined','data_by_button_press_far_baselined','ERP_info_button_press','ERP_info_masker','ERP_info_target','-v7.3')
 
 end
 
