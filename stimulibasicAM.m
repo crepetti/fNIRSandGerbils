@@ -55,7 +55,7 @@ fs = 44100;
 overlap = 0;
 trial = 1;
 practicetrial = 1;
-numtrials = 36;
+numtrials = 144;
 numpracticetrials = 10;
 
 conditionarray = [ones(1, numtrials/4), 2*ones(1, numtrials/4), 3*ones(1, numtrials/4), 4*ones(1, numtrials/4)];
@@ -641,7 +641,7 @@ while trial <= numtrials
         trigger_channel_3 = zeros(size(output(:,1)));
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
-        trigger_channel_4(1) = 1;
+        trigger_channel_3(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
@@ -655,8 +655,7 @@ while trial <= numtrials
         trigger_channel_3 = zeros(size(output(:,1)));
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
-        trigger_channel_4(1) = 1;
-        trigger_channel_5(1) = 1;
+        trigger_channel_3(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
@@ -671,7 +670,6 @@ while trial <= numtrials
         trigger_channel_4 = zeros(size(output(:,1)));
         trigger_channel_5 = zeros(size(output(:,1)));
         trigger_channel_3(1) = 1;
-        trigger_channel_5(1) = 1;
         output = cat(2,output,trigger_channel_3,trigger_channel_4,trigger_channel_5);
         audiowrite(audiofilename, output, fs);
         audiowrite(audiofilename, output, fs);
