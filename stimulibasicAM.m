@@ -2,28 +2,6 @@
 % filtered such that there is little energetic masking in frequency to
 % match with the gerbils.
 
-%% TO DO NOTES 8-17:
-% -  We need to save target onset word times separately, since they won't be
-% aligned to tOnset anymore.
-% - The GUI will now need to allow for color word selection.
-% - how many color words should we place in the masker sound?
-% - need to make sure these are 70 dB SPL ish when they come out of the RME
-% - right now, masker stream does NOT include color words. Made it a bit
-% too confusing
-% - are these streams really separable? is that the point?
-
-% WE'RE GOING WITH BOB
-%% facts - it takes approx. 500ms for humans to process words
-%%energetic masking control - scrambled (the MASKERS ARE SCRAMBLED NOT THE
-%%TARGET WORDS)
-%%informational masking - unscrambled
-%%need to filter the energetic masking target words to not overlap in
-%%frequency band
-
-%%%TO DO BEFORE CAP DESIGN SUNDAY
-% 15 seconds (closest you can get)
-%Sunday = cap design and make the behavioral side of things
-
 %%OK HERE'S ACTUAL CODE
 %%path
 % addpath('D:\Experiments\fNIRSandGerbils\unprocessed\bob_all')
