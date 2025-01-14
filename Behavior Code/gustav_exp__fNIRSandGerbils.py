@@ -485,7 +485,7 @@ def present_trial(exp):
         try:
             time.sleep(0.5)
             exp.user.side = ret
-            exp.interface.update_Prompt("Hit a key when you hear [blue, red, green, white]", show=True, redraw=True)
+            exp.interface.update_Prompt("                                                                 ", show=True, redraw=True)
             # exp.interface.update_Notify_Left('Playing', show=False, redraw=True)
             # exp.interface.update_Status_Right("", redraw=True)
             responses = []
@@ -507,8 +507,15 @@ def present_trial(exp):
                 # trigger_channel_4 = np.zeros(np.shape(s))
                 # trigger_channel_4[len(trigger_channel_4) - 1] = 1
                 # s = np.transpose(np.stack(((s, s, trigger_channel_3, trigger_channel_4))))
+                exp.interface.update_Prompt("""    🬹🬹    
+    ██    
+██████████
+    ██    
+    🬎🬎    """, show=True, redraw=True)
+
                 sd.default.device = 'ASIO Fireface USB'
                 sd.play(sound_data, exp.stim.fs, mapping=[1, 2, 3, 4, 5, 6])
+
                 # s.play()
 
                 # <>if triggers:
@@ -526,7 +533,12 @@ def present_trial(exp):
 
                     progress = psylab.string.prog(this_elapsed_percent, width=70, char_done="=",
                                                   spec_locs=resp_percent, spec_char="X")
-                    exp.interface.update_Prompt(progress, show=True, redraw=True)
+                    #exp.interface.update_Prompt(progress, show=True, redraw=True)
+                    exp.interface.update_Prompt("""    🬹🬹    
+    ██    
+██████████
+    ██    
+    🬎🬎    """, show = True, redraw = True)
                 exp.user.response = ",".join(responses)
         #                fid = open(exp.dataFile, 'a')
         #                word_line = f"{exp.stim.file},{','.join(responses)}"
